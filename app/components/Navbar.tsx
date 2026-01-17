@@ -70,13 +70,13 @@ export default function Navbar({ lang = "en", t = {} }: NavbarProps) {
         <div className="hidden items-center gap-3 md:flex">
           <a
             className="inline-flex h-10 items-center justify-center rounded-full border border-zinc-200 bg-white px-4 text-sm text-zinc-900 transition hover:bg-zinc-50"
-            href={withLang("http://localhost:5173/directory", lang)}
+            href={withLang("https://app.greenpassgroup.com//directory", lang)}
           >
             {t.cta_directory ?? "Directory"}
           </a>
           <a
             className="inline-flex h-10 items-center justify-center rounded-full bg-zinc-900 px-4 text-sm text-white transition hover:bg-zinc-800"
-            href={withLang("http://localhost:5173/welcome", lang)}
+            href={withLang("https://app.greenpassgroup.com//welcome", lang)}
           >
             {t.cta_login ?? "Login"}
           </a>
@@ -112,14 +112,14 @@ export default function Navbar({ lang = "en", t = {} }: NavbarProps) {
               <div className="mt-3 flex flex-col gap-2">
                 <a
                   className="inline-flex h-11 items-center justify-center rounded-full border border-zinc-200 bg-white px-4 text-sm text-zinc-900 transition hover:bg-zinc-50"
-                  href={withLang("http://localhost:5173/directory", lang)}
+                  href={withLang("https://app.greenpassgroup.com//directory", lang)}
                   onClick={() => setOpen(false)}
                 >
                   {t.cta_directory ?? "Directory"}
                 </a>
                 <a
                   className="inline-flex h-11 items-center justify-center rounded-full bg-zinc-900 px-4 text-sm text-white transition hover:bg-zinc-800"
-                  href={withLang("http://localhost:5173/welcome", lang)}
+                  href={withLang("https://app.greenpassgroup.com//welcome", lang)}
                   onClick={() => setOpen(false)}
                 >
                   {t.cta_login ?? "Login"}
