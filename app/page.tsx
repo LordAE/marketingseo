@@ -1,17 +1,10 @@
 "use client";
 
 import React from "react";
+
+// ✅ CHANGE THESE IMPORTS IF YOUR FOLDER IS DIFFERENT
 import Navbar from "./components/Navbar";
 import LanguageFooter from "./components/LanguageFooter";
-
-/**
- * ✅ FINAL page.tsx
- * - Auto-detect language: URL (?lang) → localStorage → browser locale → default en
- * - Persists language: localStorage gp_lang + i18nextLng
- * - Updates <html lang="...">
- * - Translates landing texts via a lightweight dictionary (no extra libs)
- * - All outbound links to OfficialGreenpass include ?lang=<selected>
- */
 
 type LangCode =
   | "en"
@@ -69,6 +62,7 @@ function getBrowserLang(): string | null {
 
 function setLangEverywhere(code: string) {
   if (typeof window === "undefined") return;
+
   window.localStorage.setItem("gp_lang", code);
   window.localStorage.setItem("i18nextLng", code);
   document.documentElement.lang = code;
@@ -83,13 +77,18 @@ function setLangEverywhere(code: string) {
   }
 }
 
+/**
+ * ✅ Safer: supports absolute + relative URLs.
+ * - If url is relative like "/welcome", it will use window.location.origin as base.
+ */
 function withLang(url: string, lang: string) {
+  if (typeof window === "undefined") return url;
+
   try {
-    const u = new URL(url);
+    const u = new URL(url, window.location.origin);
     u.searchParams.set("lang", lang || "en");
     return u.toString();
   } catch {
-    // If url is relative or malformed, just return as-is
     return url;
   }
 }
@@ -97,7 +96,7 @@ function withLang(url: string, lang: string) {
 /**
  * Lightweight landing translations (edit as you want)
  */
-const T: Record<LangCode, Record<string, string>> = {
+const T = {
   en: {
     brand_tagline: "Study • Work • Immigration Support",
     hero_title: "The all-in-one platform for international students.",
@@ -234,20 +233,22 @@ const T: Record<LangCode, Record<string, string>> = {
     s3: "Seguir",
   },
 
-  // For languages you haven't translated yet, fallback to English strings.
-  fr: {} as any,
-  de: {} as any,
-  "pt-BR": {} as any,
-  ar: {} as any,
-  zh: {} as any,
-  ja: {} as any,
-  ko: {} as any,
-};
+  // ✅ Empty objects are fine; we fallback to EN via Proxy
+  fr: {},
+  de: {},
+  "pt-BR": {},
+  ar: {},
+  zh: {},
+  ja: {},
+  ko: {},
+} satisfies Record<LangCode, Record<string, string>>;
 
 function getT(lang: LangCode) {
-  // fallback to English for missing keys
-  return new Proxy(T[lang] || {}, {
-    get(target, prop: string) {
+  const base = T[lang] || {};
+  return new Proxy(base, {
+    // ✅ prop can be string | symbol
+    get(target, prop) {
+      if (typeof prop !== "string") return undefined;
       return (target as any)[prop] ?? (T.en as any)[prop] ?? "";
     },
   }) as Record<string, string>;
@@ -276,13 +277,10 @@ export default function Home() {
 
   return (
     <div id="top" className="min-h-screen bg-white text-zinc-900 flex flex-col">
-      {/* Navbar */}
       <Navbar lang={lang} t={t} />
 
-      {/* Page content */}
       <div className="flex-1">
         <main className="mx-auto max-w-5xl px-6 py-20">
-          {/* Logo / Brand */}
           <div className="mb-10 flex items-center justify-center gap-3">
             <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-600 text-white font-bold">
               GP
@@ -293,7 +291,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Hero */}
           <div className="w-full text-center">
             <h1 className="mx-auto max-w-3xl text-4xl font-semibold leading-tight tracking-tight sm:text-5xl">
               {t.hero_title}
@@ -302,48 +299,46 @@ export default function Home() {
               {t.hero_subtitle}
             </p>
 
-            {/* CTAs */}
             <div className="mt-10 flex w-full flex-col items-center gap-3 sm:flex-row sm:justify-center">
               <a
                 className="flex h-12 w-full max-w-xs items-center justify-center rounded-full bg-zinc-900 px-6 text-white transition hover:bg-zinc-800"
-                href={withLang("http://localhost:5173/welcome", lang)}
+                href={withLang("/welcome", lang)}
               >
                 {t.cta_login}
               </a>
 
               <a
                 className="flex h-12 w-full max-w-xs items-center justify-center rounded-full border border-zinc-200 bg-white px-6 text-zinc-900 transition hover:bg-zinc-50"
-                href={withLang("http://localhost:5173/directory", lang)}
+                href={withLang("/directory", lang)}
               >
                 {t.cta_directory}
               </a>
 
               <a
                 className="flex h-12 w-full max-w-xs items-center justify-center rounded-full border border-zinc-200 bg-white px-6 text-zinc-900 transition hover:bg-zinc-50"
-                href={withLang("http://localhost:5173/events", lang)}
+                href={withLang("/events", lang)}
               >
                 {t.cta_events}
               </a>
             </div>
 
-            {/* Small note */}
             <p className="mt-6 text-sm text-zinc-500">{t.note_dns}</p>
           </div>
         </main>
 
-        {/* Sections for navbar anchors */}
         <section id="features" className="mx-auto max-w-5xl px-6 py-16">
           <h2 className="text-2xl font-semibold tracking-tight">{t.features}</h2>
           <p className="mt-3 max-w-3xl text-zinc-600">{t.features_p}</p>
+
           <div className="mt-8 grid gap-4 sm:grid-cols-2">
             {[
-              { t: "Verified Directory", d: "Schools, programs, agents, tutors — curated and searchable." },
-              { t: "Messaging & Leads", d: "Chat with providers and keep all conversations in one place." },
-              { t: "Events", d: "Join fairs and webinars, reserve a slot, and get reminders." },
-              { t: "Document System", d: "Upload, organize, and share documents securely when needed." },
+              { tt: "Verified Directory", d: "Schools, programs, agents, tutors — curated and searchable." },
+              { tt: "Messaging & Leads", d: "Chat with providers and keep all conversations in one place." },
+              { tt: "Events", d: "Join fairs and webinars, reserve a slot, and get reminders." },
+              { tt: "Document System", d: "Upload, organize, and share documents securely when needed." },
             ].map((c) => (
-              <div key={c.t} className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
-                <div className="text-sm font-semibold text-zinc-900">{c.t}</div>
+              <div key={c.tt} className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
+                <div className="text-sm font-semibold text-zinc-900">{c.tt}</div>
                 <div className="mt-2 text-sm text-zinc-600">{c.d}</div>
               </div>
             ))}
@@ -353,6 +348,7 @@ export default function Home() {
         <section id="services" className="mx-auto max-w-5xl px-6 py-16">
           <h2 className="text-2xl font-semibold tracking-tight">{t.services}</h2>
           <p className="mt-3 max-w-3xl text-zinc-600">{t.services_p}</p>
+
           <div className="mt-8 grid gap-4 sm:grid-cols-2">
             {[
               "School & program matching",
@@ -369,6 +365,7 @@ export default function Home() {
 
         <section id="how" className="mx-auto max-w-5xl px-6 py-16">
           <h2 className="text-2xl font-semibold tracking-tight">{t.how}</h2>
+
           <div className="mt-8 grid gap-4 sm:grid-cols-3">
             {[
               { n: "1", title: t.s1, desc: t.how_p1 },
@@ -389,10 +386,11 @@ export default function Home() {
         <section id="contact" className="mx-auto max-w-5xl px-6 py-16">
           <h2 className="text-2xl font-semibold tracking-tight">{t.contact}</h2>
           <p className="mt-3 max-w-3xl text-zinc-600">{t.contact_p}</p>
+
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <a
               className="inline-flex h-12 items-center justify-center rounded-full bg-zinc-900 px-6 text-white transition hover:bg-zinc-800"
-              href={withLang("http://localhost:5173/welcome", lang)}
+              href={withLang("/welcome", lang)}
             >
               {t.open_app}
             </a>
@@ -406,7 +404,6 @@ export default function Home() {
         </section>
       </div>
 
-      {/* Language selection (like Facebook) */}
       <LanguageFooter value={lang} onChange={handleLangChange} />
     </div>
   );
