@@ -9,22 +9,21 @@ type NavItem = {
 
 type NavbarProps = {
   lang?: string;
-  t?: Record<string, string>; // ✅ allow t from page.tsx
+  t?: Record<string, string>;
 };
 
-function withLang(url: string, lang: string) {
-  // ✅ supports absolute + relative + hash links
-  if (url.startsWith("#")) return url;
+const APP_BASE = "https://app.greenpassgroup.com";
 
-  try {
-    const base =
-      typeof window !== "undefined" ? window.location.origin : "http://localhost";
-    const u = new URL(url, base);
-    u.searchParams.set("lang", lang || "en");
-    return u.toString();
-  } catch {
-    return url;
-  }
+/**
+ * ✅ Hydration-safe absolute link builder:
+ * Always returns: https://app.greenpassgroup.com/<path>?lang=<lang>
+ * No window, no URL(), so SSR/client output matches.
+ */
+function appLink(path: string, lang: string) {
+  const cleanPath = (path || "/").startsWith("/") ? path : `/${path}`;
+  const code = lang || "en";
+  const sep = cleanPath.includes("?") ? "&" : "?";
+  return `${APP_BASE}${cleanPath}${sep}lang=${encodeURIComponent(code)}`;
 }
 
 export default function Navbar({ lang = "en", t = {} }: NavbarProps) {
@@ -37,7 +36,7 @@ export default function Navbar({ lang = "en", t = {} }: NavbarProps) {
     { label: t.contact ?? "Contact", href: "#contact" },
   ];
 
-  const tagline = t.brand_tagline ?? "Study • Work • Immigration";
+  const tagline = t.brand_tagline ?? "Study • Work • Immigration Support";
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-zinc-200 bg-white/90 backdrop-blur">
@@ -66,19 +65,20 @@ export default function Navbar({ lang = "en", t = {} }: NavbarProps) {
           ))}
         </nav>
 
-        {/* Right actions */}
+        {/* Right actions (desktop) */}
         <div className="hidden items-center gap-3 md:flex">
           <a
             className="inline-flex h-10 items-center justify-center rounded-full border border-zinc-200 bg-white px-4 text-sm text-zinc-900 transition hover:bg-zinc-50"
-            href={withLang("https://app.greenpassgroup.com//directory", lang)}
+            href={appLink("/directory", lang)}
           >
-            {t.cta_directory ?? "Directory"}
+            {t.cta_directory ?? "Explore Directory"}
           </a>
+
           <a
             className="inline-flex h-10 items-center justify-center rounded-full bg-zinc-900 px-4 text-sm text-white transition hover:bg-zinc-800"
-            href={withLang("https://app.greenpassgroup.com//welcome", lang)}
+            href={appLink("/welcome", lang)}
           >
-            {t.cta_login ?? "Login"}
+            {t.cta_login ?? "Login to App"}
           </a>
         </div>
 
@@ -112,17 +112,18 @@ export default function Navbar({ lang = "en", t = {} }: NavbarProps) {
               <div className="mt-3 flex flex-col gap-2">
                 <a
                   className="inline-flex h-11 items-center justify-center rounded-full border border-zinc-200 bg-white px-4 text-sm text-zinc-900 transition hover:bg-zinc-50"
-                  href={withLang("https://app.greenpassgroup.com//directory", lang)}
+                  href={appLink("/directory", lang)}
                   onClick={() => setOpen(false)}
                 >
-                  {t.cta_directory ?? "Directory"}
+                  {t.cta_directory ?? "Explore Directory"}
                 </a>
+
                 <a
                   className="inline-flex h-11 items-center justify-center rounded-full bg-zinc-900 px-4 text-sm text-white transition hover:bg-zinc-800"
-                  href={withLang("https://app.greenpassgroup.com//welcome", lang)}
+                  href={appLink("/welcome", lang)}
                   onClick={() => setOpen(false)}
                 >
-                  {t.cta_login ?? "Login"}
+                  {t.cta_login ?? "Login to App"}
                 </a>
               </div>
             </nav>
