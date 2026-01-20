@@ -279,13 +279,13 @@ export default function Home() {
   return (
     <div id="top" className="min-h-screen bg-white text-zinc-900 flex flex-col">
       {/* Navbar */}
-      <Navbar lang={lang} t={t} />
-
+      <Navbar lang={lang} /> {/* <Navbar lang={lang} t={t} /> */}
+      
       {/* Page content */}
       <div className="flex-1">
-        <main className="mx-auto max-w-5xl px-6 py-20">
+        <main className="mx-auto max-w py-20">
           {/* Logo / Brand */}
-          <div className="mb-10 flex items-center justify-center gap-3">
+          {/* <div className="mb-10 flex items-center justify-center gap-3">
             <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-600 text-white font-bold">
               GP
             </div>
@@ -293,10 +293,10 @@ export default function Home() {
               <div className="text-lg font-semibold leading-tight">GreenPass</div>
               <div className="text-sm text-zinc-600">{t.brand_tagline}</div>
             </div>
-          </div>
+          </div> */}
 
           {/* Hero */}
-          <div className="w-full text-center">
+          <div className="w-full py-20 bg-blue-200 text-center">
             <h1 className="mx-auto max-w-3xl text-4xl font-semibold leading-tight tracking-tight sm:text-5xl">
               {t.hero_title}
             </h1>
@@ -307,21 +307,21 @@ export default function Home() {
             {/* ✅ CTAs (always app.greenpassgroup.com) */}
             <div className="mt-10 flex w-full flex-col items-center gap-3 sm:flex-row sm:justify-center">
               <a
-                className="flex h-12 w-full max-w-xs items-center justify-center rounded-full bg-zinc-900 px-6 text-white transition hover:bg-zinc-800"
+                className="flex h-12 w-full max-w-xs items-center justify-center rounded-full border border-zinc-200 bg-white hover:bg-zinc-900 hover:text-white px-6 text-zinc-900 transition hover:bg-zinc-800"
                 href={appLink("/welcome", lang)}
               >
                 {t.cta_login}
               </a>
 
               <a
-                className="flex h-12 w-full max-w-xs items-center justify-center rounded-full border border-zinc-200 bg-white px-6 text-zinc-900 transition hover:bg-zinc-50"
+                className="flex h-12 w-full max-w-xs items-center justify-center rounded-full border border-zinc-200 bg-white hover:bg-zinc-900 px-6 text-zinc-900 hover:text-white transition hover:bg-zinc-50"
                 href={appLink("/directory", lang)}
               >
                 {t.cta_directory}
               </a>
 
               <a
-                className="flex h-12 w-full max-w-xs items-center justify-center rounded-full border border-zinc-200 bg-white px-6 text-zinc-900 transition hover:bg-zinc-50"
+                className="flex h-12 w-full max-w-xs items-center justify-center rounded-full border border-zinc-200 bg-white hover:bg-zinc-900 px-6 text-zinc-900 hover:text-white transition hover:bg-zinc-50"
                 href={appLink("/events", lang)}
               >
                 {t.cta_events}
