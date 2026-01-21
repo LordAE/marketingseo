@@ -283,7 +283,7 @@ export default function Home() {
       
       {/* Page content */}
       <div className="flex-1">
-        <main className="mx-auto max-w py-20">
+        <main className="mx-auto max-w">
           {/* Logo / Brand */}
           {/* <div className="mb-10 flex items-center justify-center gap-3">
             <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-600 text-white font-bold">
@@ -295,8 +295,16 @@ export default function Home() {
             </div>
           </div> */}
 
-          {/* Hero */}
-          <div className="w-full py-20 bg-blue-200 text-center">
+          {/* Hero edit the linear gradient if you want it light or darker*/}
+          <div 
+            className="w-full py-30 lg:py-35 text-center bg-no-repeat bg-cover bg-center"
+            style={{
+              backgroundImage:
+                "linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0.1)), url('/img/Gradient.png')",
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }}
+          >
             <h1 className="mx-auto max-w-3xl text-4xl font-semibold leading-tight tracking-tight sm:text-5xl">
               {t.hero_title}
             </h1>
@@ -307,21 +315,21 @@ export default function Home() {
             {/* ✅ CTAs (always app.greenpassgroup.com) */}
             <div className="mt-10 flex w-full flex-col items-center gap-3 sm:flex-row sm:justify-center">
               <a
-                className="flex h-12 w-full max-w-xs items-center justify-center rounded-full border border-zinc-200 bg-white hover:bg-zinc-900 hover:text-white px-6 text-zinc-900 transition hover:bg-zinc-800"
+                className="flex h-12 w-full max-w-xs items-center justify-center rounded-full border border-zinc-200 shadow-sm bg-white hover:bg-zinc-900 hover:text-white px-6 text-zinc-900 transition hover:bg-zinc-800"
                 href={appLink("/welcome", lang)}
               >
                 {t.cta_login}
               </a>
 
               <a
-                className="flex h-12 w-full max-w-xs items-center justify-center rounded-full border border-zinc-200 bg-white hover:bg-zinc-900 px-6 text-zinc-900 hover:text-white transition hover:bg-zinc-50"
+                className="flex h-12 w-full max-w-xs items-center justify-center rounded-full border border-zinc-200 shadow-sm bg-white hover:bg-zinc-900 px-6 text-zinc-900 hover:text-white transition hover:bg-zinc-50"
                 href={appLink("/directory", lang)}
               >
                 {t.cta_directory}
               </a>
 
               <a
-                className="flex h-12 w-full max-w-xs items-center justify-center rounded-full border border-zinc-200 bg-white hover:bg-zinc-900 px-6 text-zinc-900 hover:text-white transition hover:bg-zinc-50"
+                className="flex h-12 w-full max-w-xs items-center justify-center rounded-full border border-zinc-200 shadow-sm bg-white hover:bg-zinc-900 px-6 text-zinc-900 hover:text-white transition hover:bg-zinc-50"
                 href={appLink("/events", lang)}
               >
                 {t.cta_events}
@@ -366,7 +374,7 @@ export default function Home() {
               "IELTS/TOEFL tutoring",
               "Housing, banking, insurance guidance",
             ].map((x) => (
-              <div key={x} className="rounded-2xl border border-zinc-200 bg-white p-6">
+              <div key={x} className="rounded-2xl border border-zinc-200 shadow-sm bg-white p-6">
                 <div className="text-sm font-medium text-zinc-900">{x}</div>
               </div>
             ))}
@@ -376,7 +384,7 @@ export default function Home() {
         <section id="how" className="mx-auto max-w-5xl px-6 py-16">
           <h2 className="text-2xl font-semibold tracking-tight">{t.how}</h2>
 
-          <div className="mt-8 grid gap-4 sm:grid-cols-3">
+          <div className="mt-8 text-center grid gap-4 sm:grid-cols-3">
             {[
               { n: "1", title: t.s1, desc: t.how_p1 },
               { n: "2", title: t.s2, desc: t.how_p2 },
@@ -384,19 +392,21 @@ export default function Home() {
             ].map((s) => (
               <div
                 key={s.n}
-                className="rounded-2xl border border-zinc-200 bg-white p-6"
+                className="rounded-2xl border border-zinc-200 shadow-sm bg-white p-12"
               >
-                <div className="text-xs font-semibold text-emerald-700">
+                <div className="text-2xl font-semibold text-emerald-700">
                   {t.step} {s.n}
                 </div>
-                <div className="mt-2 text-sm font-semibold text-zinc-900">
+                <div className="mt-2 text-xl font-semibold text-zinc-900">
                   {s.title}
                 </div>
-                <div className="mt-2 text-sm text-zinc-600">{s.desc}</div>
+                <div className="mt-2 text-md text-zinc-600">{s.desc}</div>
               </div>
             ))}
           </div>
         </section>
+
+        <section className="mx-auto max-w-5xl px-6 py-8"> <hr/></section>
 
         <section id="contact" className="mx-auto max-w-5xl px-6 py-16">
           <h2 className="text-2xl font-semibold tracking-tight">{t.contact}</h2>
@@ -410,7 +420,7 @@ export default function Home() {
               {t.open_app}
             </a>
             <a
-              className="inline-flex h-12 items-center justify-center rounded-full border border-zinc-200 bg-white px-6 text-zinc-900 transition hover:bg-zinc-50"
+              className="inline-flex h-12 items-center justify-center rounded-full border border-zinc-200 shadow-sm bg-white px-6 text-zinc-900 transition hover:bg-zinc-50"
               href="mailto:info@greenpassimmigration.com"
             >
               {t.email_us}
