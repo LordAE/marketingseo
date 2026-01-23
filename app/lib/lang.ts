@@ -1,9 +1,27 @@
-export type LangCode = "en" | "fil" | "ceb" | "es" | "fr" | "de" | "pt-BR" | "ar" | "zh" | "ja" | "ko";
+export type LangCode =
+  | "en"
+  | "vi"
+  | "fil"
+  | "ceb"
+  | "es"
+  | "ja"
+  | "ko"
+  | "zh"
+  | "ar"
+  | "pt-BR"
+  | "fr"
+  | "de";
 
 export const DEFAULT_LANG: LangCode = "en";
 
+const RTL = new Set<LangCode>(["ar"]);
+
+/** Normalize browser/URL/localStorage values into our supported set */
 export function normalizeLang(input: string): LangCode {
   const v = (input || "").toLowerCase();
+
+  // ✅ FIX: Vietnamese support
+  if (v === "vi" || v.startsWith("vi-")) return "vi";
 
   if (v.startsWith("fil") || v.startsWith("tl")) return "fil";
   if (v.startsWith("ceb")) return "ceb";
@@ -21,7 +39,11 @@ export function normalizeLang(input: string): LangCode {
 
 export function getLangFromUrl(): string | null {
   if (typeof window === "undefined") return null;
-  return new URL(window.location.href).searchParams.get("lang");
+  try {
+    return new URL(window.location.href).searchParams.get("lang");
+  } catch {
+    return null;
+  }
 }
 
 export function getStoredLang(): string | null {
@@ -31,13 +53,38 @@ export function getStoredLang(): string | null {
 
 export function getBrowserLang(): string | null {
   if (typeof window === "undefined") return null;
-  // e.g. "en-US", "fil-PH"
   return navigator.language || (navigator.languages?.[0] ?? null);
 }
 
-export function setLangEverywhere(code: string) {
+/**
+ * Facebook-like: set language everywhere (storage + <html> + URL param), no reload
+ */
+export function setLangEverywhere(code: LangCode) {
   if (typeof window === "undefined") return;
+
   localStorage.setItem("gp_lang", code);
   localStorage.setItem("i18nextLng", code);
+
   document.documentElement.lang = code;
+  document.documentElement.dir = RTL.has(code) ? "rtl" : "ltr";
+
+  // Keep URL lang in sync (no reload)
+  try {
+    const u = new URL(window.location.href);
+    u.searchParams.set("lang", code);
+    window.history.replaceState({}, "", u.toString());
+  } catch {
+    // ignore
+  }
+}
+
+/**
+ * Resolve initial language with priority:
+ * URL (?lang) → localStorage → browser locale → default
+ */
+export function resolveInitialLang(): LangCode {
+  const fromUrl = getLangFromUrl();
+  const fromStore = getStoredLang();
+  const fromBrowser = getBrowserLang();
+  return normalizeLang(fromUrl || fromStore || fromBrowser || DEFAULT_LANG);
 }

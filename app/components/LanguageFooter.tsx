@@ -1,12 +1,15 @@
 "use client";
 
+import { setLangEverywhere, normalizeLang, type LangCode } from "../lib/lang";
+
 type Props = {
-  value: string;
-  onChange: (code: string) => void;
+  value: LangCode;
+  onChange: (code: LangCode) => void;
 };
 
-const LANGS = [
+const LANGS: Array<{ code: LangCode; label: string }> = [
   { code: "en", label: "English (US)" },
+  { code: "vi", label: "Tiếng Việt" }, // ✅ added
   { code: "fil", label: "Filipino" },
   { code: "ceb", label: "Bisaya" },
   { code: "es", label: "Español" },
@@ -20,10 +23,10 @@ const LANGS = [
 ];
 
 export default function LanguageFooter({ value, onChange }: Props) {
-  function choose(code: string) {
-    onChange(code);
-    localStorage.setItem("gp_lang", code);
-    localStorage.setItem("i18nextLng", code);
+  function choose(code: LangCode) {
+    const normalized = normalizeLang(code) as LangCode;
+    onChange(normalized);
+    setLangEverywhere(normalized);
   }
 
   return (
@@ -42,7 +45,9 @@ export default function LanguageFooter({ value, onChange }: Props) {
               {l.label}
             </button>
           ))}
+
           <span className="mx-2 text-gray-300">|</span>
+
           <button
             type="button"
             className="rounded border px-2 py-0.5 text-gray-700 hover:bg-gray-50"

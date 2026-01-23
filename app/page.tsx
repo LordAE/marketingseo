@@ -3,87 +3,25 @@
 import React from "react";
 import Navbar from "./components/Navbar";
 import LanguageFooter from "./components/LanguageFooter";
+import {
+  DEFAULT_LANG,
+  resolveInitialLang,
+  setLangEverywhere,
+  type LangCode,
+} from "./lib/lang";
 
 /**
- * ✅ FIXED page.tsx
- * - No hydration mismatch (NO window-based href building)
- * - Buttons always go to https://app.greenpassgroup.com/...
+ * ✅ Marketing SEO language setup (Facebook-like)
  * - Auto-detect language: URL (?lang) → localStorage → browser locale → default en
  * - Persists language: localStorage gp_lang + i18nextLng
- * - Updates <html lang="...">
+ * - Updates <html lang="..."> and RTL when needed
+ * - Keeps URL lang in sync (no reload)
+ * - All outbound links to app.greenpassgroup.com include ?lang=<selected>
  */
 
-type LangCode =
-  | "en"
-  | "fil"
-  | "ceb"
-  | "es"
-  | "fr"
-  | "de"
-  | "pt-BR"
-  | "ar"
-  | "zh"
-  | "ja"
-  | "ko";
+//const APP_BASE = "https://app.greenpassgroup.com";
+const APP_BASE = "http://localhost:5173";
 
-const DEFAULT_LANG: LangCode = "en";
-const APP_BASE = "https://app.greenpassgroup.com";
-
-function normalizeLang(input: string): LangCode {
-  const v = (input || "").toLowerCase();
-
-  if (v.startsWith("fil") || v.startsWith("tl")) return "fil";
-  if (v.startsWith("ceb")) return "ceb";
-  if (v.startsWith("es")) return "es";
-  if (v.startsWith("fr")) return "fr";
-  if (v.startsWith("de")) return "de";
-  if (v.startsWith("pt")) return "pt-BR";
-  if (v.startsWith("ar")) return "ar";
-  if (v.startsWith("zh")) return "zh";
-  if (v.startsWith("ja")) return "ja";
-  if (v.startsWith("ko")) return "ko";
-
-  return "en";
-}
-
-function getLangFromUrl(): string | null {
-  if (typeof window === "undefined") return null;
-  try {
-    return new URL(window.location.href).searchParams.get("lang");
-  } catch {
-    return null;
-  }
-}
-
-function getStoredLang(): string | null {
-  if (typeof window === "undefined") return null;
-  return (
-    window.localStorage.getItem("gp_lang") ||
-    window.localStorage.getItem("i18nextLng")
-  );
-}
-
-function getBrowserLang(): string | null {
-  if (typeof window === "undefined") return null;
-  return window.navigator.language || window.navigator.languages?.[0] || null;
-}
-
-function setLangEverywhere(code: string) {
-  if (typeof window === "undefined") return;
-
-  window.localStorage.setItem("gp_lang", code);
-  window.localStorage.setItem("i18nextLng", code);
-  document.documentElement.lang = code;
-
-  // Keep URL lang in sync (no reload)
-  try {
-    const u = new URL(window.location.href);
-    u.searchParams.set("lang", code);
-    window.history.replaceState({}, "", u.toString());
-  } catch {
-    // ignore
-  }
-}
 
 /**
  * ✅ Hydration-safe absolute URL builder (NO window, NO URL())
@@ -96,9 +34,6 @@ function appLink(path: string, lang: string) {
   return `${APP_BASE}${cleanPath}${sep}lang=${encodeURIComponent(code)}`;
 }
 
-/**
- * Lightweight landing translations
- */
 const T: Record<LangCode, Record<string, string>> = {
   en: {
     brand_tagline: "Study • Work • Immigration Support",
@@ -108,8 +43,7 @@ const T: Record<LangCode, Record<string, string>> = {
     cta_login: "Login to App",
     cta_directory: "Explore Directory",
     cta_events: "View Events",
-    note_dns:
-      "Links will open in app.greenpassgroup.com with your selected language.",
+    note_dns: "Links will open in app.greenpassgroup.com with your selected language.",
 
     features: "Features",
     services: "Services",
@@ -132,6 +66,40 @@ const T: Record<LangCode, Record<string, string>> = {
     s1: "Explore",
     s2: "Connect",
     s3: "Track",
+  },
+
+  vi: {
+    brand_tagline: "Học tập • Việc làm • Hỗ trợ Di trú",
+    hero_title: "Nền tảng tất cả-trong-một cho du học sinh.",
+    hero_subtitle:
+      "Tìm trường, tư vấn viên, gia sư và sự kiện — và quản lý hành trình của bạn trong GreenPass Marketplace.",
+    cta_login: "Đăng nhập vào Ứng dụng",
+    cta_directory: "Khám phá Danh bạ",
+    cta_events: "Xem Sự kiện",
+    note_dns:
+      "Liên kết sẽ mở trên app.greenpassgroup.com với ngôn ngữ bạn đã chọn.",
+
+    features: "Tính năng",
+    services: "Dịch vụ",
+    how: "Cách hoạt động",
+    contact: "Liên hệ",
+
+    features_p:
+      "Một nền tảng duy nhất để khám phá trường học, so sánh chương trình, trò chuyện với tư vấn viên đã xác minh, đặt lịch gia sư và theo dõi lộ trình di trú của bạn.",
+    services_p:
+      "Thiết kế cho du học sinh — từ chọn trường đến ổn định cuộc sống và lập kế hoạch lộ trình.",
+    how_p1: "Duyệt trường, chương trình, tư vấn viên, gia sư và sự kiện.",
+    how_p2: "Nhắn tin với nhà cung cấp và nhận hướng dẫn bước tiếp theo.",
+    how_p3: "Sắp xếp tài liệu và cột mốc của bạn gọn gàng.",
+    contact_p:
+      "Muốn hợp tác với vai trò trường học, tư vấn viên hoặc gia sư? Hãy liên hệ để chúng tôi hỗ trợ onboard.",
+
+    open_app: "Mở Ứng dụng GreenPass",
+    email_us: "Gửi email",
+    step: "BƯỚC",
+    s1: "Khám phá",
+    s2: "Kết nối",
+    s3: "Theo dõi",
   },
 
   fil: {
@@ -259,44 +227,28 @@ export default function Home() {
   const [lang, setLang] = React.useState<LangCode>(DEFAULT_LANG);
 
   React.useEffect(() => {
-    const fromUrl = getLangFromUrl();
-    const fromStore = getStoredLang();
-    const fromBrowser = getBrowserLang();
-
-    const resolved = normalizeLang(fromUrl || fromStore || fromBrowser || "en");
+    const resolved = resolveInitialLang();
     setLang(resolved);
     setLangEverywhere(resolved);
   }, []);
 
   const t = React.useMemo(() => getT(lang), [lang]);
 
-  const handleLangChange = (code: string) => {
-    const normalized = normalizeLang(code);
-    setLang(normalized);
-    setLangEverywhere(normalized);
+  const handleLangChange = (code: LangCode) => {
+    setLang(code);
+    setLangEverywhere(code);
   };
 
   return (
     <div id="top" className="min-h-screen bg-white text-zinc-900 flex flex-col">
       {/* Navbar */}
-      <Navbar lang={lang} /> {/* <Navbar lang={lang} t={t} /> */}
-      
+      <Navbar lang={lang} t={t} />
+
       {/* Page content */}
       <div className="flex-1">
         <main className="mx-auto max-w">
-          {/* Logo / Brand */}
-          {/* <div className="mb-10 flex items-center justify-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-600 text-white font-bold">
-              GP
-            </div>
-            <div>
-              <div className="text-lg font-semibold leading-tight">GreenPass</div>
-              <div className="text-sm text-zinc-600">{t.brand_tagline}</div>
-            </div>
-          </div> */}
-
-          {/* Hero edit the linear gradient if you want it light or darker*/}
-          <div 
+          {/* Hero */}
+          <div
             className="w-full py-30 lg:py-35 text-center bg-no-repeat bg-cover bg-center"
             style={{
               backgroundImage:
@@ -312,7 +264,7 @@ export default function Home() {
               {t.hero_subtitle}
             </p>
 
-            {/* ✅ CTAs (always app.greenpassgroup.com) */}
+            {/* ✅ CTAs */}
             <div className="mt-10 flex w-full flex-col items-center gap-3 sm:flex-row sm:justify-center">
               <a
                 className="flex h-12 w-full max-w-xs items-center justify-center rounded-full border border-zinc-200 shadow-sm bg-white hover:bg-zinc-900 hover:text-white px-6 text-zinc-900 transition hover:bg-zinc-800"
@@ -340,17 +292,26 @@ export default function Home() {
           </div>
         </main>
 
-        {/* Sections for navbar anchors */}
+        {/* Sections */}
         <section id="features" className="mx-auto max-w-5xl px-6 py-16">
           <h2 className="text-2xl font-semibold tracking-tight">{t.features}</h2>
           <p className="mt-3 max-w-3xl text-zinc-600">{t.features_p}</p>
 
           <div className="mt-8 grid gap-4 sm:grid-cols-2">
             {[
-              { tt: "Verified Directory", d: "Schools, programs, agents, tutors — curated and searchable." },
-              { tt: "Messaging & Leads", d: "Chat with providers and keep all conversations in one place." },
+              {
+                tt: "Verified Directory",
+                d: "Schools, programs, agents, tutors — curated and searchable.",
+              },
+              {
+                tt: "Messaging & Leads",
+                d: "Chat with providers and keep all conversations in one place.",
+              },
               { tt: "Events", d: "Join fairs and webinars, reserve a slot, and get reminders." },
-              { tt: "Document System", d: "Upload, organize, and share documents securely when needed." },
+              {
+                tt: "Document System",
+                d: "Upload, organize, and share documents securely when needed.",
+              },
             ].map((c) => (
               <div
                 key={c.tt}
@@ -397,16 +358,16 @@ export default function Home() {
                 <div className="text-2xl font-semibold text-emerald-700">
                   {t.step} {s.n}
                 </div>
-                <div className="mt-2 text-xl font-semibold text-zinc-900">
-                  {s.title}
-                </div>
+                <div className="mt-2 text-xl font-semibold text-zinc-900">{s.title}</div>
                 <div className="mt-2 text-md text-zinc-600">{s.desc}</div>
               </div>
             ))}
           </div>
         </section>
 
-        <section className="mx-auto max-w-5xl px-6 py-8"> <hr/></section>
+        <section className="mx-auto max-w-5xl px-6 py-8">
+          <hr />
+        </section>
 
         <section id="contact" className="mx-auto max-w-5xl px-6 py-16">
           <h2 className="text-2xl font-semibold tracking-tight">{t.contact}</h2>
