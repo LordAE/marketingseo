@@ -39,7 +39,7 @@ const T: Record<LangCode, Record<string, string>> = {
     brand_tagline: "Study • Work • Immigration Support",
     hero_title: "The all-in-one platform for international students.",
     hero_subtitle:
-      "Find schools, agents, tutors, and events — and manage your journey inside the GreenPass Marketplace.",
+      "Find schools, agents, tutors, events, and manage your journey inside the GreenPass Marketplace.",
     cta_login: "Login to App",
     cta_directory: "Explore Directory",
     cta_events: "View Events",
@@ -53,7 +53,7 @@ const T: Record<LangCode, Record<string, string>> = {
     features_p:
       "A single platform to discover schools, compare programs, talk to verified agents, book tutors, and track your immigration journey.",
     services_p:
-      "Designed for international students — from choosing a school to settling in and planning your pathway.",
+      "Designed for international students from choosing a school to settling in and planning your pathway.",
     how_p1: "Browse schools, programs, agents, tutors, and events.",
     how_p2: "Message providers and get guided next steps.",
     how_p3: "Keep your documents and milestones organized.",
@@ -72,7 +72,7 @@ const T: Record<LangCode, Record<string, string>> = {
     brand_tagline: "Học tập • Việc làm • Hỗ trợ Di trú",
     hero_title: "Nền tảng tất cả-trong-một cho du học sinh.",
     hero_subtitle:
-      "Tìm trường, tư vấn viên, gia sư và sự kiện — và quản lý hành trình của bạn trong GreenPass Marketplace.",
+      "Tìm trường, tư vấn viên, gia sư và sự kiện và quản lý hành trình của bạn trong GreenPass Marketplace.",
     cta_login: "Đăng nhập vào Ứng dụng",
     cta_directory: "Khám phá Danh bạ",
     cta_events: "Xem Sự kiện",
@@ -106,7 +106,7 @@ const T: Record<LangCode, Record<string, string>> = {
     brand_tagline: "Pag-aaral • Trabaho • Suporta sa Imigrasyon",
     hero_title: "All-in-one platform para sa international students.",
     hero_subtitle:
-      "Maghanap ng schools, agents, tutors, at events — at i-manage ang journey mo sa GreenPass app.",
+      "Maghanap ng schools, agents, tutors, at events at i-manage ang journey mo sa GreenPass app.",
     cta_login: "Mag-login sa App",
     cta_directory: "Tingnan ang Directory",
     cta_events: "Tingnan ang Events",
@@ -140,7 +140,7 @@ const T: Record<LangCode, Record<string, string>> = {
     brand_tagline: "Tuon • Trabaho • Suporta sa Imigrasyon",
     hero_title: "All-in-one platform para sa international students.",
     hero_subtitle:
-      "Pangitaa ang schools, agents, tutors, ug events — ug i-manage imong journey sulod sa GreenPass app.",
+      "Pangitaa ang schools, agents, tutors, ug events ug i-manage imong journey sulod sa GreenPass app.",
     cta_login: "Mo-login sa App",
     cta_directory: "Tan-awa ang Directory",
     cta_events: "Tan-awa ang Events",
@@ -155,7 +155,7 @@ const T: Record<LangCode, Record<string, string>> = {
     features_p:
       "Usa ka platform para mangita og schools, ikumpara ang programs, makig-istorya sa verified agents, mag-book og tutors, ug masubay ang immigration journey.",
     services_p:
-      "Alang sa international students — gikan sa pagpili og school hangtod sa pag-settle ug pagplano sa pathway.",
+      "Alang sa international students gikan sa pagpili og school hangtod sa pag-settle ug pagplano sa pathway.",
     how_p1: "Tan-awa ang schools, programs, agents, tutors, ug events.",
     how_p2: "Mag-message ug kuhaa ang guided next steps.",
     how_p3: "Organisaha imong documents ug milestones.",
