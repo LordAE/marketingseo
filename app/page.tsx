@@ -19,8 +19,8 @@ import {
  * - All outbound links to app.greenpassgroup.com include ?lang=<selected>
  */
 
-//const APP_BASE = "https://app.greenpassgroup.com";
-const APP_BASE = "http://localhost:5173";
+const APP_BASE = "https://app.greenpassgroup.com";
+//const APP_BASE = "http://localhost:5173";
 
 
 /**
@@ -39,7 +39,7 @@ const T: Record<LangCode, Record<string, string>> = {
     brand_tagline: "Study • Work • Immigration Support",
     hero_title: "The all-in-one platform for international students.",
     hero_subtitle:
-      "Find schools, agents, tutors, events, and manage your journey inside the GreenPass Marketplace.",
+      "Find schools, agents, tutors, and events — and manage your journey inside the GreenPass Marketplace.",
     cta_login: "Login to App",
     cta_directory: "Explore Directory",
     cta_events: "View Events",
@@ -53,7 +53,7 @@ const T: Record<LangCode, Record<string, string>> = {
     features_p:
       "A single platform to discover schools, compare programs, talk to verified agents, book tutors, and track your immigration journey.",
     services_p:
-      "Designed for international students from choosing a school to settling in and planning your pathway.",
+      "Designed for international students — from choosing a school to settling in and planning your pathway.",
     how_p1: "Browse schools, programs, agents, tutors, and events.",
     how_p2: "Message providers and get guided next steps.",
     how_p3: "Keep your documents and milestones organized.",
@@ -72,7 +72,7 @@ const T: Record<LangCode, Record<string, string>> = {
     brand_tagline: "Học tập • Việc làm • Hỗ trợ Di trú",
     hero_title: "Nền tảng tất cả-trong-một cho du học sinh.",
     hero_subtitle:
-      "Tìm trường, tư vấn viên, gia sư và sự kiện và quản lý hành trình của bạn trong GreenPass Marketplace.",
+      "Tìm trường, tư vấn viên, gia sư và sự kiện — và quản lý hành trình của bạn trong GreenPass Marketplace.",
     cta_login: "Đăng nhập vào Ứng dụng",
     cta_directory: "Khám phá Danh bạ",
     cta_events: "Xem Sự kiện",
@@ -106,7 +106,7 @@ const T: Record<LangCode, Record<string, string>> = {
     brand_tagline: "Pag-aaral • Trabaho • Suporta sa Imigrasyon",
     hero_title: "All-in-one platform para sa international students.",
     hero_subtitle:
-      "Maghanap ng schools, agents, tutors, at events at i-manage ang journey mo sa GreenPass app.",
+      "Maghanap ng schools, agents, tutors, at events — at i-manage ang journey mo sa GreenPass app.",
     cta_login: "Mag-login sa App",
     cta_directory: "Tingnan ang Directory",
     cta_events: "Tingnan ang Events",
@@ -140,7 +140,7 @@ const T: Record<LangCode, Record<string, string>> = {
     brand_tagline: "Tuon • Trabaho • Suporta sa Imigrasyon",
     hero_title: "All-in-one platform para sa international students.",
     hero_subtitle:
-      "Pangitaa ang schools, agents, tutors, ug events ug i-manage imong journey sulod sa GreenPass app.",
+      "Pangitaa ang schools, agents, tutors, ug events — ug i-manage imong journey sulod sa GreenPass app.",
     cta_login: "Mo-login sa App",
     cta_directory: "Tan-awa ang Directory",
     cta_events: "Tan-awa ang Events",
@@ -155,7 +155,7 @@ const T: Record<LangCode, Record<string, string>> = {
     features_p:
       "Usa ka platform para mangita og schools, ikumpara ang programs, makig-istorya sa verified agents, mag-book og tutors, ug masubay ang immigration journey.",
     services_p:
-      "Alang sa international students gikan sa pagpili og school hangtod sa pag-settle ug pagplano sa pathway.",
+      "Alang sa international students — gikan sa pagpili og school hangtod sa pag-settle ug pagplano sa pathway.",
     how_p1: "Tan-awa ang schools, programs, agents, tutors, ug events.",
     how_p2: "Mag-message ug kuhaa ang guided next steps.",
     how_p3: "Organisaha imong documents ug milestones.",
@@ -244,152 +244,292 @@ export default function Home() {
       {/* Navbar */}
       <Navbar lang={lang} t={t} />
 
-      {/* Page content */}
-      <div className="flex-1">
-        <main className="mx-auto max-w">
-          {/* Hero */}
-          <div
-            className="w-full py-30 lg:py-35 text-center bg-no-repeat bg-cover bg-center"
-            style={{
-              backgroundImage:
-                "linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0.1)), url('/img/Gradient.png')",
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-            }}
+
+{/* Page content */}
+<div className="flex-1">
+  {/* HERO */}
+  <section
+    className="relative overflow-hidden"
+    style={{
+      backgroundImage:
+        "linear-gradient(rgba(15,23,42,0.70), rgba(15,23,42,0.15)), url('/img/Gradient.png')",
+      backgroundSize: "cover",
+      backgroundPosition: "center",
+    }}
+  >
+    <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(1200px_600px_at_50%_-10%,rgba(16,185,129,0.35),transparent_60%)]" />
+    <div className="mx-auto max-w-7xl px-6 py-16 sm:py-20 lg:py-24">
+      <div className="mx-auto max-w-4xl text-center">
+        <div className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-4 py-2 text-sm text-white/90 backdrop-blur">
+          <span className="h-2 w-2 rounded-full bg-emerald-400" />
+          <span>{t.brand_tagline}</span>
+        </div>
+
+        <h1 className="mt-6 text-4xl font-extrabold leading-tight tracking-tight text-white sm:text-5xl">
+          {t.hero_title}
+        </h1>
+        <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-white/85">
+          {t.hero_subtitle}
+        </p>
+
+        {/* CTAs */}
+        <div className="mt-10 flex w-full flex-col items-center gap-3 sm:flex-row sm:justify-center">
+          <a
+            className="flex h-12 w-full max-w-xs items-center justify-center rounded-full bg-emerald-500 px-6 font-semibold text-white shadow-sm transition hover:bg-emerald-600"
+            href={appLink("/welcome", lang)}
           >
-            <h1 className="mx-auto max-w-3xl text-4xl font-semibold leading-tight tracking-tight sm:text-5xl">
-              {t.hero_title}
-            </h1>
-            <p className="mx-auto mt-4 max-w-2xl text-lg leading-8 text-zinc-600">
-              {t.hero_subtitle}
-            </p>
+            {t.cta_login}
+          </a>
 
-            {/* ✅ CTAs */}
-            <div className="mt-10 flex w-full flex-col items-center gap-3 sm:flex-row sm:justify-center">
-              <a
-                className="flex h-12 w-full max-w-xs items-center justify-center rounded-full border border-zinc-200 shadow-sm bg-white hover:bg-zinc-900 hover:text-white px-6 text-zinc-900 transition hover:bg-zinc-800"
-                href={appLink("/welcome", lang)}
-              >
-                {t.cta_login}
-              </a>
+          <a
+            className="flex h-12 w-full max-w-xs items-center justify-center rounded-full border border-white/30 bg-white/10 px-6 font-semibold text-white backdrop-blur transition hover:bg-white/15"
+            href={appLink("/directory", lang)}
+          >
+            {t.cta_directory}
+          </a>
 
-              <a
-                className="flex h-12 w-full max-w-xs items-center justify-center rounded-full border border-zinc-200 shadow-sm bg-white hover:bg-zinc-900 px-6 text-zinc-900 hover:text-white transition hover:bg-zinc-50"
-                href={appLink("/directory", lang)}
-              >
-                {t.cta_directory}
-              </a>
+          <a
+            className="flex h-12 w-full max-w-xs items-center justify-center rounded-full border border-white/30 bg-white/10 px-6 font-semibold text-white backdrop-blur transition hover:bg-white/15"
+            href={appLink("/events", lang)}
+          >
+            {t.cta_events}
+          </a>
+        </div>
 
-              <a
-                className="flex h-12 w-full max-w-xs items-center justify-center rounded-full border border-zinc-200 shadow-sm bg-white hover:bg-zinc-900 px-6 text-zinc-900 hover:text-white transition hover:bg-zinc-50"
-                href={appLink("/events", lang)}
-              >
-                {t.cta_events}
-              </a>
-            </div>
-
-            <p className="mt-6 text-sm text-zinc-500">{t.note_dns}</p>
-          </div>
-        </main>
-
-        {/* Sections */}
-        <section id="features" className="mx-auto max-w-5xl px-6 py-16">
-          <h2 className="text-2xl font-semibold tracking-tight">{t.features}</h2>
-          <p className="mt-3 max-w-3xl text-zinc-600">{t.features_p}</p>
-
-          <div className="mt-8 grid gap-4 sm:grid-cols-2">
-            {[
-              {
-                tt: "Verified Directory",
-                d: "Schools, programs, agents, tutors — curated and searchable.",
-              },
-              {
-                tt: "Messaging & Leads",
-                d: "Chat with providers and keep all conversations in one place.",
-              },
-              { tt: "Events", d: "Join fairs and webinars, reserve a slot, and get reminders." },
-              {
-                tt: "Document System",
-                d: "Upload, organize, and share documents securely when needed.",
-              },
-            ].map((c) => (
-              <div
-                key={c.tt}
-                className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm"
-              >
-                <div className="text-sm font-semibold text-zinc-900">{c.tt}</div>
-                <div className="mt-2 text-sm text-zinc-600">{c.d}</div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section id="services" className="mx-auto max-w-5xl px-6 py-16">
-          <h2 className="text-2xl font-semibold tracking-tight">{t.services}</h2>
-          <p className="mt-3 max-w-3xl text-zinc-600">{t.services_p}</p>
-
-          <div className="mt-8 grid gap-4 sm:grid-cols-2">
-            {[
-              "School & program matching",
-              "Agent referrals & visa support",
-              "IELTS/TOEFL tutoring",
-              "Housing, banking, insurance guidance",
-            ].map((x) => (
-              <div key={x} className="rounded-2xl border border-zinc-200 shadow-sm bg-white p-6">
-                <div className="text-sm font-medium text-zinc-900">{x}</div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section id="how" className="mx-auto max-w-5xl px-6 py-16">
-          <h2 className="text-2xl font-semibold tracking-tight">{t.how}</h2>
-
-          <div className="mt-8 text-center grid gap-4 sm:grid-cols-3">
-            {[
-              { n: "1", title: t.s1, desc: t.how_p1 },
-              { n: "2", title: t.s2, desc: t.how_p2 },
-              { n: "3", title: t.s3, desc: t.how_p3 },
-            ].map((s) => (
-              <div
-                key={s.n}
-                className="rounded-2xl border border-zinc-200 shadow-sm bg-white p-12"
-              >
-                <div className="text-2xl font-semibold text-emerald-700">
-                  {t.step} {s.n}
-                </div>
-                <div className="mt-2 text-xl font-semibold text-zinc-900">{s.title}</div>
-                <div className="mt-2 text-md text-zinc-600">{s.desc}</div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="mx-auto max-w-5xl px-6 py-8">
-          <hr />
-        </section>
-
-        <section id="contact" className="mx-auto max-w-5xl px-6 py-16">
-          <h2 className="text-2xl font-semibold tracking-tight">{t.contact}</h2>
-          <p className="mt-3 max-w-3xl text-zinc-600">{t.contact_p}</p>
-
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <a
-              className="inline-flex h-12 items-center justify-center rounded-full bg-zinc-900 px-6 text-white transition hover:bg-zinc-800"
-              href={appLink("/welcome", lang)}
-            >
-              {t.open_app}
-            </a>
-            <a
-              className="inline-flex h-12 items-center justify-center rounded-full border border-zinc-200 shadow-sm bg-white px-6 text-zinc-900 transition hover:bg-zinc-50"
-              href="mailto:info@greenpassimmigration.com"
-            >
-              {t.email_us}
-            </a>
-          </div>
-        </section>
+        <p className="mt-6 text-sm text-white/70">{t.note_dns}</p>
       </div>
 
+      {/* FEATURE TILES (reference-style) */}
+      <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        {[
+          {
+            title: "Future Students",
+            desc: "Explore programs, admissions, and support designed for international students.",
+            href: appLink("/directory", lang),
+          },
+          {
+            title: "Academic Programs",
+            desc: "Compare tuition, duration, and intake dates — all in one place.",
+            href: appLink("/directory", lang),
+          },
+          {
+            title: "Events & Key Dates",
+            desc: "Join fairs, webinars, and school events — reserve slots and get reminders.",
+            href: appLink("/events", lang),
+          },
+          {
+            title: "Verified Providers",
+            desc: "Agents, tutors, and schools can submit verification documents for review.",
+            href: appLink("/welcome", lang),
+          },
+        ].map((x) => (
+          <a
+            key={x.title}
+            href={x.href}
+            className="group relative overflow-hidden rounded-3xl border border-white/15 bg-white/10 p-6 text-left text-white shadow-sm backdrop-blur transition hover:bg-white/15"
+          >
+            <div className="text-sm font-semibold tracking-wide text-white/90">
+              {x.title}
+            </div>
+            <div className="mt-2 text-sm leading-6 text-white/80">{x.desc}</div>
+            <div className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-white">
+              Learn more <span className="transition group-hover:translate-x-0.5">→</span>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  {/* TRUST / STATS */}
+  <section className="bg-white">
+    <div className="mx-auto max-w-7xl px-6 py-14">
+      <div className="grid gap-6 sm:grid-cols-4">
+        {[
+          { k: "Verified onboarding", v: "KYC + docs per role" },
+          { k: "Multi-role marketplace", v: "Student • Agent • Tutor • School" },
+          { k: "Messaging built-in", v: "Leads + follow-ups" },
+          { k: "Events + directory", v: "Discover & convert" },
+        ].map((s) => (
+          <div key={s.k} className="rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm">
+            <div className="text-sm font-semibold text-zinc-900">{s.k}</div>
+            <div className="mt-2 text-sm text-zinc-600">{s.v}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  {/* Sections */}
+  <section id="features" className="mx-auto max-w-7xl px-6 py-16">
+    <div className="mx-auto max-w-3xl text-center">
+      <h2 className="text-3xl font-bold tracking-tight text-zinc-900 sm:text-4xl">
+        {t.features}
+      </h2>
+      <p className="mt-4 text-lg text-zinc-600">{t.features_p}</p>
+    </div>
+
+    <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      {[
+        {
+          tt: "Verified Directory",
+          d: "Schools, programs, agents, tutors — curated and searchable.",
+        },
+        {
+          tt: "Messaging & Leads",
+          d: "Chat with providers and keep all conversations in one place.",
+        },
+        {
+          tt: "Events",
+          d: "Join fairs and webinars, reserve a slot, and get reminders.",
+        },
+        {
+          tt: "Document System",
+          d: "Upload and organize verification documents for faster reviews.",
+        },
+      ].map((c) => (
+        <div key={c.tt} className="rounded-3xl border border-zinc-200 bg-white p-7 shadow-sm transition hover:shadow-md">
+          <div className="text-sm font-semibold text-zinc-900">{c.tt}</div>
+          <div className="mt-2 text-sm leading-6 text-zinc-600">{c.d}</div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section id="services" className="mx-auto max-w-7xl px-6 py-16">
+    <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
+      <div>
+        <h2 className="text-3xl font-bold tracking-tight text-zinc-900 sm:text-4xl">
+          {t.services}
+        </h2>
+        <p className="mt-4 text-lg text-zinc-600">{t.services_p}</p>
+
+        <div className="mt-8 grid gap-4 sm:grid-cols-2">
+          {[
+            "School & program matching",
+            "Agent referrals & visa support",
+            "IELTS/TOEFL tutoring",
+            "Housing, banking, insurance guidance",
+          ].map((x) => (
+            <div key={x} className="rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm">
+              <div className="text-sm font-semibold text-zinc-900">{x}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Role cards */}
+      <div className="rounded-3xl border border-zinc-200 bg-gradient-to-br from-emerald-50 to-white p-7 shadow-sm">
+        <div className="text-sm font-semibold text-emerald-800">Built for every role</div>
+        <div className="mt-2 text-sm text-zinc-600">
+          GreenPass works like a marketplace: students discover, providers connect, admin verifies.
+        </div>
+
+        <div className="mt-6 grid gap-3 sm:grid-cols-2">
+          {[
+            { role: "Student", line: "Browse + chat, upload basic valid ID." },
+            { role: "Agent", line: "Valid ID + business permit verification." },
+            { role: "Tutor", line: "Valid ID + proof as a tutor." },
+            { role: "School", line: "DLI / permits & accreditation docs." },
+          ].map((r) => (
+            <div key={r.role} className="rounded-2xl border border-emerald-100 bg-white p-5">
+              <div className="text-sm font-semibold text-zinc-900">{r.role}</div>
+              <div className="mt-1 text-sm text-zinc-600">{r.line}</div>
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+          <a
+            className="inline-flex h-11 items-center justify-center rounded-full bg-emerald-600 px-5 text-sm font-semibold text-white transition hover:bg-emerald-700"
+            href={appLink("/welcome", lang)}
+          >
+            {t.open_app}
+          </a>
+          <a
+            className="inline-flex h-11 items-center justify-center rounded-full border border-zinc-200 bg-white px-5 text-sm font-semibold text-zinc-900 transition hover:bg-zinc-50"
+            href={appLink("/directory", lang)}
+          >
+            {t.cta_directory}
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="how" className="mx-auto max-w-7xl px-6 py-16">
+    <div className="mx-auto max-w-3xl text-center">
+      <h2 className="text-3xl font-bold tracking-tight text-zinc-900 sm:text-4xl">{t.how}</h2>
+    </div>
+
+    <div className="mt-10 grid gap-5 sm:grid-cols-3">
+      {[
+        { n: "1", title: t.s1, desc: t.how_p1 },
+        { n: "2", title: t.s2, desc: t.how_p2 },
+        { n: "3", title: t.s3, desc: t.how_p3 },
+      ].map((s) => (
+        <div
+          key={s.n}
+          className="rounded-3xl border border-zinc-200 bg-white p-10 text-center shadow-sm"
+        >
+          <div className="text-sm font-semibold text-emerald-700">
+            {t.step} {s.n}
+          </div>
+          <div className="mt-2 text-2xl font-bold text-zinc-900">{s.title}</div>
+          <div className="mt-3 text-sm leading-6 text-zinc-600">{s.desc}</div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section className="mx-auto max-w-7xl px-6 py-8">
+    <hr />
+  </section>
+
+  <section id="contact" className="mx-auto max-w-7xl px-6 py-16">
+    <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
+      <div>
+        <h2 className="text-3xl font-bold tracking-tight text-zinc-900 sm:text-4xl">{t.contact}</h2>
+        <p className="mt-4 text-lg text-zinc-600">{t.contact_p}</p>
+
+        <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+          <a
+            className="inline-flex h-12 items-center justify-center rounded-full bg-zinc-900 px-6 font-semibold text-white transition hover:bg-zinc-800"
+            href={appLink("/welcome", lang)}
+          >
+            {t.open_app}
+          </a>
+          <a
+            className="inline-flex h-12 items-center justify-center rounded-full border border-zinc-200 bg-white px-6 font-semibold text-zinc-900 shadow-sm transition hover:bg-zinc-50"
+            href="mailto:info@greenpassimmigration.com"
+          >
+            {t.email_us}
+          </a>
+        </div>
+      </div>
+
+      {/* Simple partner logos (reference-inspired) */}
+      <div className="rounded-3xl border border-zinc-200 bg-white p-7 shadow-sm">
+        <div className="text-sm font-semibold text-zinc-900">Trusted by learners worldwide</div>
+        <div className="mt-4 grid grid-cols-3 gap-4">
+          {[
+            { n: "UWE Bristol", src: "https://firebasestorage.googleapis.com/v0/b/greenpass-dc92d.firebasestorage.app/o/home%2Flogos%2FUWEBristol.jpg?alt=media" },
+            { n: "Cape Breton", src: "https://firebasestorage.googleapis.com/v0/b/greenpass-dc92d.firebasestorage.app/o/home%2Flogos%2FCapeBretonUniveristy.jpg?alt=media" },
+            { n: "U of T", src: "https://firebasestorage.googleapis.com/v0/b/greenpass-dc92d.firebasestorage.app/o/home%2Flogos%2FUniversityofToronto.avif?alt=media" },
+            { n: "McGill", src: "https://firebasestorage.googleapis.com/v0/b/greenpass-dc92d.firebasestorage.app/o/home%2Flogos%2FmcgillUniversity.png?alt=media" },
+            { n: "UBC", src: "https://firebasestorage.googleapis.com/v0/b/greenpass-dc92d.firebasestorage.app/o/home%2Flogos%2FUniversityofBristishColumbia.jpg?alt=media" },
+            { n: "Western", src: "https://firebasestorage.googleapis.com/v0/b/greenpass-dc92d.firebasestorage.app/o/home%2Flogos%2FWesternUniversity.png?alt=media" },
+          ].map((p) => (
+            <div key={p.n} className="flex items-center justify-center rounded-2xl border border-zinc-100 bg-zinc-50 p-3">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={p.src} alt={p.n} className="h-10 w-auto object-contain" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
       <LanguageFooter value={lang} onChange={handleLangChange} />
     </div>
   );
