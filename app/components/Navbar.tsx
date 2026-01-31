@@ -31,19 +31,8 @@ function appLink(path: string, lang: string) {
 export default function Navbar({ lang = "en", t = {}, onLangChange }: NavbarProps) {
   const [open, setOpen] = React.useState(false);
   const [langOpen, setLangOpen] = React.useState(false);
-  const langWrapRef = React.useRef<HTMLDivElement | null>(null);
 
-  // Close language menu when clicking outside
-  React.useEffect(() => {
-    function onDocClick(e: MouseEvent) {
-      const el = langWrapRef.current;
-      if (!el) return;
-      if (e.target instanceof Node && el.contains(e.target)) return;
-      setLangOpen(false);
-    }
-    document.addEventListener("mousedown", onDocClick);
-    return () => document.removeEventListener("mousedown", onDocClick);
-  }, []);
+  const langWrapRef = React.useRef<HTMLDivElement | null>(null);
 
   const LANGS: Array<{ code: LangCode; label: string }> = [
     { code: "en", label: "English (US)" },
@@ -60,13 +49,24 @@ export default function Navbar({ lang = "en", t = {}, onLangChange }: NavbarProp
     { code: "ko", label: "한국어" },
   ];
 
+  // Close language menu when clicking outside
+  React.useEffect(() => {
+    function onDocClick(e: MouseEvent) {
+      const el = langWrapRef.current;
+      if (!el) return;
+      if (e.target instanceof Node && el.contains(e.target)) return;
+      setLangOpen(false);
+    }
+    document.addEventListener("mousedown", onDocClick);
+    return () => document.removeEventListener("mousedown", onDocClick);
+  }, []);
+
   function chooseLanguage(code: LangCode) {
     const normalized = normalizeLang(code) as LangCode;
-    // Update global lang + URL param
     setLangEverywhere(normalized);
-    // Let parent update text strings/state
     onLangChange?.(normalized);
     setLangOpen(false);
+    setOpen(false);
   }
 
   const items: NavItem[] = [
@@ -105,23 +105,28 @@ export default function Navbar({ lang = "en", t = {}, onLangChange }: NavbarProp
           ))}
         </nav>
 
-        {/* Right actions (desktop) */}
-        <div className="hidden items-center gap-3 md:flex">
-          {/* Language selector */}
+        {/* Right actions */}
+        <div className="flex items-center gap-3">
+          {/* ✅ Language selector (NOW visible on mobile at top) */}
           <div ref={langWrapRef} className="relative">
             <button
               type="button"
               className="inline-flex h-10 items-center justify-center gap-2 rounded-full border border-zinc-200 bg-white px-3 text-sm text-zinc-900 transition hover:bg-zinc-50"
               aria-label="Choose language"
+              aria-haspopup="menu"
+              aria-expanded={langOpen}
               onClick={() => setLangOpen((v) => !v)}
             >
               <span className="text-base">🌐</span>
-              <span className="hidden lg:inline">{lang}</span>
+              <span className="hidden sm:inline">{lang}</span>
               <span className="text-xs">▾</span>
             </button>
 
             {langOpen && (
-              <div className="absolute right-0 mt-2 w-56 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg">
+              <div
+                role="menu"
+                className="absolute right-0 mt-2 w-56 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg"
+              >
                 <div className="max-h-72 overflow-auto py-1">
                   {LANGS.map((l) => (
                     <button
@@ -140,30 +145,34 @@ export default function Navbar({ lang = "en", t = {}, onLangChange }: NavbarProp
               </div>
             )}
           </div>
-          <a
-            className="inline-flex h-10 items-center justify-center rounded-full border border-zinc-200 bg-white px-4 text-sm text-zinc-900 transition hover:bg-zinc-50"
-            href={appLink("/directory", lang)}
-          >
-            {t.cta_directory ?? "Explore Directory"}
-          </a>
 
-          <a
-            className="inline-flex h-10 items-center justify-center rounded-full bg-zinc-900 px-4 text-sm text-white transition hover:bg-zinc-800"
-            href={appLink("/welcome", lang)}
+          {/* Desktop CTAs */}
+          <div className="hidden items-center gap-3 md:flex">
+            <a
+              className="inline-flex h-10 items-center justify-center rounded-full border border-zinc-200 bg-white px-4 text-sm text-zinc-900 transition hover:bg-zinc-50"
+              href={appLink("/directory", lang)}
+            >
+              {t.cta_directory ?? "Explore Directory"}
+            </a>
+
+            <a
+              className="inline-flex h-10 items-center justify-center rounded-full bg-zinc-900 px-4 text-sm text-white transition hover:bg-zinc-800"
+              href={appLink("/welcome", lang)}
+            >
+              {t.cta_login ?? "Login to App"}
+            </a>
+          </div>
+
+          {/* Mobile menu button */}
+          <button
+            type="button"
+            className="md:hidden inline-flex h-10 w-10 items-center justify-center rounded-lg border border-zinc-200 text-zinc-900"
+            aria-label="Open menu"
+            onClick={() => setOpen((v) => !v)}
           >
-            {t.cta_login ?? "Login to App"}
-          </a>
+            <span className="text-lg">{open ? "✕" : "☰"}</span>
+          </button>
         </div>
-
-        {/* Mobile menu button */}
-        <button
-          type="button"
-          className="md:hidden inline-flex h-10 w-10 items-center justify-center rounded-lg border border-zinc-200 text-zinc-900"
-          aria-label="Open menu"
-          onClick={() => setOpen((v) => !v)}
-        >
-          <span className="text-lg">☰</span>
-        </button>
       </div>
 
       {/* Mobile drawer */}
@@ -183,37 +192,15 @@ export default function Navbar({ lang = "en", t = {}, onLangChange }: NavbarProp
               ))}
 
               <div className="mt-3 flex flex-col gap-2">
-                {/* Language selector (mobile) */}
-                <div className="rounded-xl border border-zinc-200 p-3">
-                  <div className="mb-2 text-xs font-semibold text-zinc-600">Language</div>
-                  <div className="flex flex-wrap gap-2">
-                    {LANGS.map((l) => (
-                      <button
-                        key={l.code}
-                        type="button"
-                        onClick={() => chooseLanguage(l.code)}
-                        className={`rounded-full border px-3 py-1 text-xs transition ${
-                          String(lang) === l.code
-                            ? "border-zinc-900 bg-zinc-900 text-white"
-                            : "border-zinc-200 bg-white text-zinc-800 hover:bg-zinc-50"
-                        }`}
-                      >
-                        {l.code}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
                 <a
-                  className="inline-flex h-11 items-center justify-center rounded-full border border-zinc-200 bg-white px-4 text-sm text-zinc-900 transition hover:bg-zinc-50"
+                  className="inline-flex h-11 items-center justify-center rounded-xl border border-zinc-200 bg-white px-4 text-sm text-zinc-900"
                   href={appLink("/directory", lang)}
                   onClick={() => setOpen(false)}
                 >
                   {t.cta_directory ?? "Explore Directory"}
                 </a>
-
                 <a
-                  className="inline-flex h-11 items-center justify-center rounded-full bg-zinc-900 px-4 text-sm text-white transition hover:bg-zinc-800"
+                  className="inline-flex h-11 items-center justify-center rounded-xl bg-zinc-900 px-4 text-sm text-white"
                   href={appLink("/welcome", lang)}
                   onClick={() => setOpen(false)}
                 >
