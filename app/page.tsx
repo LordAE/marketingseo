@@ -252,7 +252,7 @@ export default function Home() {
     className="relative overflow-hidden"
     style={{
       backgroundImage:
-        "linear-gradient(rgba(15,23,42,0.70), rgba(15,23,42,0.15)), url('/img/Gradient.png')",
+        "linear-gradient(rgba(15,23,42,1), rgba(15,23,42,0.15)), url('/img/Gradient.png')",
       backgroundSize: "cover",
       backgroundPosition: "center",
     }}
@@ -326,14 +326,24 @@ export default function Home() {
           <a
             key={x.title}
             href={x.href}
-            className="group relative overflow-hidden rounded-3xl border border-white/15 bg-white/10 p-6 text-left text-white shadow-sm backdrop-blur transition hover:bg-white/15"
+            // className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-white/15 bg-white/10 p-6 text-left text-white shadow-sm backdrop-blur transition hover:bg-white/15"
+            // Fix the text being negligible
+            className="group relative flex h-full flex-col overflow-hidden rounded-3xl
+            border border-white/20 bg-black/30 p-6 text-left text-white
+            shadow-sm backdrop-blur-md transition hover:bg-black/40"
           >
             <div className="text-sm font-semibold tracking-wide text-white/90">
               {x.title}
             </div>
-            <div className="mt-2 text-sm leading-6 text-white/80">{x.desc}</div>
-            <div className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-white">
-              Learn more <span className="transition group-hover:translate-x-0.5">→</span>
+
+            <div className="mt-2 text-sm leading-6 text-white/80">
+              {x.desc}
+            </div>
+
+            {/* Push this to the bottom */}
+            <div className="mt-auto pt-5 inline-flex items-center gap-2 text-sm font-semibold text-white">
+              Learn more{" "}
+              <span className="transition group-hover:translate-x-0.5">→</span>
             </div>
           </a>
         ))}
@@ -412,7 +422,7 @@ export default function Home() {
             "Housing, banking, insurance guidance",
           ].map((x) => (
             <div key={x} className="rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm">
-              <div className="text-sm font-semibold text-zinc-900">{x}</div>
+              <div className="text-center text-sm font-semibold text-zinc-900">{x}</div>
             </div>
           ))}
         </div>
@@ -470,7 +480,7 @@ export default function Home() {
       ].map((s) => (
         <div
           key={s.n}
-          className="rounded-3xl border border-zinc-200 bg-white p-10 text-center shadow-sm"
+          className="rounded-3xl border border-zinc-200 bg-white p-10 py-16 text-center shadow-sm"
         >
           <div className="text-sm font-semibold text-emerald-700">
             {t.step} {s.n}
