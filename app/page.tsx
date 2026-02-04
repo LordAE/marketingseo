@@ -57,7 +57,6 @@ const TX: Record<LangCode, Record<string, string>> = {
     hero_line2: "Build your future with GreenPass.",
     hero_sub:
       "GreenPass is your all-in-one platform for international students — connect with verified schools, agents, tutors, jobs, and immigration support in one place.",
-    hero_note: "Sign in here, then continue inside the GreenPass app.",
 
     // Feature cards
     card1_title: "Verified Schools",
@@ -102,7 +101,6 @@ const TX: Record<LangCode, Record<string, string>> = {
     hero_line2: "Xây dựng tương lai cùng GreenPass.",
     hero_sub:
       "GreenPass là nền tảng tất cả-trong-một dành cho du học sinh — kết nối với trường đã xác minh, tư vấn viên, gia sư, việc làm và hỗ trợ di trú tại một nơi.",
-    hero_note: "Đăng nhập tại đây, sau đó tiếp tục trong ứng dụng GreenPass.",
     card1_title: "Trường đã xác minh",
     card1_sub: "Khám phá các trường uy tín.",
     card2_title: "Một ứng dụng. Một hành trình.",
@@ -116,7 +114,6 @@ const TX: Record<LangCode, Record<string, string>> = {
     hero_line2: "Buoin ang future mo with GreenPass.",
     hero_sub:
       "GreenPass ang all-in-one platform para sa international students — kumonekta sa verified schools, agents, tutors, jobs, at immigration support sa iisang lugar.",
-    hero_note: "Mag-sign in dito, tapos ituloy sa GreenPass app.",
     card1_title: "Verified Schools",
     card1_sub: "Hanapin ang trusted institutions.",
     card2_title: "One App. One Journey.",
@@ -130,7 +127,6 @@ const TX: Record<LangCode, Record<string, string>> = {
     hero_line2: "Tukora ang imong kaugmaon sa GreenPass.",
     hero_sub:
       "GreenPass kay all-in-one platform para sa international students — konekta sa verified schools, agents, tutors, trabaho, ug immigration support sa usa ka lugar.",
-    hero_note: "Sign in diri, dayon padayon sa GreenPass app.",
     card1_title: "Verified Schools",
     card1_sub: "Pangitaa ang kasaligan nga mga eskwelahan.",
     card2_title: "One App. One Journey.",
@@ -144,7 +140,6 @@ const TX: Record<LangCode, Record<string, string>> = {
     hero_line2: "Construye tu futuro con GreenPass.",
     hero_sub:
       "GreenPass es tu plataforma todo-en-uno para estudiantes internacionales: conecta con escuelas verificadas, agentes, tutores, empleos y apoyo migratorio en un solo lugar.",
-    hero_note: "Inicia sesión aquí y continúa dentro de la app de GreenPass.",
     card1_title: "Escuelas verificadas",
     card1_sub: "Descubre instituciones confiables.",
     card2_title: "Una app. Un camino.",
@@ -158,7 +153,6 @@ const TX: Record<LangCode, Record<string, string>> = {
     hero_line2: "GreenPassで未来をつくろう。",
     hero_sub:
       "GreenPassは留学生向けのオールインワンプラットフォーム。認証済みの学校、エージェント、講師、仕事、移民サポートを一つに。",
-    hero_note: "ここでログインして、GreenPassアプリへ進みます。",
     card1_title: "認証済み学校",
     card1_sub: "信頼できる学校を探す。",
     card2_title: "1つのアプリ。1つの旅。",
@@ -172,7 +166,6 @@ const TX: Record<LangCode, Record<string, string>> = {
     hero_line2: "GreenPass로 미래를 준비하세요.",
     hero_sub:
       "GreenPass는 유학생을 위한 올인원 플랫폼입니다 — 검증된 학교, 에이전트, 튜터, 일자리, 이민 지원을 한 곳에서 연결하세요.",
-    hero_note: "여기서 로그인한 뒤 GreenPass 앱에서 계속 진행합니다.",
     card1_title: "검증된 학교",
     card1_sub: "신뢰할 수 있는 기관을 찾아보세요.",
     card2_title: "하나의 앱. 하나의 여정.",
@@ -186,7 +179,6 @@ const TX: Record<LangCode, Record<string, string>> = {
     hero_line2: "用 GreenPass 规划你的未来。",
     hero_sub:
       "GreenPass 是面向国际学生的一站式平台——在一个地方连接已验证的学校、顾问/中介、导师、工作机会与移民支持。",
-    hero_note: "在这里登录，然后进入 GreenPass 应用继续。",
     card1_title: "已验证院校",
     card1_sub: "发现可信机构。",
     card2_title: "一个应用，一个旅程。",
@@ -200,7 +192,6 @@ const TX: Record<LangCode, Record<string, string>> = {
     hero_line2: "ابنِ مستقبلك مع GreenPass.",
     hero_sub:
       "GreenPass منصة متكاملة للطلاب الدوليين — تواصل مع مدارس ووكلاء ومدرّسين وفرص عمل ودعم للهجرة في مكان واحد.",
-    hero_note: "سجّل الدخول هنا، ثم تابع داخل تطبيق GreenPass.",
     card1_title: "مدارس موثّقة",
     card1_sub: "اكتشف مؤسسات موثوقة.",
     card2_title: "تطبيق واحد. رحلة واحدة.",
@@ -214,7 +205,6 @@ const TX: Record<LangCode, Record<string, string>> = {
     hero_line2: "Construa seu futuro com a GreenPass.",
     hero_sub:
       "A GreenPass é a plataforma tudo-em-um para estudantes internacionais — conecte-se com escolas verificadas, agentes, tutores, vagas e suporte de imigração em um só lugar.",
-    hero_note: "Entre aqui e continue dentro do app GreenPass.",
     card1_title: "Escolas verificadas",
     card1_sub: "Descubra instituições confiáveis.",
     card2_title: "Um app. Uma jornada.",
@@ -228,7 +218,6 @@ const TX: Record<LangCode, Record<string, string>> = {
     hero_line2: "Construis ton avenir avec GreenPass.",
     hero_sub:
       "GreenPass est une plateforme tout-en-un pour les étudiants internationaux — écoles vérifiées, agents, tuteurs, emplois et soutien à l’immigration, au même endroit.",
-    hero_note: "Connecte-toi ici, puis continue dans l’app GreenPass.",
     card1_title: "Écoles vérifiées",
     card1_sub: "Découvre des institutions fiables.",
     card2_title: "Une app. Un parcours.",
@@ -242,7 +231,6 @@ const TX: Record<LangCode, Record<string, string>> = {
     hero_line2: "Baue deine Zukunft mit GreenPass.",
     hero_sub:
       "GreenPass ist deine All-in-One-Plattform für internationale Studierende — verbinde dich mit verifizierten Schulen, Agenten, Tutoren, Jobs und Einwanderungs-Support an einem Ort.",
-    hero_note: "Hier anmelden und dann in der GreenPass-App fortfahren.",
     card1_title: "Verifizierte Schulen",
     card1_sub: "Entdecke vertrauenswürdige Einrichtungen.",
     card2_title: "Eine App. Eine Reise.",
@@ -476,14 +464,6 @@ export default function Page() {
                 </span>
               </span>
             </h1>
-
-            <p className="mt-5 max-w-xl text-base leading-7 text-gray-600">
-              {tr(lang, "hero_sub")}
-              <br />
-              <span className="block mt-2 text-sm text-gray-500">
-                {tr(lang, "hero_note")}
-              </span>
-            </p>
 
             <div className="mt-10 flex items-end gap-4">
               {/* Card 1 */}
