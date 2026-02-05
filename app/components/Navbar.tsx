@@ -72,12 +72,6 @@ export default function Navbar({ lang, onLangChange }: Props) {
             Explore Directory
           </a>
 
-          <a
-            href="/"
-            className="inline-flex rounded-xl bg-gray-900 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-black"
-          >
-            Login
-          </a>
         </div>
       </div>
     </header>
