@@ -356,6 +356,25 @@ export default function Page() {
     return true;
   }, [email, password, confirm, role, mode]);
 
+  function scrollToAuth() {
+    // Smoothly jump to the auth card on the right
+    if (typeof document === "undefined") return;
+    document.getElementById("auth-card")?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  }
+
+  function pickRole(r: RoleValue) {
+    setMode("signup");
+    setRole(r);
+    setRoleOpen(false);
+    setMsg(null);
+    // Wait a tick so the signup UI renders before scrolling
+    setTimeout(scrollToAuth, 50);
+  }
+
+
   async function handleEmailAuth() {
     setMsg(null);
     try {
@@ -456,56 +475,186 @@ export default function Page() {
               <span>GreenPass</span>
             </div>
 
+            {/* Headline + Subheadline */}
             <h1 className="mt-6 text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl">
-              <span className="block">{tr(lang, "hero_line1")}</span>
+              <span className="block">The Global Marketplace Connecting</span>
               <span className="block">
-                <span className="bg-gradient-to-r from-emerald-600 to-blue-600 bg-clip-text text-transparent">
-                  {tr(lang, "hero_line2")}
+                <span className="text-slate-900">
+                  Schools, Agents, Tutors &amp; Students
                 </span>
               </span>
             </h1>
 
-            <div className="mt-10 flex items-end gap-4">
-              {/* Card 1 */}
-              <div className="h-44 w-32 rotate-[-8deg] rounded-3xl border border-gray-200 bg-white shadow-sm p-4">
-                <div className="h-9 w-9 rounded-2xl bg-emerald-100 flex items-center justify-center text-emerald-700 font-bold">
-                  ✓
-                </div>
-                <div className="mt-3 text-sm font-semibold text-gray-900">{tr(lang, "card1_title")}</div>
-                <div className="mt-1 text-xs text-gray-500">{tr(lang, "card1_sub")}</div>
+            <div className="headline-accent-bar mt-4 h-1.5 w-24 rounded-full bg-gradient-to-r from-slate-900 to-slate-500" />
+
+            <p className="mt-4 max-w-2xl text-base leading-7 text-gray-600">
+              Study, work, and immigration pathways — connected transparently in one trusted platform.
+            </p>
+
+            {/* Hero Section Text */}
+            <div className="mt-8 rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
+              <div className="text-xl font-extrabold text-gray-900">
+                Build Your Global Education &amp; Career Network with GreenPass
+              </div>
+              <p className="mt-3 text-sm leading-6 text-gray-600">
+                GreenPass is a trusted marketplace where schools connect with verified agents, agents support students,
+                tutors provide academic guidance, and everyone grows together — transparently and efficiently.
+              </p>
+
+              {/* Trust line */}
+              <div className="mt-4 flex flex-wrap items-center gap-2 text-sm text-gray-700">
+                <span className="inline-flex items-center rounded-full border border-gray-200 bg-gray-50 px-3 py-1">
+                  ✔ Verified profiles
+                </span>
+                <span className="inline-flex items-center rounded-full border border-gray-200 bg-gray-50 px-3 py-1">
+                  ✔ Transparent partnerships
+                </span>
+                <span className="inline-flex items-center rounded-full border border-gray-200 bg-gray-50 px-3 py-1">
+                  ✔ No hidden agendas
+                </span>
               </div>
 
-              {/* Card 2 (main) */}
-              <div className="h-56 w-40 rounded-3xl border border-gray-200 bg-white shadow-md p-4">
-                <div className="h-9 w-9 rounded-2xl bg-blue-100 flex items-center justify-center text-blue-700 font-bold">
-                  GP
-                </div>
-                <div className="mt-3 text-sm font-semibold text-gray-900">{tr(lang, "card2_title")}</div>
-                <div className="mt-1 text-xs text-gray-500">
-                  {tr(lang, "card2_sub")}
-                </div>
-                <div className="mt-4 space-y-2">
-                  <div className="h-2 w-full rounded-full bg-gray-100" />
-                  <div className="h-2 w-4/5 rounded-full bg-gray-100" />
-                  <div className="h-2 w-3/5 rounded-full bg-gray-100" />
-                </div>
-              </div>
+              {/* Primary CTA */}
+              <div className="mt-5 flex flex-wrap gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMode("signup");
+                    setMsg(null);
+                    setTimeout(scrollToAuth, 50);
+                  }}
+                  className="rounded-2xl bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700"
+                >
+                  Join GreenPass — Start Connecting Today
+                </button>
 
-              {/* Card 3 */}
-              <div className="h-44 w-32 rotate-[8deg] rounded-3xl border border-gray-200 bg-white shadow-sm p-4">
-                <div className="h-9 w-9 rounded-2xl bg-pink-100 flex items-center justify-center text-pink-700 font-bold">
-                  A+
-                </div>
-                <div className="mt-3 text-sm font-semibold text-gray-900">{tr(lang, "card3_title")}</div>
-                <div className="mt-1 text-xs text-gray-500">{tr(lang, "card3_sub")}</div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMode("signin");
+                    setMsg(null);
+                    setTimeout(scrollToAuth, 50);
+                  }}
+                  className="rounded-2xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-semibold text-gray-900 shadow-sm hover:bg-gray-50"
+                >
+                  Sign in
+                </button>
               </div>
             </div>
+
+            {/* Join as… cards */}
+            <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 items-stretch">
+              {/* School */}
+              <div className="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm flex flex-col h-full">
+                <div className="flex-1">
+<div className="inline-flex items-center rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700">
+                  SCHOOL
+                </div>
+                <div className="mt-3 text-base font-extrabold text-gray-900">Join as a School</div>
+                <div className="mt-2 text-sm text-gray-600">
+                  Connect with trusted global agents and students
+                </div>
+                <ul className="mt-4 space-y-2 text-sm text-gray-700">
+                  <li className="flex gap-2"><span className="mt-2 h-1 w-1 rounded-full bg-emerald-600" />Reach verified agents worldwide</li>
+                  <li className="flex gap-2"><span className="mt-2 h-1 w-1 rounded-full bg-emerald-600" />Manage recruitment transparently</li>
+                  <li className="flex gap-2"><span className="mt-2 h-1 w-1 rounded-full bg-emerald-600" />Reduce marketing and admission costs</li>
+                </ul>
+</div>
+                <button
+                  type="button"
+                  onClick={() => pickRole("school")}
+                  className="mt-4 w-full rounded-2xl bg-gray-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-black"
+                >
+                  Join as a School
+                </button>
+              </div>
+
+              {/* Agent */}
+              <div className="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm flex flex-col h-full">
+                <div className="flex-1">
+<div className="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-blue-700">
+                  AGENT
+                </div>
+                <div className="mt-3 text-base font-extrabold text-gray-900">Join as an Agent</div>
+                <div className="mt-2 text-sm text-gray-600">
+                  Work directly with real schools — no middle layers
+                </div>
+                <ul className="mt-4 space-y-2 text-sm text-gray-700">
+                  <li className="flex gap-2"><span className="mt-2 h-1 w-1 rounded-full bg-emerald-600" />Access verified schools and programs</li>
+                  <li className="flex gap-2"><span className="mt-2 h-1 w-1 rounded-full bg-emerald-600" />Track applications clearly</li>
+                  <li className="flex gap-2"><span className="mt-2 h-1 w-1 rounded-full bg-emerald-600" />Build long-term, trusted partnerships</li>
+                </ul>
+</div>
+                <button
+                  type="button"
+                  onClick={() => pickRole("agent")}
+                  className="mt-4 w-full rounded-2xl bg-gray-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-black"
+                >
+                  Join as an Agent
+                </button>
+              </div>
+
+              {/* Tutor */}
+              <div className="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm flex flex-col h-full">
+                <div className="flex-1">
+<div className="inline-flex items-center rounded-full bg-yellow-50 px-3 py-1 text-xs font-bold text-yellow-800">
+                  TUTOR
+                </div>
+                <div className="mt-3 text-base font-extrabold text-gray-900">Join as a Tutor</div>
+                <div className="mt-2 text-sm text-gray-600">
+                  Support students globally and grow your practice
+                </div>
+                <ul className="mt-4 space-y-2 text-sm text-gray-700">
+                  <li className="flex gap-2"><span className="mt-2 h-1 w-1 rounded-full bg-emerald-600" />Find students internationally</li>
+                  <li className="flex gap-2"><span className="mt-2 h-1 w-1 rounded-full bg-emerald-600" />Offer academic and pathway support</li>
+                  <li className="flex gap-2"><span className="mt-2 h-1 w-1 rounded-full bg-emerald-600" />Build your professional profile</li>
+                </ul>
+</div>
+                <button
+                  type="button"
+                  onClick={() => pickRole("tutor")}
+                  className="mt-4 w-full rounded-2xl bg-gray-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-black"
+                >
+                  Join as a Tutor
+                </button>
+              </div>
+
+              {/* Student */}
+              <div className="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm flex flex-col h-full">
+                <div className="flex-1">
+<div className="inline-flex items-center rounded-full bg-purple-50 px-3 py-1 text-xs font-bold text-purple-700">
+                  STUDENT
+                </div>
+                <div className="mt-3 text-base font-extrabold text-gray-900">Join as a Student</div>
+                <div className="mt-2 text-sm text-gray-600">
+                  Find schools, agents, and tutors you can trust
+                </div>
+                <ul className="mt-4 space-y-2 text-sm text-gray-700">
+                  <li className="flex gap-2"><span className="mt-2 h-1 w-1 rounded-full bg-emerald-600" />Discover verified schools and programs</li>
+                  <li className="flex gap-2"><span className="mt-2 h-1 w-1 rounded-full bg-emerald-600" />Connect with reliable agents and tutors</li>
+                  <li className="flex gap-2"><span className="mt-2 h-1 w-1 rounded-full bg-emerald-600" />Get guided step by step — transparently</li>
+                </ul>
+</div>
+                <button
+                  type="button"
+                  onClick={() => pickRole("student")}
+                  className="mt-4 w-full rounded-2xl bg-gray-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-black"
+                >
+                  Join as a Student
+                </button>
+              </div>
+            </div>
+
+            {/* Closing line */}
+            <p className="mt-6 text-sm font-semibold text-gray-700">
+              One platform. One journey. Real connections that matter.
+            </p>
           </section>
 
           {/* Right auth card (LIGHT) */}
           <section>
             <div className="mx-auto w-full max-w-md">
-              <div className="rounded-3xl border border-gray-200 bg-white p-6 shadow-lg">
+              <div id="auth-card" className="rounded-3xl border border-gray-200 bg-white p-6 shadow-lg">
                 <div className="flex items-center justify-between">
                   <div>
                     <div className="text-lg font-semibold">

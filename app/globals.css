@@ -1,3 +1,8 @@
+/* === SEO Global Font: Times New Roman === */
+html, body {
+  font-family: "Times New Roman", Times, serif;
+}
+
 @import "tailwindcss";
 
 :root {
