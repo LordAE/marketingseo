@@ -991,16 +991,13 @@ async function routeLikeWelcome(user: User, lang: LangCode, fallbackRole?: RoleV
   const onboardingCompleted = Boolean(data?.onboarding_completed);
 
   if (!exists || !onboardingCompleted) {
-    // ✅ go to app subdomain (NO /app prefix)
     window.location.assign(
       appLink(`/onboarding?role=${encodeURIComponent(userType)}`, lang)
     );
   } else {
-    // ✅ go to app subdomain (NO /app prefix)
     window.location.assign(appLink(`/dashboard`, lang));
   }
 }
-
 
 export default function Page() {
   const [lang, setLang] = useState<LangCode>(DEFAULT_LANG);
