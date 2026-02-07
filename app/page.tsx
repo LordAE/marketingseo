@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import Navbar from "./components/Navbar";
 import LanguageFooter from "./components/LanguageFooter";
 import {
@@ -18,6 +18,7 @@ import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
   signInWithPopup,
+  signOut,
   type User,
 } from "firebase/auth";
 import {
@@ -31,7 +32,6 @@ import {
 /** ✅ Set your app URL here */
 const APP_BASE = "https://app.greenpassgroup.com";
 // const APP_BASE = "http://localhost:5173";
-
 
 /**
  * ✅ Build a cross-domain URL to the GreenPass app.
@@ -82,24 +82,38 @@ async function fetchCustomToken(idToken: string) {
     body: JSON.stringify({ idToken }),
   });
 
+  // The API SHOULD return JSON, but on 500 Vercel often returns HTML.
+  const raw = await res.text();
+
+  let parsed: any = null;
+  try {
+    parsed = raw ? JSON.parse(raw) : null;
+  } catch {
+    parsed = null;
+  }
+
   if (!res.ok) {
-    let detail = "";
-    try {
-      const j = await res.json();
-      detail = j?.error || j?.message || "";
-    } catch {
-      // ignore
-    }
-    const err = new Error(detail || `Custom token API failed (${res.status})`);
+    const isHtml = raw?.trim().startsWith("<");
+    const detail =
+      parsed?.error ||
+      parsed?.message ||
+      (isHtml ? null : raw?.slice(0, 200)) ||
+      `Custom token API failed (${res.status}). Check Vercel function logs.`;
+    const err = new Error(detail);
     (err as any).status = res.status;
     throw err;
   }
 
-  const data = (await res.json()) as { customToken?: string };
-  if (!data?.customToken) throw new Error("Custom token missing in API response.");
-  return data.customToken;
+  const customToken = parsed?.customToken;
+  if (!customToken) {
+    throw new Error(
+      parsed?.error ||
+        parsed?.message ||
+        "Custom token missing in API response."
+    );
+  }
+  return customToken as string;
 }
-
 type RoleValue = "student" | "agent" | "tutor" | "school";
 
 const ROLE_ITEMS: { value: RoleValue; key: string; def: string }[] = [
@@ -1109,6 +1123,9 @@ export default function Page() {
   const [role, setRole] = useState<RoleValue | "">("");
   const [roleOpen, setRoleOpen] = useState(false);
 
+  // ✅ Prevent auto-redirect loops on first load
+  const autoRouteOnce = useRef(false);
+
   // ✅ Initialize language from URL/storage/browser
   useEffect(() => {
     const initial = resolveInitialLang();
@@ -1119,10 +1136,17 @@ export default function Page() {
   // ✅ If already logged in, route like Welcome
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        routeLikeWelcome(user, lang).catch((e: any) => {
+      // If there's already a Firebase session, quietly route the user into the app.
+      // IMPORTANT: don't show an error message on first load (it scares users).
+      if (user && !autoRouteOnce.current) {
+        autoRouteOnce.current = true;
+        routeLikeWelcome(user, lang).catch(async (e: any) => {
           console.error(e);
-          setMsg(e?.message || "Custom token API failed.");
+          // If token exchange fails, clear the session so the user can log in again.
+          try {
+            await signOut(auth);
+          } catch {}
+          autoRouteOnce.current = false;
         });
       }
     });
