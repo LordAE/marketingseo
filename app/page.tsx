@@ -1177,203 +1177,291 @@ export default function Page() {
         }}
       />
 
-      <main className="mx-auto w-full max-w-[1440px] px-4 sm:px-6 lg:px-8 py-10 lg:py-12">
-        <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:items-start">
-          {/* Left promo (LIGHT) */}
-          <section className="lg:col-span-7">
-            <div className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2 text-sm text-gray-700 shadow-sm">
-              <span className="h-2 w-2 rounded-full bg-emerald-500" />
-              <span>GreenPass</span>
+      <main className="w-full bg-gradient-to-br from-blue-700 via-blue-600 to-indigo-800 px-2 sm:px-4 lg:px-6 pt-24 pb-10 lg:pt-28 lg:pb-12">
+        <div className="grid grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_520px] xl:grid-cols-[minmax(0,1fr)_560px]">
+          <section className="lg:pr-6 xl:pr-10">
+            <div className="relative overflow-hidden rounded-[44px] border border-white/15 bg-white/10 p-6 sm:p-8 lg:p-10 shadow-[0_22px_90px_rgba(0,0,0,0.35)] backdrop-blur">
+              {/* soft glow */}
+              <div className="pointer-events-none absolute inset-0 opacity-70 [background:radial-gradient(900px_circle_at_15%_20%,rgba(255,255,255,0.22),transparent_55%),radial-gradient(900px_circle_at_85%_30%,rgba(16,185,129,0.18),transparent_55%),radial-gradient(900px_circle_at_60%_90%,rgba(255,255,255,0.10),transparent_55%)]" />
+              <div className="relative">
+                {/* Brand pill */}
+                <div className="inline-flex items-center gap-3 rounded-full bg-white/90 px-4 py-2 text-sm font-semibold text-slate-900 shadow-sm">
+                  <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-emerald-600 text-white">
+                    GP
+                  </span>
+                  <span>GreenPass</span>
+                </div>
+
+                {/* Headline */}
+                <h1 className="mt-7 text-center text-3xl font-extrabold leading-tight tracking-tight text-white sm:text-4xl lg:text-5xl">
+                  <span className="block">{tr(lang, "hero_h1_1", "The Global Marketplace Connecting")}</span>
+                  <span className="block">
+                    {tr(lang, "hero_h1_2", "Schools, Agents, Tutors & Students")}
+                  </span>
+                </h1>
+
+                {/* Tagline */}
+                <p className="mx-auto mt-4 max-w-2xl text-center text-sm leading-6 text-white/85 sm:text-base">
+                  {tr(
+                    lang,
+                    "hero_tagline",
+                    "Study, work, and immigration pathways. Connected transparently in one trusted platform."
+                  )}
+                </p>
+
+                {/* Infographic layout (desktop) */}
+                <div className="relative mt-10 hidden md:block h-[640px] lg:h-[660px]">
+                  {/* orbit + arrows */}
+                  <svg
+                    className="absolute inset-0 z-0 h-full w-full opacity-70"
+                    viewBox="0 0 1000 640"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <defs>
+                      {/* Colorful gradients to match the poster */}
+                      <linearGradient id="gpGreen" x1="0" y1="0" x2="1" y2="1">
+                        <stop stopColor="rgba(52,211,153,0.95)" />
+                        <stop offset="1" stopColor="rgba(16,185,129,0.25)" />
+                      </linearGradient>
+                      <linearGradient id="gpBlue" x1="0" y1="0" x2="1" y2="1">
+                        <stop stopColor="rgba(96,165,250,0.95)" />
+                        <stop offset="1" stopColor="rgba(59,130,246,0.25)" />
+                      </linearGradient>
+                      <linearGradient id="gpPurple" x1="0" y1="0" x2="1" y2="1">
+                        <stop stopColor="rgba(167,139,250,0.95)" />
+                        <stop offset="1" stopColor="rgba(124,58,237,0.25)" />
+                      </linearGradient>
+                      <linearGradient id="gpAmber" x1="0" y1="0" x2="1" y2="1">
+                        <stop stopColor="rgba(251,191,36,0.95)" />
+                        <stop offset="1" stopColor="rgba(245,158,11,0.25)" />
+                      </linearGradient>
+
+                      {/* Arrowhead markers */}
+                      <marker id="arrowGreen" markerWidth="14" markerHeight="14" refX="10" refY="7" orient="auto" markerUnits="userSpaceOnUse">
+                        <path d="M0 0 L14 7 L0 14 Z" fill="rgba(16,185,129,0.85)" />
+                      </marker>
+                      <marker id="arrowBlue" markerWidth="14" markerHeight="14" refX="10" refY="7" orient="auto" markerUnits="userSpaceOnUse">
+                        <path d="M0 0 L14 7 L0 14 Z" fill="rgba(59,130,246,0.85)" />
+                      </marker>
+                      <marker id="arrowPurple" markerWidth="14" markerHeight="14" refX="10" refY="7" orient="auto" markerUnits="userSpaceOnUse">
+                        <path d="M0 0 L14 7 L0 14 Z" fill="rgba(124,58,237,0.85)" />
+                      </marker>
+                      <marker id="arrowAmber" markerWidth="14" markerHeight="14" refX="10" refY="7" orient="auto" markerUnits="userSpaceOnUse">
+                        <path d="M0 0 L14 7 L0 14 Z" fill="rgba(245,158,11,0.85)" />
+                      </marker>
+                    </defs>
+                    <circle cx="500" cy="320" r="150" stroke="rgba(255,255,255,0.28)" strokeWidth="3" strokeDasharray="2 10" />
+                    <circle cx="500" cy="320" r="210" stroke="rgba(255,255,255,0.16)" strokeWidth="2" strokeDasharray="3 14" />
+                    {/* arrows (card-to-card, like the poster) */}
+                    <path d="M360 150 C 460 50, 560 50, 660 150" stroke="url(#gpAmber)" strokeWidth="12" strokeLinecap="round" opacity="0.85" markerEnd="url(#arrowAmber)"/>
+                    <path d="M710 210 C 790 320, 790 320, 710 430" stroke="url(#gpBlue)" strokeWidth="12" strokeLinecap="round" opacity="0.85" markerEnd="url(#arrowBlue)"/>
+                    <path d="M660 490 C 560 590, 460 590, 360 490" stroke="url(#gpPurple)" strokeWidth="12" strokeLinecap="round" opacity="0.80" markerEnd="url(#arrowPurple)"/>
+                    <path d="M290 430 C 210 320, 210 320, 290 210" stroke="url(#gpGreen)" strokeWidth="12" strokeLinecap="round" opacity="0.80" markerEnd="url(#arrowGreen)"/>
+                  </svg>
+
+                  {/* Center GP */}
+                  <div className="absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2">
+                    <div className="relative flex h-28 w-28 items-center justify-center rounded-full bg-white/95 shadow-[0_14px_50px_rgba(0,0,0,0.25)]">
+                      <div className="absolute inset-[-10px] rounded-full border-2 border-white/30" />
+                      <span className="text-3xl font-extrabold text-emerald-700">GP</span>
+                    </div>
+                  </div>
+
+                  {/* Cards */}
+                  <div className="absolute left-0 top-4 z-10 w-[40%] px-2">
+                    <div className="rounded-3xl bg-white/92 p-5 text-slate-900 shadow-[0_18px_50px_rgba(0,0,0,0.20)]">
+                      {/* Illustration */}
+                      <div className="mb-4 flex items-center justify-between rounded-2xl bg-gradient-to-br from-emerald-50 to-sky-50 p-3">
+                        <div className="text-xs font-semibold text-emerald-700/80">{tr(lang, "role_school", "School")}</div>
+                        <div className="h-12 w-20 overflow-hidden rounded-xl bg-white/70 ring-1 ring-black/5">
+                          <svg viewBox="0 0 160 96" className="h-full w-full" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <rect x="16" y="36" width="128" height="44" rx="10" fill="#E8F3FF" />
+                            <rect x="30" y="44" width="24" height="36" rx="6" fill="#C7E1FF" />
+                            <rect x="66" y="44" width="28" height="36" rx="6" fill="#BFE7D8" />
+                            <rect x="106" y="44" width="24" height="36" rx="6" fill="#C7E1FF" />
+                            <path d="M80 18 L32 40 H128 Z" fill="#6FA8FF" />
+                            <rect x="72" y="52" width="16" height="28" rx="6" fill="#2F855A" opacity="0.9" />
+                            <circle cx="132" cy="26" r="10" fill="#34D399" opacity="0.9" />
+                          </svg>
+                        </div>
+                      </div>
+                      <div className="text-xl font-extrabold">{tr(lang, "role_school", "School")}</div>
+                      <div className="mt-1 text-sm text-slate-600">{tr(lang, "school_desc", "Connect with trusted global agents and students")}</div>
+                      <ul className="mt-3 space-y-2 text-sm text-slate-700">
+                        <li className="flex items-start gap-2"><span className="mt-1.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">✓</span>{tr(lang, "school_b1", "Reach verified agents worldwide")}</li>
+                        <li className="flex items-start gap-2"><span className="mt-1.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">✓</span>{tr(lang, "school_b2", "Manage recruitment transparently")}</li>
+                        <li className="flex items-start gap-2"><span className="mt-1.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">✓</span>{tr(lang, "school_b3", "Reduce marketing and admission costs")}</li>
+                      </ul>
+                    </div>
+                  </div>
+
+                  <div className="absolute right-0 top-4 z-10 w-[40%] px-2">
+                    <div className="rounded-3xl bg-white/92 p-5 text-slate-900 shadow-[0_18px_50px_rgba(0,0,0,0.20)]">
+                      {/* Illustration */}
+                      <div className="mb-4 flex items-center justify-between rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 p-3">
+                        <div className="text-xs font-semibold text-blue-700/80">{tr(lang, "role_agent", "Agent")}</div>
+                        <div className="h-12 w-20 overflow-hidden rounded-xl bg-white/70 ring-1 ring-black/5">
+                          <svg viewBox="0 0 160 96" className="h-full w-full" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <rect x="18" y="22" width="124" height="62" rx="14" fill="#EAF2FF" />
+                            <circle cx="64" cy="46" r="14" fill="#1F4ED8" opacity="0.85" />
+                            <rect x="48" y="60" width="34" height="20" rx="10" fill="#93C5FD" />
+                            <circle cx="118" cy="44" r="16" fill="#34D399" opacity="0.9" />
+                            <path d="M118 28c8 6 8 22 0 28c-8-6-8-22 0-28z" fill="#10B981" opacity="0.6" />
+                            <path d="M108 44h20" stroke="#065F46" strokeWidth="2" opacity="0.55" />
+                            <path d="M118 34v20" stroke="#065F46" strokeWidth="2" opacity="0.35" />
+                          </svg>
+                        </div>
+                      </div>
+                      <div className="text-xl font-extrabold">{tr(lang, "role_agent", "Agent")}</div>
+                      <div className="mt-1 text-sm text-slate-600">{tr(lang, "agent_desc", "Work directly with real schools — no middle layers")}</div>
+                      <ul className="mt-3 space-y-2 text-sm text-slate-700">
+                        <li className="flex items-start gap-2"><span className="mt-1.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-blue-100 text-blue-700">✓</span>{tr(lang, "agent_b1", "Access verified schools and programs")}</li>
+                        <li className="flex items-start gap-2"><span className="mt-1.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-blue-100 text-blue-700">✓</span>{tr(lang, "agent_b2", "Track applications clearly")}</li>
+                        <li className="flex items-start gap-2"><span className="mt-1.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-blue-100 text-blue-700">✓</span>{tr(lang, "agent_b3", "Build long-term, trusted partnerships")}</li>
+                      </ul>
+                    </div>
+                  </div>
+
+                  <div className="absolute left-0 bottom-4 z-10 w-[40%] px-2">
+                    <div className="rounded-3xl bg-white/92 p-5 text-slate-900 shadow-[0_18px_50px_rgba(0,0,0,0.20)]">
+                      {/* Illustration */}
+                      <div className="mb-4 flex items-center justify-between rounded-2xl bg-gradient-to-br from-violet-50 to-fuchsia-50 p-3">
+                        <div className="text-xs font-semibold text-violet-700/80">{tr(lang, "role_student", "Students")}</div>
+                        <div className="h-12 w-20 overflow-hidden rounded-xl bg-white/70 ring-1 ring-black/5">
+                          <svg viewBox="0 0 160 96" className="h-full w-full" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <rect x="18" y="22" width="124" height="62" rx="14" fill="#F3E8FF" />
+                            <circle cx="62" cy="46" r="12" fill="#7C3AED" opacity="0.85" />
+                            <rect x="48" y="58" width="28" height="22" rx="11" fill="#C4B5FD" />
+                            <circle cx="98" cy="46" r="12" fill="#A78BFA" opacity="0.9" />
+                            <rect x="84" y="58" width="28" height="22" rx="11" fill="#DDD6FE" />
+                            <path d="M36 74h88" stroke="#6D28D9" strokeWidth="3" opacity="0.18" />
+                          </svg>
+                        </div>
+                      </div>
+                      <div className="text-xl font-extrabold">{tr(lang, "role_student", "Students")}</div>
+                      <div className="mt-1 text-sm text-slate-600">{tr(lang, "student_desc", "Find schools, agents, and tutors you can trust")}</div>
+                      <ul className="mt-3 space-y-2 text-sm text-slate-700">
+                        <li className="flex items-start gap-2">
+                          <span className="mt-1.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-violet-100 text-violet-700 ring-1 ring-violet-200">✓</span>
+                          {tr(lang, "student_b1", "Discover verified schools and programs")}
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="mt-1.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-violet-100 text-violet-700 ring-1 ring-violet-200">✓</span>
+                          {tr(lang, "student_b2", "Connect with reliable agents and tutors")}
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <span className="mt-1.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-violet-100 text-violet-700 ring-1 ring-violet-200">✓</span>
+                          {tr(lang, "student_b3", "Get guided step by step transparently")}
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+
+                  <div className="absolute right-0 bottom-4 z-10 w-[40%] px-2">
+                    <div className="rounded-3xl bg-white/92 p-5 text-slate-900 shadow-[0_18px_50px_rgba(0,0,0,0.20)]">
+                      {/* Illustration */}
+                      <div className="mb-4 flex items-center justify-between rounded-2xl bg-gradient-to-br from-amber-50 to-emerald-50 p-3">
+                        <div className="text-xs font-semibold text-amber-700/80">{tr(lang, "role_tutor", "Tutor")}</div>
+                        <div className="h-12 w-20 overflow-hidden rounded-xl bg-white/70 ring-1 ring-black/5">
+                          <svg viewBox="0 0 160 96" className="h-full w-full" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <rect x="18" y="28" width="124" height="48" rx="14" fill="#FFF7ED" />
+                            <rect x="34" y="36" width="60" height="34" rx="8" fill="#DCFCE7" />
+                            <rect x="98" y="38" width="30" height="18" rx="6" fill="#FDE68A" />
+                            <circle cx="52" cy="40" r="10" fill="#2563EB" opacity="0.75" />
+                            <path d="M44 62h40" stroke="#059669" strokeWidth="4" strokeLinecap="round" opacity="0.5" />
+                            <path d="M108 66l10 10 10-10" stroke="#B45309" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" opacity="0.55" />
+                          </svg>
+                        </div>
+                      </div>
+                      <div className="text-xl font-extrabold">{tr(lang, "role_tutor", "Tutors")}</div>
+                      <div className="mt-1 text-sm text-slate-600">{tr(lang, "tutor_desc", "Support students globally and grow your practice")}</div>
+                      <ul className="mt-3 space-y-2 text-sm text-slate-700">
+                        <li className="flex items-start gap-2"><span className="mt-1.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-amber-100 text-amber-700">✓</span>{tr(lang, "tutor_b1", "Find students internationally")}</li>
+                        <li className="flex items-start gap-2"><span className="mt-1.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-amber-100 text-amber-700">✓</span>{tr(lang, "tutor_b2", "Offer academic and pathway support")}</li>
+                        <li className="flex items-start gap-2"><span className="mt-1.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-amber-100 text-amber-700">✓</span>{tr(lang, "tutor_b3", "Build your professional profile")}</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Mobile cards */}
+                <div className="mt-8 grid grid-cols-1 gap-4 md:hidden">
+                  <div className="rounded-3xl bg-white/92 p-5 text-slate-900 shadow-[0_18px_50px_rgba(0,0,0,0.20)]">
+                    <div className="text-lg font-extrabold">{tr(lang, "role_school", "School")}</div>
+                    <div className="mt-1 text-sm text-slate-600">{tr(lang, "school_desc", "Connect with trusted global agents and students")}</div>
+                  </div>
+                  <div className="rounded-3xl bg-white/92 p-5 text-slate-900 shadow-[0_18px_50px_rgba(0,0,0,0.20)]">
+                    <div className="text-lg font-extrabold">{tr(lang, "role_agent", "Agent")}</div>
+                    <div className="mt-1 text-sm text-slate-600">{tr(lang, "agent_desc", "Work directly with real schools — no middle layers")}</div>
+                  </div>
+                  <div className="rounded-3xl bg-white/92 p-5 text-slate-900 shadow-[0_18px_50px_rgba(0,0,0,0.20)]">
+                    <div className="text-lg font-extrabold">{tr(lang, "role_student", "Students")}</div>
+                    <div className="mt-1 text-sm text-slate-600">{tr(lang, "student_desc", "Find schools, agents, and tutors you can trust")}</div>
+                  </div>
+                  <div className="rounded-3xl bg-white/92 p-5 text-slate-900 shadow-[0_18px_50px_rgba(0,0,0,0.20)]">
+                    <div className="text-lg font-extrabold">{tr(lang, "role_tutor", "Tutors")}</div>
+                    <div className="mt-1 text-sm text-slate-600">{tr(lang, "tutor_desc", "Support students globally and grow your practice")}</div>
+                  </div>
+                </div>
+
+                
+                {/* Bottom trust bullets (poster style) */}
+                <div className="mt-10 w-full text-white/95">
+                  <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-center gap-x-10 gap-y-4">
+                    <div className="flex items-center gap-3">
+                      <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/15 ring-1 ring-white/25">
+                        <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                          <path d="M12 2l7 4v6c0 5-3 9-7 10-4-1-7-5-7-10V6l7-4z" />
+                          <path d="M9 12l2 2 4-4" />
+                        </svg>
+                      </span>
+                      <span className="text-lg font-semibold leading-tight">
+                        {tr(lang, "trust_verified", "✔ Verified profiles").replace("✔", "").trim()}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/15 ring-1 ring-white/25">
+                        <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                          <path d="M12 6a3 3 0 103 3" />
+                          <path d="M12 21a9 9 0 110-18 9 9 0 010 18z" />
+                          <path d="M7.5 12h9" />
+                          <path d="M12 7.5v9" />
+                        </svg>
+                      </span>
+                      <span className="text-lg font-semibold leading-tight">
+                        {tr(lang, "trust_transparent", "✔ Transparent partnerships").replace("✔", "").trim()}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/15 ring-1 ring-white/25">
+                        <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                          <path d="M12 3v18" />
+                          <path d="M7 8l5-5 5 5" />
+                          <path d="M7 16l5 5 5-5" />
+                        </svg>
+                      </span>
+                      <span className="text-lg font-semibold leading-tight">
+                        {tr(lang, "trust_no_hidden", "✔ No hidden agendas").replace("✔", "").trim()}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+
+                {/* Closing line */}
+                <p className="mt-8 text-center text-sm font-semibold text-white/85">
+                  One platform. One journey. Real connections that matter.
+                </p>
+              </div>
             </div>
-
-            {/* Headline + Subheadline */}
-            <h1 className="mt-6 text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl">
-              <span className="block">{tr(lang, "hero_h1_1", "The Global Marketplace Connecting")}</span>
-              <span className="block">
-                <span className="text-slate-900">{tr(lang, "hero_h1_2", "Schools, Agents, Tutors & Students")}</span>
-              </span>
-            </h1>
-
-            <div className="headline-accent-bar mt-4 h-1.5 w-24 rounded-full bg-gradient-to-r from-slate-900 to-slate-500" />
-
-            <p className="mt-4 max-w-2xl text-base leading-7 text-gray-600">
-              {tr(lang, "hero_tagline", "Study, work, and immigration pathways — connected transparently in one trusted platform.")}
-            </p>
-
-            {/* Hero Section Text */}
-            <div className="mt-8 rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
-              <div className="text-xl font-extrabold text-gray-900">
-                {tr(lang, "promo_title", "Build Your Global Education & Career Network with GreenPass")}
-              </div>
-              <p className="mt-3 text-sm leading-6 text-gray-600">
-                {tr(lang, "promo_body", "GreenPass is a trusted marketplace where schools connect with verified agents, agents support students, tutors provide academic guidance, and everyone grows together transparently and efficiently.")}
-              </p>
-
-              {/* Trust line */}
-              <div className="mt-4 flex flex-wrap items-center gap-2 text-sm text-gray-700">
-                <span className="inline-flex items-center rounded-full border border-gray-200 bg-gray-50 px-3 py-1">
-                  {tr(lang, "trust_verified", "✔ Verified profiles")}
-                </span>
-                <span className="inline-flex items-center rounded-full border border-gray-200 bg-gray-50 px-3 py-1">
-                  {tr(lang, "trust_transparent", "✔ Transparent partnerships")}
-                </span>
-                <span className="inline-flex items-center rounded-full border border-gray-200 bg-gray-50 px-3 py-1">
-                  {tr(lang, "trust_no_hidden", "✔ No hidden agendas")}
-                </span>
-              </div>
-
-              {/* Primary CTA */}
-              <div className="mt-5 flex flex-wrap gap-3">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMode("signup");
-                    setMsg(null);
-                    setTimeout(scrollToAuth, 50);
-                  }}
-                  className="rounded-2xl bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700"
-                >
-                  {tr(lang, "promo_cta_join", "Join GreenPass — Start Connecting Today")}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMode("signin");
-                    setMsg(null);
-                    setTimeout(scrollToAuth, 50);
-                  }}
-                  className="rounded-2xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-semibold text-gray-900 shadow-sm hover:bg-gray-50"
-                >
-                  Sign in
-                </button>
-              </div>
-            </div>
-
-            {/* Join as… cards */}
-            <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 items-stretch">
-              {/* School */}
-              <div className="rounded-3xl border border-emerald-200/70 bg-gradient-to-b from-emerald-50 to-white p-5 shadow-sm flex flex-col h-full">
-                <div className="flex-1">
-<div className="inline-flex items-center rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-700">
-                  {tr(lang, "role_school", "School").toUpperCase()}
-                </div>
-                <div className="mt-3 text-base font-extrabold text-gray-900">{tr(lang, "join_school", "Join as a School")}</div>
-                <div className="mt-2 text-sm text-gray-600">
-                  {tr(lang, "school_desc", "Connect with trusted global agents and students")}
-                </div>
-                <ul className="mt-4 space-y-2 text-sm text-gray-700">
-                  <li className="flex gap-2"><span className="mt-2 h-1 w-1 rounded-full bg-emerald-600" />{tr(lang, "school_b1", "Reach verified agents worldwide")}</li>
-                  <li className="flex gap-2"><span className="mt-2 h-1 w-1 rounded-full bg-emerald-600" />{tr(lang, "school_b2", "Manage recruitment transparently")}</li>
-                  <li className="flex gap-2"><span className="mt-2 h-1 w-1 rounded-full bg-emerald-600" />{tr(lang, "school_b3", "Reduce marketing and admission costs")}</li>
-                </ul>
-</div>
-                <div className="mt-auto pt-4">
-                  <button
-                  type="button"
-                  onClick={() => pickRole("school")}
-                  className="w-full rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:from-emerald-700 hover:to-teal-700"
-                  >
-                  {tr(lang, "join_school", "Join as a School")}
-                </button>
-
-                </div>
-              </div>
-
-              {/* Agent */}
-              <div className="rounded-3xl border border-blue-200/70 bg-gradient-to-b from-blue-50 to-white p-5 shadow-sm flex flex-col h-full">
-                <div className="flex-1">
-<div className="inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-xs font-bold text-blue-700">
-                  {tr(lang, "role_agent", "Agent").toUpperCase()}
-                </div>
-                <div className="mt-3 text-base font-extrabold text-gray-900">{tr(lang, "join_agent", "Join as an Agent")}</div>
-                <div className="mt-2 text-sm text-gray-600">
-                  {tr(lang, "agent_desc", "Work directly with real schools — no middle layers")}
-                </div>
-                <ul className="mt-4 space-y-2 text-sm text-gray-700">
-                  <li className="flex gap-2"><span className="mt-2 h-1 w-1 rounded-full bg-blue-600" />{tr(lang, "agent_b1", "Access verified schools and programs")}</li>
-                  <li className="flex gap-2"><span className="mt-2 h-1 w-1 rounded-full bg-blue-600" />{tr(lang, "agent_b2", "Track applications clearly")}</li>
-                  <li className="flex gap-2"><span className="mt-2 h-1 w-1 rounded-full bg-blue-600" />{tr(lang, "agent_b3", "Build long-term, trusted partnerships")}</li>
-                </ul>
-</div>
-                <div className="mt-auto pt-4">
-                  <button
-                  type="button"
-                  onClick={() => pickRole("agent")}
-                  className="w-full rounded-2xl bg-gradient-to-r from-blue-600 to-sky-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:from-blue-700 hover:to-sky-700"
-                  >
-                  {tr(lang, "join_agent", "Join as an Agent")}
-                </button>
-
-                </div>
-              </div>
-
-              {/* Tutor */}
-              <div className="rounded-3xl border border-orange-200/80 bg-gradient-to-b from-orange-50 to-white p-5 shadow-sm flex flex-col h-full">
-                <div className="flex-1">
-<div className="inline-flex items-center rounded-full bg-orange-100 px-3 py-1 text-xs font-bold text-orange-800">
-                  {tr(lang, "role_tutor", "Tutor").toUpperCase()}
-                </div>
-                <div className="mt-3 text-base font-extrabold text-gray-900">{tr(lang, "join_tutor", "Join as a Tutor")}</div>
-                <div className="mt-2 text-sm text-gray-600">
-                  {tr(lang, "tutor_desc", "Support students globally and grow your practice")}
-                </div>
-                <ul className="mt-4 space-y-2 text-sm text-gray-700">
-                  <li className="flex gap-2"><span className="mt-2 h-1 w-1 rounded-full bg-orange-600" />{tr(lang, "tutor_b1", "Find students internationally")}</li>
-                  <li className="flex gap-2"><span className="mt-2 h-1 w-1 rounded-full bg-orange-600" />{tr(lang, "tutor_b2", "Offer academic and pathway support")}</li>
-                  <li className="flex gap-2"><span className="mt-2 h-1 w-1 rounded-full bg-orange-600" />{tr(lang, "tutor_b3", "Build your professional profile")}</li>
-                </ul>
-</div>
-                <div className="mt-auto pt-4">
-                  <button
-                  type="button"
-                  onClick={() => pickRole("tutor")}
-                  className="w-full rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:from-orange-600 hover:to-amber-600"
-                  >
-                  {tr(lang, "join_tutor", "Join as a Tutor")}
-                </button>
-
-                </div>
-              </div>
-
-              {/* Student */}
-              <div className="rounded-3xl border border-teal-200/70 bg-gradient-to-b from-teal-50 to-white p-5 shadow-sm flex flex-col h-full">
-                <div className="flex-1">
-<div className="inline-flex items-center rounded-full bg-teal-100 px-3 py-1 text-xs font-bold text-teal-800">
-                  {tr(lang, "role_student", "Student").toUpperCase()}
-                </div>
-                <div className="mt-3 text-base font-extrabold text-gray-900">{tr(lang, "join_student", "Join as a Student")}</div>
-                <div className="mt-2 text-sm text-gray-600">
-                  {tr(lang, "student_desc", "Find schools, agents, and tutors you can trust")}
-                </div>
-                <ul className="mt-4 space-y-2 text-sm text-gray-700">
-                  <li className="flex gap-2"><span className="mt-2 h-1 w-1 rounded-full bg-teal-600" />{tr(lang, "student_b1", "Discover verified schools and programs")}</li>
-                  <li className="flex gap-2"><span className="mt-2 h-1 w-1 rounded-full bg-teal-600" />{tr(lang, "student_b2", "Connect with reliable agents and tutors")}</li>
-                  <li className="flex gap-2"><span className="mt-2 h-1 w-1 rounded-full bg-teal-600" />{tr(lang, "student_b3", "Get guided step by step transparently")}</li>
-                </ul>
-</div>
-                <div className="mt-auto pt-4">
-                  <button
-                  type="button"
-                  onClick={() => pickRole("student")}
-                  className="w-full rounded-2xl bg-gradient-to-r from-teal-600 to-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:from-teal-700 hover:to-emerald-700"
-                  >
-                  {tr(lang, "join_student", "Join as a Student")}
-                </button>
-
-                </div>
-              </div>
-            </div>
-
-            {/* Closing line */}
-            <p className="mt-6 text-sm font-semibold text-gray-700">
-              One platform. One journey. Real connections that matter.
-            </p>
           </section>
 
           {/* Right auth card (LIGHT) */}
-          <section className="lg:col-span-5 lg:sticky lg:top-6">
-            <div className="mx-auto w-full max-w-md">
+          <section className="lg:sticky lg:top-6 justify-self-end w-full text-gray-900">
+            <div className="w-full max-w-[560px]">
               <div id="auth-card" className="rounded-3xl border border-gray-200 bg-white p-6 shadow-lg">
                 <div className="flex items-center justify-between">
                   <div>
