@@ -1210,7 +1210,7 @@ export default function Page() {
                 </p>
 
                 {/* Infographic layout (desktop) */}
-                <div className="relative mt-10 hidden md:block h-[640px] lg:h-[660px]">
+                <div className="relative mt-10 hidden md:block h-[720px] lg:h-[760px]">
                   {/* orbit + arrows */}
                   <svg
                     className="absolute inset-0 z-0 h-full w-full opacity-70"
@@ -1272,18 +1272,11 @@ export default function Page() {
                   <div className="absolute left-0 top-4 z-10 w-[40%] px-2">
                     <div className="rounded-3xl bg-white/92 p-5 text-slate-900 shadow-[0_18px_50px_rgba(0,0,0,0.20)]">
                       {/* Illustration */}
-                      <div className="mb-4 flex items-center justify-between rounded-2xl bg-gradient-to-br from-emerald-50 to-sky-50 p-3">
-                        <div className="text-xs font-semibold text-emerald-700/80">{tr(lang, "role_school", "School")}</div>
-                        <div className="h-12 w-20 overflow-hidden rounded-xl bg-white/70 ring-1 ring-black/5">
-                          <svg viewBox="0 0 160 96" className="h-full w-full" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                            <rect x="16" y="36" width="128" height="44" rx="10" fill="#E8F3FF" />
-                            <rect x="30" y="44" width="24" height="36" rx="6" fill="#C7E1FF" />
-                            <rect x="66" y="44" width="28" height="36" rx="6" fill="#BFE7D8" />
-                            <rect x="106" y="44" width="24" height="36" rx="6" fill="#C7E1FF" />
-                            <path d="M80 18 L32 40 H128 Z" fill="#6FA8FF" />
-                            <rect x="72" y="52" width="16" height="28" rx="6" fill="#2F855A" opacity="0.9" />
-                            <circle cx="132" cy="26" r="10" fill="#34D399" opacity="0.9" />
-                          </svg>
+                      <div className="mb-4 rounded-2xl bg-gradient-to-br from-emerald-50 to-sky-50 p-3">
+                        
+                        <div />
+                        <div className="relative h-28 w-full overflow-hidden rounded-2xl bg-white/70">
+                          <img src="/role-images/role_school.png" alt="" className="absolute inset-0 h-full w-full object-contain p-2" loading="lazy" />
                         </div>
                       </div>
                       <div className="text-xl font-extrabold">{tr(lang, "role_school", "School")}</div>
@@ -1299,18 +1292,11 @@ export default function Page() {
                   <div className="absolute right-0 top-4 z-10 w-[40%] px-2">
                     <div className="rounded-3xl bg-white/92 p-5 text-slate-900 shadow-[0_18px_50px_rgba(0,0,0,0.20)]">
                       {/* Illustration */}
-                      <div className="mb-4 flex items-center justify-between rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 p-3">
-                        <div className="text-xs font-semibold text-blue-700/80">{tr(lang, "role_agent", "Agent")}</div>
-                        <div className="h-12 w-20 overflow-hidden rounded-xl bg-white/70 ring-1 ring-black/5">
-                          <svg viewBox="0 0 160 96" className="h-full w-full" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                            <rect x="18" y="22" width="124" height="62" rx="14" fill="#EAF2FF" />
-                            <circle cx="64" cy="46" r="14" fill="#1F4ED8" opacity="0.85" />
-                            <rect x="48" y="60" width="34" height="20" rx="10" fill="#93C5FD" />
-                            <circle cx="118" cy="44" r="16" fill="#34D399" opacity="0.9" />
-                            <path d="M118 28c8 6 8 22 0 28c-8-6-8-22 0-28z" fill="#10B981" opacity="0.6" />
-                            <path d="M108 44h20" stroke="#065F46" strokeWidth="2" opacity="0.55" />
-                            <path d="M118 34v20" stroke="#065F46" strokeWidth="2" opacity="0.35" />
-                          </svg>
+                      <div className="mb-4 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 p-3">
+                        
+                        <div />
+                        <div className="relative h-28 w-full overflow-hidden rounded-2xl bg-white/70">
+                          <img src="/role-images/role_agent.png" alt="" className="absolute inset-0 h-full w-full object-contain p-2" loading="lazy" />
                         </div>
                       </div>
                       <div className="text-xl font-extrabold">{tr(lang, "role_agent", "Agent")}</div>
@@ -1326,17 +1312,11 @@ export default function Page() {
                   <div className="absolute left-0 bottom-4 z-10 w-[40%] px-2">
                     <div className="rounded-3xl bg-white/92 p-5 text-slate-900 shadow-[0_18px_50px_rgba(0,0,0,0.20)]">
                       {/* Illustration */}
-                      <div className="mb-4 flex items-center justify-between rounded-2xl bg-gradient-to-br from-violet-50 to-fuchsia-50 p-3">
-                        <div className="text-xs font-semibold text-violet-700/80">{tr(lang, "role_student", "Students")}</div>
-                        <div className="h-12 w-20 overflow-hidden rounded-xl bg-white/70 ring-1 ring-black/5">
-                          <svg viewBox="0 0 160 96" className="h-full w-full" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                            <rect x="18" y="22" width="124" height="62" rx="14" fill="#F3E8FF" />
-                            <circle cx="62" cy="46" r="12" fill="#7C3AED" opacity="0.85" />
-                            <rect x="48" y="58" width="28" height="22" rx="11" fill="#C4B5FD" />
-                            <circle cx="98" cy="46" r="12" fill="#A78BFA" opacity="0.9" />
-                            <rect x="84" y="58" width="28" height="22" rx="11" fill="#DDD6FE" />
-                            <path d="M36 74h88" stroke="#6D28D9" strokeWidth="3" opacity="0.18" />
-                          </svg>
+                      <div className="mb-4 rounded-2xl bg-gradient-to-br from-violet-50 to-fuchsia-50 p-3">
+                        
+                        <div />
+                        <div className="relative h-28 w-full overflow-hidden rounded-2xl bg-white/70">
+                          <img src="/role-images/role_student.png" alt="" className="absolute inset-0 h-full w-full object-contain p-2" loading="lazy" />
                         </div>
                       </div>
                       <div className="text-xl font-extrabold">{tr(lang, "role_student", "Students")}</div>
@@ -1361,17 +1341,11 @@ export default function Page() {
                   <div className="absolute right-0 bottom-4 z-10 w-[40%] px-2">
                     <div className="rounded-3xl bg-white/92 p-5 text-slate-900 shadow-[0_18px_50px_rgba(0,0,0,0.20)]">
                       {/* Illustration */}
-                      <div className="mb-4 flex items-center justify-between rounded-2xl bg-gradient-to-br from-amber-50 to-emerald-50 p-3">
-                        <div className="text-xs font-semibold text-amber-700/80">{tr(lang, "role_tutor", "Tutor")}</div>
-                        <div className="h-12 w-20 overflow-hidden rounded-xl bg-white/70 ring-1 ring-black/5">
-                          <svg viewBox="0 0 160 96" className="h-full w-full" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                            <rect x="18" y="28" width="124" height="48" rx="14" fill="#FFF7ED" />
-                            <rect x="34" y="36" width="60" height="34" rx="8" fill="#DCFCE7" />
-                            <rect x="98" y="38" width="30" height="18" rx="6" fill="#FDE68A" />
-                            <circle cx="52" cy="40" r="10" fill="#2563EB" opacity="0.75" />
-                            <path d="M44 62h40" stroke="#059669" strokeWidth="4" strokeLinecap="round" opacity="0.5" />
-                            <path d="M108 66l10 10 10-10" stroke="#B45309" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" opacity="0.55" />
-                          </svg>
+                      <div className="mb-4 rounded-2xl bg-gradient-to-br from-amber-50 to-emerald-50 p-3">
+                        
+                        <div />
+                        <div className="relative h-28 w-full overflow-hidden rounded-2xl bg-white/70">
+                          <img src="/role-images/role_tutor.jpg" alt="" className="absolute inset-0 h-full w-full object-contain p-2" loading="lazy" />
                         </div>
                       </div>
                       <div className="text-xl font-extrabold">{tr(lang, "role_tutor", "Tutors")}</div>
@@ -1496,32 +1470,10 @@ export default function Page() {
                 </div>
 
                 {/* Social */}
-                <div className="mt-5 space-y-2">
-                  <button
-                    onClick={handleGoogle}
-                    disabled={busy}
-                    className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-semibold shadow-sm hover:bg-gray-50 disabled:opacity-60"
-                  >
-                    {t.google}
-                  </button>
-                  <button
-                    onClick={handleApple}
-                    disabled={busy}
-                    className="w-full rounded-2xl bg-gray-900 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-black disabled:opacity-60"
-                  >
-                    {t.apple}
-                  </button>
-                </div>
-
-                <div className="my-5 flex items-center gap-3">
-                  <div className="h-px flex-1 bg-gray-200" />
-                  <div className="text-xs text-gray-500">{t.or}</div>
-                  <div className="h-px flex-1 bg-gray-200" />
-                </div>
 
                 {/* Role dropdown (CUSTOM, fixes hover-only + dark option issues) */}
                 {mode === "signup" && (
-                  <div className="mb-3" data-role-dropdown>
+                  <div className="mb-4" data-role-dropdown>
                     <label className="mb-1 block text-xs font-semibold text-gray-600">
                       {t.choose_role}
                     </label>
@@ -1560,6 +1512,29 @@ export default function Page() {
                     )}
                   </div>
                 )}
+
+                <div className="mt-5 space-y-2">
+                  <button
+                    onClick={handleGoogle}
+                    disabled={busy}
+                    className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-semibold shadow-sm hover:bg-gray-50 disabled:opacity-60"
+                  >
+                    {t.google}
+                  </button>
+                  <button
+                    onClick={handleApple}
+                    disabled={busy}
+                    className="w-full rounded-2xl bg-gray-900 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-black disabled:opacity-60"
+                  >
+                    {t.apple}
+                  </button>
+                </div>
+
+                <div className="my-5 flex items-center gap-3">
+                  <div className="h-px flex-1 bg-gray-200" />
+                  <div className="text-xs text-gray-500">{t.or}</div>
+                  <div className="h-px flex-1 bg-gray-200" />
+                </div>
 
                 {/* Email */}
                 <div className="space-y-3">
