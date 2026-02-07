@@ -982,19 +982,6 @@ async function ensureUserDoc(user: User, role?: RoleValue) {
   return { exists: true, data };
 }
 
-async function getCustomToken(idToken: string) {
-  const res = await fetch("/api/auth/custom-token", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ idToken }),
-  });
-
-  if (!res.ok) throw new Error("Custom token API failed");
-  const data = await res.json();
-  return data.customToken as string;
-}
-
-
 async function routeLikeWelcome(user: User, lang: LangCode, fallbackRole?: RoleValue) {
   const { exists, data } = await ensureUserDoc(user, fallbackRole);
 
@@ -1003,19 +990,14 @@ async function routeLikeWelcome(user: User, lang: LangCode, fallbackRole?: RoleV
 
   const onboardingCompleted = Boolean(data?.onboarding_completed);
 
-  // ✅ create custom token for app domain login
-  const idToken = await user.getIdToken(true);
-  const customToken = await getCustomToken(idToken);
-
-  const nextPath = !exists || !onboardingCompleted
-    ? `/onboarding?role=${encodeURIComponent(userType)}`
-    : `/dashboard`;
-
-  // ✅ send token via URL hash (safer than query)
-  const url = `${APP_BASE}/auth/callback#token=${encodeURIComponent(customToken)}&next=${encodeURIComponent(nextPath)}&lang=${encodeURIComponent(lang)}`;
-  window.location.assign(url);
+  if (!exists || !onboardingCompleted) {
+    window.location.assign(
+      appLink(`/onboarding?role=${encodeURIComponent(userType)}`, lang)
+    );
+  } else {
+    window.location.assign(appLink(`/dashboard`, lang));
+  }
 }
-
 
 export default function Page() {
   const [lang, setLang] = useState<LangCode>(DEFAULT_LANG);
