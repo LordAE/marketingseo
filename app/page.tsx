@@ -32,12 +32,72 @@ import {
 const APP_BASE = "https://app.greenpassgroup.com";
 // const APP_BASE = "http://localhost:5173";
 
-/** Always returns: APP_BASE + path + ?lang=<lang> */
-function appLink(path: string, lang: string) {
+
+/**
+ * ✅ Build a cross-domain URL to the GreenPass app.
+ * - Always includes ?lang=<lang>
+ * - Optional extra query params (search)
+ * - Optional hash params (hash) — useful for passing tokens without sending them in HTTP referrers
+ */
+function appUrl(
+  path: string,
+  lang: string,
+  search?: Record<string, string | undefined>,
+  hash?: Record<string, string | undefined>
+) {
   const cleanPath = (path || "/").startsWith("/") ? path : `/${path}`;
   const code = lang || "en";
-  const sep = cleanPath.includes("?") ? "&" : "?";
-  return `${APP_BASE}${cleanPath}${sep}lang=${encodeURIComponent(code)}`;
+
+  const url = new URL(`${APP_BASE}${cleanPath}`);
+  url.searchParams.set("lang", code);
+
+  if (search) {
+    Object.entries(search).forEach(([k, v]) => {
+      if (v === undefined || v === null || v === "") return;
+      url.searchParams.set(k, String(v));
+    });
+  }
+
+  if (hash) {
+    const hp = new URLSearchParams();
+    Object.entries(hash).forEach(([k, v]) => {
+      if (v === undefined || v === null || v === "") return;
+      hp.set(k, String(v));
+    });
+    const h = hp.toString();
+    if (h) url.hash = h;
+  }
+
+  return url.toString();
+}
+
+/**
+ * ✅ Exchange an ID token (from SEO domain) into a custom token for the App domain.
+ * This lets the App sign the user in seamlessly on app.greenpassgroup.com.
+ */
+async function fetchCustomToken(idToken: string) {
+  const res = await fetch("/api/auth/custom-token", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ idToken }),
+  });
+
+  if (!res.ok) {
+    let detail = "";
+    try {
+      const j = await res.json();
+      detail = j?.error || j?.message || "";
+    } catch {
+      // ignore
+    }
+    const err = new Error(detail || `Custom token API failed (${res.status})`);
+    (err as any).status = res.status;
+    throw err;
+  }
+
+  const data = (await res.json()) as { customToken?: string };
+  if (!data?.customToken) throw new Error("Custom token missing in API response.");
+  return data.customToken;
 }
 
 type RoleValue = "student" | "agent" | "tutor" | "school";
@@ -982,20 +1042,8 @@ async function ensureUserDoc(user: User, role?: RoleValue) {
   return { exists: true, data };
 }
 
-async function getCustomToken(idToken: string) {
-  const res = await fetch("/api/auth/custom-token", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ idToken }),
-  });
-
-  if (!res.ok) throw new Error("Custom token API failed");
-  const data = await res.json();
-  return data.customToken as string;
-}
-
-
 async function routeLikeWelcome(user: User, lang: LangCode, fallbackRole?: RoleValue) {
+  // 1) Ensure user doc exists (so onboarding_completed/user_type are reliable)
   const { exists, data } = await ensureUserDoc(user, fallbackRole);
 
   const userType: RoleValue =
@@ -1003,19 +1051,20 @@ async function routeLikeWelcome(user: User, lang: LangCode, fallbackRole?: RoleV
 
   const onboardingCompleted = Boolean(data?.onboarding_completed);
 
-  // ✅ create custom token for app domain login
-  const idToken = await user.getIdToken(true);
-  const customToken = await getCustomToken(idToken);
-
-  const nextPath = !exists || !onboardingCompleted
+  // 2) Decide where inside the App we should land
+  const targetPath = !exists || !onboardingCompleted
     ? `/onboarding?role=${encodeURIComponent(userType)}`
     : `/dashboard`;
 
-  // ✅ send token via URL hash (safer than query)
-  const url = `${APP_BASE}/auth/callback#token=${encodeURIComponent(customToken)}&next=${encodeURIComponent(nextPath)}&lang=${encodeURIComponent(lang)}`;
+  // 3) Create App-session token via server (SEO -> App bridge)
+  const idToken = await user.getIdToken(true);
+  const customToken = await fetchCustomToken(idToken);
+
+  // 4) Redirect to App with token in URL hash (safer than query)
+  // App should read: new URLSearchParams(location.hash.slice(1)).get("ct")
+  const url = appUrl(targetPath, lang, undefined, { ct: customToken });
   window.location.assign(url);
 }
-
 
 export default function Page() {
   const [lang, setLang] = useState<LangCode>(DEFAULT_LANG);
@@ -1071,7 +1120,10 @@ export default function Page() {
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (user) => {
       if (user) {
-        routeLikeWelcome(user, lang).catch(() => {});
+        routeLikeWelcome(user, lang).catch((e: any) => {
+          console.error(e);
+          setMsg(e?.message || "Custom token API failed.");
+        });
       }
     });
     return () => unsub();
