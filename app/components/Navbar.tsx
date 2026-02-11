@@ -37,9 +37,11 @@ export default function Navbar({ lang, onLangChange }: Props) {
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
         {/* Brand */}
         <div className="flex items-center gap-2">
-          <div className="grid h-9 w-9 place-items-center rounded-xl bg-emerald-600 text-white font-bold">
-            GP
-          </div>
+          <img
+            src="https://firebasestorage.googleapis.com/v0/b/greenpass-dc92d.firebasestorage.app/o/rawdatas%2FGreenPass%20Official.png?alt=media&token=809da08b-22f6-4049-bbbf-9b82342630e8"
+            alt="GreenPass"
+            className="h-9 w-9 rounded-xl object-cover"
+          />
           <div className="leading-tight">
             <div className="text-sm font-semibold text-gray-900">GreenPass</div>
             <div className="text-xs text-gray-500">Study • Work • Immigration Support</div>
