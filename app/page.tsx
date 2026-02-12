@@ -49,8 +49,11 @@ const ROLE_ITEMS: { value: RoleValue; key: string; def: string }[] = [
  { value: "school", key: "role_school", def: "School" },
 ];
 
-/** ✅ Minimal translations for auth UI (fallback to EN for missing keys) */
-const TX: Record<LangCode, Record<string, string>> = {
+/** ✅ Minimal translations for auth UI (fallback to EN for missing keys)
+ *  NOTE: typed as Record<string,...> so it won't TypeScript-error
+ *  if your LangCode union is narrower than the languages you show.
+ */
+const TX: Record<string, Record<string, string>> = {
  en: {
   // Hero (Option A)
   hero_line1: "Study abroad. Work abroad.",
@@ -881,7 +884,7 @@ const TX: Record<LangCode, Record<string, string>> = {
 
   hero_h1_1: "Der globale Marktplatz, der verbindet",
   hero_h1_2: "Schulen, Agenten, Tutoren & Studierende",
-  hero_tagline: "Studium, Arbeit und Einwanderungswege — transparent verbunden auf einer vertrauenswürdigen Plattform.",
+  hero_tagline: "Studium, Arbeit und Einwanderungswege. Transparent verbunden auf einer vertrauenswürdigen Plattform.",
   promo_title: "Bauen Sie Ihr globales Bildungs- & Karrierenetzwerk mit GreenPass auf",
   promo_body: "GreenPass ist ein vertrauenswürdiger Marktplatz, auf dem Schulen mit verifizierten Agenten zusammenkommen, Agenten Studierende unterstützen, Tutoren akademische Begleitung bieten und alle gemeinsam wachsen transparent und effizient.",
   trust_verified: "✔ Verifizierte Profile",
@@ -1078,7 +1081,6 @@ export default function Page() {
  function pickRole(r: RoleValue) {
   setMode("signup");
   setRole(r);
-  setRoleOpen(false);
   setMsg(null);
   // Wait a tick so the signup UI renders before scrolling
   setTimeout(scrollToAuth, 50);
