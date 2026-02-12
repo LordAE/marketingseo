@@ -1038,7 +1038,6 @@ export default function Page() {
  const [confirm, setConfirm] = useState("");
 
  const [role, setRole] = useState<RoleValue | "">("");
- const [roleOpen, setRoleOpen] = useState(false);
 
  // ✅ Initialize language from URL/storage/browser
  useEffect(() => {
@@ -1157,15 +1156,7 @@ export default function Page() {
   }
  }
 
- // Close role dropdown on outside click
- useEffect(() => {
-  function onDocClick(e: MouseEvent) {
-   const target = e.target as HTMLElement;
-   if (!target.closest?.("[data-role-dropdown]")) setRoleOpen(false);
-  }
-  document.addEventListener("mousedown", onDocClick);
-  return () => document.removeEventListener("mousedown", onDocClick);
- }, []);
+ 
 
  return (
   <div className="min-h-screen flex flex-col bg-gray-50 text-gray-900">
@@ -1177,10 +1168,10 @@ export default function Page() {
     }}
    />
 
-   <main className="w-full flex-1 min-h-0 overflow-hidden bg-gradient-to-br from-blue-700 via-blue-600 to-indigo-800 px-2 sm:px-4 lg:px-6 pt-6 pb-6 lg:pt-6 lg:pb-6">
+   <main className="w-full flex-1 min-h-0 overflow-hidden bg-gradient-to-br from-blue-700 via-blue-600 to-indigo-800 px-2 sm:px-4 lg:px-6 pt-4 pb-4 lg:pt-4 lg:pb-4">
     <div className="grid flex-1 min-h-0 grid-cols-1 items-center gap-8 lg:gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(320px,520px)] xl:grid-cols-[minmax(0,1fr)_minmax(360px,560px)]">
      <section className="lg:pr-6 xl:pr-10">
-      <div className="relative overflow-hidden rounded-[44px] border border-white/15 bg-white/10 p-6 sm:p-8 lg:p-10 shadow-[0_22px_90px_rgba(0,0,0,0.35)] backdrop-blur">
+      <div className="relative overflow-hidden rounded-[44px] border border-white/15 bg-white/10 p-4 sm:p-6 lg:p-7 shadow-[0_22px_90px_rgba(0,0,0,0.35)] backdrop-blur">
        {/* soft glow */}
        <div className="pointer-events-none absolute inset-0 opacity-70 [background:radial-gradient(900px_circle_at_15%_20%,rgba(255,255,255,0.22),transparent_55%),radial-gradient(900px_circle_at_85%_30%,rgba(16,185,129,0.18),transparent_55%),radial-gradient(900px_circle_at_60%_90%,rgba(255,255,255,0.10),transparent_55%)]" />
        <div className="relative">
@@ -1203,7 +1194,9 @@ export default function Page() {
         </p>
 
         {/* Infographic layout (desktop) */}
-        <div className="relative mt-2 hidden md:block h-[720px] lg:h-[760px]">
+        <div className="relative mt-2 hidden md:block h-[62vh] min-h-[460px] max-h-[600px] lg:max-h-[640px]">
+         <div className="absolute inset-0 flex items-center justify-center">
+          <div className="relative h-[640px] w-[1000px] origin-center scale-[0.78] lg:scale-[0.85] xl:scale-[0.9]">
          {/* orbit + arrows */}
          <svg
           className="absolute inset-0 z-0 h-full w-full opacity-70"
@@ -1231,26 +1224,109 @@ export default function Page() {
            </linearGradient>
 
            {/* Arrowhead markers */}
-           <marker id="arrowGreen" markerWidth="14" markerHeight="14" refX="10" refY="7" orient="auto" markerUnits="userSpaceOnUse">
-            <path d="M0 0 L14 7 L0 14 Z" fill="rgba(16,185,129,0.85)" />
-           </marker>
-           <marker id="arrowBlue" markerWidth="14" markerHeight="14" refX="10" refY="7" orient="auto" markerUnits="userSpaceOnUse">
-            <path d="M0 0 L14 7 L0 14 Z" fill="rgba(59,130,246,0.85)" />
-           </marker>
-           <marker id="arrowPurple" markerWidth="14" markerHeight="14" refX="10" refY="7" orient="auto" markerUnits="userSpaceOnUse">
-            <path d="M0 0 L14 7 L0 14 Z" fill="rgba(124,58,237,0.85)" />
-           </marker>
-           <marker id="arrowAmber" markerWidth="14" markerHeight="14" refX="10" refY="7" orient="auto" markerUnits="userSpaceOnUse">
-            <path d="M0 0 L14 7 L0 14 Z" fill="rgba(245,158,11,0.85)" />
-           </marker>
+           {/* Arrowhead markers (auto-rotate with the path tangent) */}
+<marker
+  id="arrowGreen"
+  viewBox="0 0 12 12"
+  markerWidth="10"
+  markerHeight="10"
+  refX="10"
+  refY="6"
+  orient="auto"
+  markerUnits="userSpaceOnUse"
+>
+  <path d="M0 0 L12 6 L0 12 Z" fill="rgba(16,185,129,0.95)" />
+</marker>
+
+<marker
+  id="arrowBlue"
+  viewBox="0 0 12 12"
+  markerWidth="10"
+  markerHeight="10"
+  refX="10"
+  refY="6"
+  orient="auto"
+  markerUnits="userSpaceOnUse"
+>
+  <path d="M0 0 L12 6 L0 12 Z" fill="rgba(59,130,246,0.95)" />
+</marker>
+
+<marker
+  id="arrowPurple"
+  viewBox="0 0 12 12"
+  markerWidth="10"
+  markerHeight="10"
+  refX="10"
+  refY="6"
+  orient="auto"
+  markerUnits="userSpaceOnUse"
+>
+  <path d="M0 0 L12 6 L0 12 Z" fill="rgba(124,58,237,0.95)" />
+</marker>
+
+<marker
+  id="arrowAmber"
+  viewBox="0 0 12 12"
+  markerWidth="10"
+  markerHeight="10"
+  refX="10"
+  refY="6"
+  orient="auto"
+  markerUnits="userSpaceOnUse"
+>
+  <path d="M0 0 L12 6 L0 12 Z" fill="rgba(245,158,11,0.95)" />
+</marker>
+
+
+
           </defs>
-          <circle cx="500" cy="320" r="150" stroke="rgba(255,255,255,0.28)" strokeWidth="3" strokeDasharray="2 10" />
-          <circle cx="500" cy="320" r="210" stroke="rgba(255,255,255,0.16)" strokeWidth="2" strokeDasharray="3 14" />
+          <circle cx="500" cy="320" r="120" stroke="rgba(255,255,255,0.28)" strokeWidth="3" strokeDasharray="2 10" />
+          <circle cx="500" cy="320" r="170" stroke="rgba(255,255,255,0.16)" strokeWidth="2" strokeDasharray="3 14" />
           {/* arrows (card-to-card, like the poster) */}
-          <path d="M360 150 C 460 50, 560 50, 660 150" stroke="url(#gpAmber)" strokeWidth="12" strokeLinecap="round" opacity="0.85" markerEnd="url(#arrowAmber)"/>
-          <path d="M710 210 C 790 320, 790 320, 710 430" stroke="url(#gpBlue)" strokeWidth="12" strokeLinecap="round" opacity="0.85" markerEnd="url(#arrowBlue)"/>
-          <path d="M660 490 C 560 590, 460 590, 360 490" stroke="url(#gpPurple)" strokeWidth="12" strokeLinecap="round" opacity="0.80" markerEnd="url(#arrowPurple)"/>
-          <path d="M290 430 C 210 320, 210 320, 290 210" stroke="url(#gpGreen)" strokeWidth="12" strokeLinecap="round" opacity="0.80" markerEnd="url(#arrowGreen)"/>
+{/* arrows (cycle ring) — ONE perfect circle split into 4 segments */}
+{/* Center is (500,320). Radius 180. Clockwise loop. */}
+{/* Segment 1: School -> Agent (top) */}
+<path
+  d="M372.7 192.7 A180 180 0 0 1 627.3 192.7"
+  stroke="url(#gpAmber)"
+  strokeWidth="12"
+  strokeLinecap="round"
+  opacity="0.9"
+  markerEnd="url(#arrowAmber)"
+/>
+
+{/* Segment 2: Agent -> Tutor (right) */}
+<path
+  d="M627.3 192.7 A180 180 0 0 1 627.3 447.3"
+  stroke="url(#gpBlue)"
+  strokeWidth="12"
+  strokeLinecap="round"
+  opacity="0.9"
+  markerEnd="url(#arrowBlue)"
+/>
+
+{/* Segment 3: Tutor -> Student (bottom) */}
+<path
+  d="M627.3 447.3 A180 180 0 0 1 372.7 447.3"
+  stroke="url(#gpPurple)"
+  strokeWidth="12"
+  strokeLinecap="round"
+  opacity="0.9"
+  markerEnd="url(#arrowPurple)"
+/>
+
+{/* Segment 4: Student -> School (left) */}
+<path
+  d="M372.7 447.3 A180 180 0 0 1 372.7 192.7"
+  stroke="url(#gpGreen)"
+  strokeWidth="12"
+  strokeLinecap="round"
+  opacity="0.9"
+  markerEnd="url(#arrowGreen)"
+/>
+
+
+
          </svg>
 
          {/* Center GP */}
@@ -1336,6 +1412,8 @@ export default function Page() {
             <li className="flex items-start gap-2"><span className="mt-1 inline-flex h-4 w-4 items-center justify-center rounded-full bg-amber-100 text-amber-700">✓</span>{tr(lang, "tutor_b2", "Offer academic and pathway support")}</li>
             <li className="flex items-start gap-2"><span className="mt-1 inline-flex h-4 w-4 items-center justify-center rounded-full bg-amber-100 text-amber-700">✓</span>{tr(lang, "tutor_b3", "Build your professional profile")}</li>
            </ul>
+          </div>
+         </div>
           </div>
          </div>
         </div>
@@ -1452,45 +1530,28 @@ export default function Page() {
 
         {/* Social */}
 
-        {/* Role dropdown (CUSTOM, fixes hover-only + dark option issues) */}
+        {/* Role dropdown (NATIVE <select> — behaves like a real dropdown) */}
         {mode === "signup" && (
-         <div className="mb-4" data-role-dropdown>
+         <div className="mb-4">
           <label className="mb-1 block text-xs font-semibold text-gray-600">
            {t.choose_role}
           </label>
 
-          <button
-           type="button"
-           onClick={() => setRoleOpen((v) => !v)}
-           className="flex w-full items-center justify-between rounded-2xl border border-gray-300 bg-white px-3 py-3 text-sm text-gray-900 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          <select
+           value={role}
+           onChange={(e) => setRole(e.target.value as RoleValue)}
+           className="w-full rounded-2xl border border-gray-300 bg-white px-3 py-3 text-sm text-gray-900 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-emerald-500"
           >
-           <span className={role ? "text-gray-900" : "text-gray-400"}>
-            {role
-             ? ROLE_ITEMS.find((x) => x.value === role)?.def
-             : t.select_role}
-           </span>
-           <span className="text-gray-400">▾</span>
-          </button>
+           <option value="" disabled>
+            {t.select_role}
+           </option>
 
-          {roleOpen && (
-           <div className="mt-2 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-lg">
-            {ROLE_ITEMS.map((r) => (
-             <button
-              key={r.value}
-              type="button"
-              onClick={() => {
-               setRole(r.value);
-               setRoleOpen(false);
-              }}
-              className={`flex w-full items-center px-3 py-3 text-left text-sm hover:bg-gray-50 ${
-               role === r.value ? "bg-emerald-50 text-emerald-700" : "text-gray-900"
-              }`}
-             >
-              {tr(lang, r.key, r.def)}
-             </button>
-            ))}
-           </div>
-          )}
+           {ROLE_ITEMS.map((r) => (
+            <option key={r.value} value={r.value}>
+             {tr(lang, r.key, r.def)}
+            </option>
+           ))}
+          </select>
          </div>
         )}
 
