@@ -989,31 +989,52 @@ function tr(lang: LangCode, key: string, def?: string) {
 }
 
 async function ensureUserDoc(user: User, role?: RoleValue) {
- const ref = doc(db, "users", user.uid);
- const snap = await getDoc(ref);
+  const ref = doc(db, "users", user.uid);
+  const snap = await getDoc(ref);
 
- if (!snap.exists()) {
-  await setDoc(ref, {
-   uid: user.uid,
-   email: user.email || "",
-   full_name: user.displayName || "",
-   user_type: role || "student",
-   onboarding_completed: false,
-   created_at: serverTimestamp(),
-   updated_at: serverTimestamp(),
-  });
-  return { exists: false, data: null as any };
+  const chosen = role || "student";
 
- }
+  if (!snap.exists()) {
+    await setDoc(ref, {
+      uid: user.uid,
+      email: user.email || "",
+      full_name: user.displayName || "",
 
- const data = snap.data();
- const patch: any = { updated_at: serverTimestamp() };
+      selected_role: chosen,
+      user_type: chosen,
+      userType: chosen,
+      role: chosen,
 
- if (role && !data.user_type) patch.user_type = role;
+      onboarding_completed: false,
+      onboarding_step: "basic_info",
 
- // Only patch if needed
- await updateDoc(ref, patch);
- return { exists: true, data };
+      created_at: serverTimestamp(),
+      updated_at: serverTimestamp(),
+    });
+    return { exists: false, data: null as any };
+  }
+
+  const data = snap.data() || {};
+  const patch: any = { updated_at: serverTimestamp() };
+
+  // If SEO provided role, fill any missing role fields (do NOT overwrite existing role)
+  if (role) {
+    if (!data.selected_role) patch.selected_role = chosen;
+    if (!data.user_type) patch.user_type = chosen;
+    if (!data.userType) patch.userType = chosen;
+    if (!data.role) patch.role = chosen;
+  }
+
+  // If step is missing, default to BASIC_INFO so user doesn't re-pick role.
+  if (!data.onboarding_step) patch.onboarding_step = "basic_info";
+
+  // Only write if needed
+  const needsWrite = Object.keys(patch).length > 1;
+  if (needsWrite) {
+    await updateDoc(ref, patch);
+  }
+
+  return { exists: true, data };
 }
 
 async function routeLikeWelcome(user: User, lang: LangCode, fallbackRole?: RoleValue) {
