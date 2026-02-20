@@ -1,5 +1,7 @@
 "use client";
 
+
+import { useSearchParams } from "next/navigation";
 import React, { useEffect, useMemo, useState } from "react";
 import Navbar from "./components/Navbar";
 import LanguageFooter from "./components/LanguageFooter";
@@ -11,15 +13,13 @@ import {
 } from "./lib/lang";
 
 import { auth, db } from "./lib/firebase";
-import {
- GoogleAuthProvider,
+import {GoogleAuthProvider,
  OAuthProvider,
  createUserWithEmailAndPassword,
  onAuthStateChanged,
  signInWithEmailAndPassword,
  signInWithPopup,
- type User,
-} from "firebase/auth";
+ type User, signOut} from "firebase/auth";
 import {
  doc,
  getDoc,
@@ -1059,7 +1059,21 @@ async function routeLikeWelcome(user: User, lang: LangCode, fallbackRole?: RoleV
 
 
 export default function Page() {
- const [lang, setLang] = useState<LangCode>(DEFAULT_LANG);
+ const params = useSearchParams();
+const logout = params.get("logout") === "1";
+const next = params.get("next") || "/";
+
+useEffect(() => {
+  if (!logout) return;
+  (async () => {
+    try {
+      // Sign out on greenpassgroup.com origin so users won't bounce back to app authenticated
+      await signOut(auth);
+    } catch (e) {}
+  })();
+}, [logout]);
+
+const [lang, setLang] = useState<LangCode>(DEFAULT_LANG);
  const t = useMemo(() => {
   return {   signin: tr(lang, "signin"),
    signup: tr(lang, "signup"),
