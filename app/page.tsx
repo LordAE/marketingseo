@@ -30,7 +30,7 @@ import {
 
 /** ✅ Set your app URL here */
 const APP_BASE = "https://app.greenpassgroup.com";
-// const APP_BASE = "http://localhost:5173";
+//const APP_BASE = "http://localhost:5173";
 
 /** Always returns: APP_BASE + path + ?lang=<lang> */
 function appLink(path: string, lang: string) {
@@ -38,6 +38,37 @@ function appLink(path: string, lang: string) {
  const code = lang || "en";
  const sep = cleanPath.includes("?") ? "&" : "?";
  return `${APP_BASE}${cleanPath}${sep}lang=${encodeURIComponent(code)}`;
+}
+
+
+/** ✅ Firebase Functions base URL (for SEO -> App auth bridge)
+ *  Set NEXT_PUBLIC_FUNCTIONS_BASE in your SEO environment (recommended).
+ *  Example: https://us-central1-greenpass-dc92d.cloudfunctions.net
+ */
+const FUNCTIONS_BASE =
+ (process.env.NEXT_PUBLIC_FUNCTIONS_BASE as string | undefined) ||
+ "https://us-central1-greenpass-dc92d.cloudfunctions.net";
+
+/** Create a one-time auth bridge code (server validates ID token) */
+async function createBridgeCode(user: User) {
+ const idToken = await user.getIdToken(true);
+
+ const r = await fetch(`${FUNCTIONS_BASE.replace(/\/+$/, "")}/createAuthBridgeCode`, {
+  method: "POST",
+  headers: {
+   "Content-Type": "application/json",
+   Authorization: `Bearer ${idToken}`,
+  },
+ });
+
+ if (!r.ok) {
+  const msg = await r.text().catch(() => "");
+  throw new Error(msg || "Failed to create auth bridge code");
+ }
+
+ const data = await r.json().catch(() => ({} as any));
+ if (!data?.code) throw new Error("No bridge code returned");
+ return data.code as string;
 }
 
 type RoleValue = "student" | "agent" | "tutor" | "school";
@@ -993,12 +1024,18 @@ async function routeLikeWelcome(user: User, lang: LangCode, fallbackRole?: RoleV
 
  const onboardingCompleted = Boolean(data?.onboarding_completed);
 
- if (!exists || !onboardingCompleted) {
-  window.location.href = appLink(`/app/onboarding?role=${encodeURIComponent(userType)}`, lang);
- } else {
-  window.location.href = `/app/dashboard?lang=${lang}`;
- }
+ // ✅ Cross-domain auth handoff:
+ // SEO (greenpassgroup.com) signs-in the user, then we mint a one-time code
+ // and send them to app.greenpassgroup.com/auth-bridge which signs in via custom token.
+ const code = await createBridgeCode(user);
+
+ const next = !exists || !onboardingCompleted ? "/onboarding" : "/dashboard";
+ window.location.href = appLink(
+  `/auth-bridge?code=${encodeURIComponent(code)}&next=${encodeURIComponent(next)}`,
+  lang
+ );
 }
+
 
 export default function Page() {
  const [lang, setLang] = useState<LangCode>(DEFAULT_LANG);
