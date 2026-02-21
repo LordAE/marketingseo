@@ -1051,6 +1051,10 @@ async function routeLikeWelcome(user: User, lang: LangCode, fallbackRole?: RoleV
  const code = await createBridgeCode(user);
 
  const next = !exists || !onboardingCompleted ? "/onboarding" : "/dashboard";
+
+ // ✅ Important: also sign out on greenpassgroup.com so it does not stay authenticated and bounce back later
+ try { await signOut(auth); } catch {}
+
  window.location.href = appLink(
   `/auth-bridge?code=${encodeURIComponent(code)}&next=${encodeURIComponent(next)}`,
   lang
