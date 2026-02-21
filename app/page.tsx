@@ -1063,14 +1063,55 @@ export default function Page() {
 const logout = params.get("logout") === "1";
 const next = params.get("next") || "/";
 
+const [logoutDone, setLogoutDone] = useState(!logout);
+
 useEffect(() => {
-  if (!logout) return;
-  (async () => {
+  let cancelled = false;
+
+  const run = async () => {
+    if (!logout) {
+      setLogoutDone(true);
+      return;
+    }
+
+    setLogoutDone(false);
+
     try {
-      // Sign out on greenpassgroup.com origin so users won't bounce back to app authenticated
+      // ✅ Sign out on greenpassgroup.com origin so users won't bounce back to app authenticated
       await signOut(auth);
-    } catch (e) {}
-  })();
+    } catch (e) {
+      // ignore
+    }
+
+    // Best-effort cookie cleanup (covers shared cookies on .greenpassgroup.com)
+    try {
+      const expire = "Thu, 01 Jan 1970 00:00:00 GMT";
+      const domains = [".greenpassgroup.com", "greenpassgroup.com", ".www.greenpassgroup.com", "www.greenpassgroup.com"];
+      const names = ["__session", "session", "token", "gp_session", "gp_token"];
+      names.forEach((name) => {
+        document.cookie = `${name}=; expires=${expire}; path=/`;
+        domains.forEach((d) => {
+          document.cookie = `${name}=; expires=${expire}; path=/; domain=${d}`;
+        });
+      });
+    } catch {}
+
+    // Remove the logout flag from the URL so normal auth routing can resume cleanly
+    try {
+      const u = new URL(window.location.href);
+      u.searchParams.delete("logout");
+      u.searchParams.delete("next");
+      u.searchParams.delete("role");
+      window.history.replaceState({}, "", u.pathname + (u.search ? u.search : ""));
+    } catch {}
+
+    if (!cancelled) setLogoutDone(true);
+  };
+
+  run();
+  return () => {
+    cancelled = true;
+  };
 }, [logout]);
 
 const [lang, setLang] = useState<LangCode>(DEFAULT_LANG);
@@ -1122,14 +1163,18 @@ const [lang, setLang] = useState<LangCode>(DEFAULT_LANG);
  }, []);
 
  // ✅ If already logged in, route like Welcome
+ // ✅ If already logged in, route like Welcome (BUT never while logout is running)
  useEffect(() => {
+  if (logout && !logoutDone) return;
+
   const unsub = onAuthStateChanged(auth, (user) => {
+   if (logout && !logoutDone) return;
    if (user) {
     routeLikeWelcome(user, lang).catch(() => {});
    }
   });
   return () => unsub();
- }, [lang]);
+ }, [lang, logout, logoutDone]);
 
  const canSubmit = useMemo(() => {
   if (!email || !password) return false;
