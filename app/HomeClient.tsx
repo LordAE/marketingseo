@@ -146,6 +146,30 @@ async function createBridgeCode(user: User) {
  return data.code as string;
 }
 
+/** Accept an invite (sets role & onboarding fields server-side). */
+async function acceptInvite(user: User, inviteId: string, token: string) {
+ const idToken = await user.getIdToken(true);
+
+ const r = await fetch(
+  `${FUNCTIONS_BASE.replace(/\/+$/, "")}/acceptInvite`,
+  {
+   method: "POST",
+   headers: {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${idToken}`,
+   },
+   body: JSON.stringify({ inviteId, token }),
+  }
+ );
+
+ if (!r.ok) {
+  const msg = await r.text().catch(() => "");
+  throw new Error(msg || "Failed to accept invite");
+ }
+
+ return r.json().catch(() => ({} as any));
+}
+
 type RoleValue = "student" | "agent" | "tutor" | "school";
 
 const ROLE_ITEMS: { value: RoleValue; key: string; def: string }[] = [
@@ -901,25 +925,29 @@ async function ensureUserDoc(user: User, role?: RoleValue) {
  const ref = doc(db, "users", user.uid);
  const snap = await getDoc(ref);
 
- const chosen = role || "student";
+ const chosen = role;
 
  if (!snap.exists()) {
-  await setDoc(ref, {
+  // If role is not provided (eg invite flow sets role server-side),
+  // do NOT default to student here.
+  const base: any = {
    uid: user.uid,
    email: user.email || "",
    full_name: user.displayName || "",
-
-   selected_role: chosen,
-   user_type: chosen,
-   userType: chosen,
-   role: chosen,
-
    onboarding_completed: false,
    onboarding_step: "basic_info",
-
    created_at: serverTimestamp(),
    updated_at: serverTimestamp(),
-  });
+  };
+
+  if (chosen) {
+   base.selected_role = chosen;
+   base.user_type = chosen;
+   base.userType = chosen;
+   base.role = chosen;
+  }
+
+  await setDoc(ref, base);
   return { exists: false, data: null as any };
  }
 
@@ -927,7 +955,7 @@ async function ensureUserDoc(user: User, role?: RoleValue) {
  const patch: any = { updated_at: serverTimestamp() };
 
  // If SEO provided role, fill any missing role fields (do NOT overwrite existing role)
- if (role) {
+ if (chosen) {
   if (!data.selected_role) patch.selected_role = chosen;
   if (!data.user_type) patch.user_type = chosen;
   if (!data.userType) patch.userType = chosen;
@@ -946,7 +974,17 @@ async function ensureUserDoc(user: User, role?: RoleValue) {
  return { exists: true, data };
 }
 
-async function routeLikeWelcome(user: User, lang: LangCode, fallbackRole?: RoleValue) {
+async function routeLikeWelcome(
+ user: User,
+ lang: LangCode,
+ fallbackRole?: RoleValue,
+ invite?: { inviteId: string; token: string }
+) {
+ // If this is an invite link, lock role server-side first.
+ if (invite?.inviteId && invite?.token) {
+  await acceptInvite(user, invite.inviteId, invite.token);
+ }
+
  const { exists, data } = await ensureUserDoc(user, fallbackRole);
 
  const onboardingCompleted = Boolean(data?.onboarding_completed);
@@ -985,8 +1023,12 @@ function normalizeLang(input: string): LangCode {
 export default function HomeClient() {
  const params = useSearchParams();
  const urlLangRaw = params.get("lang") || "";
+ const inviteId = params.get("invite") || "";
+ const inviteToken = params.get("token") || "";
  const logout = params.get("logout") === "1";
  const [logoutDone, setLogoutDone] = useState(!logout);
+
+ const hasInvite = Boolean(inviteId && inviteToken);
 
  useEffect(() => {
   let cancelled = false;
@@ -1129,21 +1171,26 @@ export default function HomeClient() {
   const unsub = onAuthStateChanged(auth, (user) => {
    if (logout && !logoutDone) return;
    if (user) {
-    routeLikeWelcome(user, lang).catch(() => {});
+    routeLikeWelcome(
+     user,
+     lang,
+     undefined,
+     hasInvite ? { inviteId, token: inviteToken } : undefined
+    ).catch(() => {});
    }
   });
   return () => unsub();
- }, [lang, logout, logoutDone]);
+ }, [lang, logout, logoutDone, hasInvite, inviteId, inviteToken]);
 
  const canSubmit = useMemo(() => {
   if (!email || !password) return false;
   if (mode === "signup") {
-   if (!role) return false;
+  if (!hasInvite && !role) return false;
    if (password.length < 6) return false;
    if (password !== confirm) return false;
   }
   return true;
- }, [email, password, confirm, role, mode]);
+ }, [email, password, confirm, role, mode, hasInvite]);
 
  function scrollToAuth() {
   if (typeof document === "undefined") return;
@@ -1168,11 +1215,16 @@ export default function HomeClient() {
 
    if (mode === "signin") {
     const cred = await signInWithEmailAndPassword(auth, email.trim(), password);
-    await routeLikeWelcome(cred.user, lang);
+    await routeLikeWelcome(
+     cred.user,
+     lang,
+     undefined,
+     hasInvite ? { inviteId, token: inviteToken } : undefined
+    );
     return;
    }
 
-   if (!role) {
+   if (!hasInvite && !role) {
     setMsg(t.role_required);
     return;
    }
@@ -1190,8 +1242,17 @@ export default function HomeClient() {
     email.trim(),
     password
    );
-   await ensureUserDoc(cred.user, role as RoleValue);
-   await routeLikeWelcome(cred.user, lang, role as RoleValue);
+
+   if (!hasInvite && role) {
+    await ensureUserDoc(cred.user, role as RoleValue);
+   }
+
+   await routeLikeWelcome(
+    cred.user,
+    lang,
+    !hasInvite && role ? (role as RoleValue) : undefined,
+    hasInvite ? { inviteId, token: inviteToken } : undefined
+   );
   } catch (e: any) {
    const code = String(e?.code || "");
    if (
@@ -1230,7 +1291,12 @@ export default function HomeClient() {
    setBusy(true);
    const provider = new GoogleAuthProvider();
    const cred = await signInWithPopup(auth, provider);
-   await routeLikeWelcome(cred.user, lang, role ? (role as RoleValue) : undefined);
+   await routeLikeWelcome(
+    cred.user,
+    lang,
+    !hasInvite && role ? (role as RoleValue) : undefined,
+    hasInvite ? { inviteId, token: inviteToken } : undefined
+   );
   } catch (e: any) {
    setMsg(e?.message || t.google_fail);
   } finally {
@@ -1244,7 +1310,12 @@ export default function HomeClient() {
    setBusy(true);
    const provider = new OAuthProvider("apple.com");
    const cred = await signInWithPopup(auth, provider);
-   await routeLikeWelcome(cred.user, lang, role ? (role as RoleValue) : undefined);
+   await routeLikeWelcome(
+    cred.user,
+    lang,
+    !hasInvite && role ? (role as RoleValue) : undefined,
+    hasInvite ? { inviteId, token: inviteToken } : undefined
+   );
   } catch (e: any) {
    setMsg(e?.message || t.apple_fail);
   } finally {
