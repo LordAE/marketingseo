@@ -1030,12 +1030,6 @@ export default function HomeClient() {
 
  const hasInvite = Boolean(inviteId && inviteToken);
 
-  // ✅ AUTO-OPEN SIGNUP FOR INVITES
-  useEffect(() => {
-    if (hasInvite) setMode("signup");
-  }, [hasInvite]);
-
-
  useEffect(() => {
   let cancelled = false;
 
@@ -1878,7 +1872,7 @@ export default function HomeClient() {
         )}
 
         {/* Role dropdown */}
-        {authView === "auth" && mode === "signup" && (
+        {authView === "auth" && mode === "signup" && !hasInvite && (
          <div className="mt-5">
           <label className="mb-1 block text-xs font-semibold text-gray-600">
            {t.choose_role}
