@@ -1,20 +1,13 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-
-// Invite URL format:
-//  https://greenpassgroup.com/join?invite=...&token=...
-// This is a CLIENT redirect so it works even on static hosting.
 
 export default function JoinPage() {
-  const router = useRouter();
-  const params = useSearchParams();
-
   useEffect(() => {
-    const invite = params.get("invite");
-    const token = params.get("token");
-    const lang = params.get("lang");
+    const url = new URL(window.location.href);
+    const invite = url.searchParams.get("invite");
+    const token = url.searchParams.get("token");
+    const lang = url.searchParams.get("lang");
 
     const sp = new URLSearchParams();
     if (invite) sp.set("invite", invite);
@@ -22,12 +15,8 @@ export default function JoinPage() {
     if (lang) sp.set("lang", lang);
 
     const qs = sp.toString();
-    router.replace(qs ? `/?${qs}` : "/");
-  }, [params, router]);
+    window.location.replace(qs ? `/?${qs}` : "/");
+  }, []);
 
-  return (
-    <main style={{ padding: 24 }}>
-      Redirecting…
-    </main>
-  );
+  return <main style={{ padding: 24 }}>Redirecting…</main>;
 }
