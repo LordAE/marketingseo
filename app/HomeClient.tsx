@@ -1030,10 +1030,11 @@ export default function HomeClient() {
 
  const hasInvite = Boolean(inviteId && inviteToken);
 
- // ✅ AUTO-OPEN SIGNUP FOR INVITES
- useEffect(() => {
-  if (hasInvite) setMode("signup");
- }, [hasInvite]);
+  // ✅ AUTO-OPEN SIGNUP FOR INVITES
+  useEffect(() => {
+    if (hasInvite) setMode("signup");
+  }, [hasInvite]);
+
 
  useEffect(() => {
   let cancelled = false;
