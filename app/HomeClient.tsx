@@ -1134,6 +1134,11 @@ export default function HomeClient() {
  const [busy, setBusy] = useState(false);
  const [msg, setMsg] = useState<string | null>(null);
 
+ // ✅ If the URL has an invite, open the Sign up tab automatically
+ useEffect(() => {
+  if (hasInvite) setMode("signup");
+ }, [hasInvite]);
+
  useEffect(() => {
   setAuthView("auth");
  }, [mode]);
@@ -1872,7 +1877,7 @@ export default function HomeClient() {
         )}
 
         {/* Role dropdown */}
-        {authView === "auth" && mode === "signup" && !hasInvite && (
+        {authView === "auth" && mode === "signup" && (
          <div className="mt-5">
           <label className="mb-1 block text-xs font-semibold text-gray-600">
            {t.choose_role}
