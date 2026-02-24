@@ -1872,7 +1872,7 @@ export default function HomeClient() {
         )}
 
         {/* Role dropdown */}
-        {authView === "auth" && mode === "signup" && (
+        {authView === "auth" && mode === "signup" && !hasInvite && (
          <div className="mt-5">
           <label className="mb-1 block text-xs font-semibold text-gray-600">
            {t.choose_role}
