@@ -1030,6 +1030,11 @@ export default function HomeClient() {
 
  const hasInvite = Boolean(inviteId && inviteToken);
 
+ // ✅ AUTO-OPEN SIGNUP FOR INVITES
+ useEffect(() => {
+  if (hasInvite) setMode("signup");
+ }, [hasInvite]);
+
  useEffect(() => {
   let cancelled = false;
 
@@ -1133,11 +1138,6 @@ export default function HomeClient() {
  const [authView, setAuthView] = useState<"auth" | "forgot">("auth");
  const [busy, setBusy] = useState(false);
  const [msg, setMsg] = useState<string | null>(null);
-
- // ✅ If the URL has an invite, open the Sign up tab automatically
- useEffect(() => {
-  if (hasInvite) setMode("signup");
- }, [hasInvite]);
 
  useEffect(() => {
   setAuthView("auth");
