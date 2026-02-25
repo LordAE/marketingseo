@@ -1030,6 +1030,48 @@ export default function HomeClient() {
 
  const hasInvite = Boolean(inviteId && inviteToken);
 
+
+// ✅ LOAD INVITE ROLE (preselect + lock) when opening an invite link
+useEffect(() => {
+ let cancelled = false;
+
+ const run = async () => {
+  if (!hasInvite) return;
+
+  setInviteRoleLoading(true);
+  try {
+   const base = FUNCTIONS_BASE.replace(/\/+$/, "");
+   const url = `${base}/getInviteRolePublic?inviteId=${encodeURIComponent(inviteId)}&token=${encodeURIComponent(inviteToken)}`;
+   const r = await fetch(url, { method: "GET" });
+   const data = await r.json();
+
+   if (cancelled) return;
+
+   if (!data?.ok || !data?.role) {
+    setMsg("Invalid or expired invite link.");
+    return;
+   }
+
+   setRole(data.role as RoleValue);
+
+   // Optional: Prefill invited email if returned
+   if (data.invitedEmail && typeof data.invitedEmail === "string") {
+    setEmail(data.invitedEmail);
+   }
+  } catch (e) {
+   if (!cancelled) setMsg("Could not verify invite link.");
+  } finally {
+   if (!cancelled) setInviteRoleLoading(false);
+  }
+ };
+
+ run();
+ return () => {
+  cancelled = true;
+ };
+}, [hasInvite, inviteId, inviteToken]);
+
+
  useEffect(() => {
   let cancelled = false;
 
@@ -1148,6 +1190,8 @@ export default function HomeClient() {
 
  const [role, setRole] = useState<RoleValue | "">("");
 
+ const [inviteRoleLoading, setInviteRoleLoading] = useState(false);
+
  // ✅ Initialize language from URL/storage/browser
  useEffect(() => {
   // Prefer explicit URL lang when present; normalize to match TX keys
@@ -1185,7 +1229,11 @@ export default function HomeClient() {
  const canSubmit = useMemo(() => {
   if (!email || !password) return false;
   if (mode === "signup") {
-  if (!hasInvite && !role) return false;
+  if (hasInvite) {
+   if (inviteRoleLoading || !role) return false;
+  } else {
+   if (!role) return false;
+  }
    if (password.length < 6) return false;
    if (password !== confirm) return false;
   }
@@ -1224,6 +1272,10 @@ export default function HomeClient() {
     return;
    }
 
+   if (hasInvite && (inviteRoleLoading || !role)) {
+    setMsg("Verifying invite… please wait.");
+    return;
+   }
    if (!hasInvite && !role) {
     setMsg(t.role_required);
     return;
@@ -1872,7 +1924,7 @@ export default function HomeClient() {
         )}
 
         {/* Role dropdown */}
-        {authView === "auth" && mode === "signup" && !hasInvite && (
+        {authView === "auth" && mode === "signup" && (
          <div className="mt-5">
           <label className="mb-1 block text-xs font-semibold text-gray-600">
            {t.choose_role}
@@ -1881,6 +1933,7 @@ export default function HomeClient() {
           <select
            value={role}
            onChange={(e) => setRole(e.target.value as RoleValue)}
+           disabled={busy || inviteRoleLoading || hasInvite}
            className="w-full rounded-2xl border border-gray-300 bg-white px-3 py-3 text-sm text-gray-900 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-emerald-500"
           >
            <option value="" disabled>
