@@ -1931,20 +1931,20 @@ useEffect(() => {
           </label>
 
           <select
-           value={role}
-           onChange={(e) => setRole(e.target.value as RoleValue)}
-           disabled={busy || inviteRoleLoading || hasInvite}
-           className="w-full rounded-2xl border border-gray-300 bg-white px-3 py-3 text-sm text-gray-900 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            value={role}
+            onChange={(e) => setRole(e.target.value as RoleValue)}
+            disabled={busy || inviteRoleLoading || hasInvite}
+            className="w-full rounded-2xl border border-gray-300 bg-white px-3 py-3 text-sm text-gray-900 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-emerald-500"
           >
-           <option value="" disabled>
-            {t.select_role}
-           </option>
-
-           {ROLE_ITEMS.map((r) => (
-            <option key={r.value} value={r.value}>
-             {tr(lang, r.key, r.def)}
+            <option value="" disabled>
+              {t.select_role}
             </option>
-           ))}
+
+            {ROLE_ITEMS.map((r) => (
+              <option key={r.value} value={r.value}>
+                {tr(lang, r.key, r.def)}
+              </option>
+            ))}
           </select>
          </div>
         )}
