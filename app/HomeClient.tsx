@@ -1172,7 +1172,18 @@ useEffect(() => {
 
  // auth UI state
  const [mode, setMode] = useState<"signin" | "signup">("signin");
- const [authView, setAuthView] = useState<"auth" | "forgot">("auth");
+ 
+
+  // ✅ FORCE SIGNUP MODE WHEN INVITE PARAMS EXIST (runs on first client render)
+  useEffect(() => {
+    try {
+      const p = new URLSearchParams(window.location.search);
+      const invite = p.get("invite");
+      const token = p.get("token");
+      if (invite && token) setMode("signup");
+    } catch {}
+  }, []);
+const [authView, setAuthView] = useState<"auth" | "forgot">("auth");
  const [busy, setBusy] = useState(false);
  const [msg, setMsg] = useState<string | null>(null);
 
