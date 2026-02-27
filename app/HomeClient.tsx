@@ -113,6 +113,20 @@ function appLink(path: string, lang: string) {
  return `${APP_BASE}${cleanPath}${sep}lang=${encodeURIComponent(code)}`;
 }
 
+/**
+ * ✅ Safe internal `next` param only (prevents open redirects)
+ * Allows only paths like "/accept-org-invite?..." and blocks full URLs.
+ */
+function safeNextPath(p: string) {
+ const raw = (p || "").trim();
+ if (!raw) return "";
+ if (!raw.startsWith("/")) return "";
+ if (raw.startsWith("//")) return "";
+ const lower = raw.toLowerCase();
+ if (lower.includes("http://") || lower.includes("https://")) return "";
+ return raw;
+}
+
 /** ✅ Firebase Functions base URL (for SEO -> App auth bridge)
  *  Set NEXT_PUBLIC_FUNCTIONS_BASE in your SEO environment (recommended).
  *  Example: https://us-central1-greenpass-dc92d.cloudfunctions.net
@@ -978,6 +992,7 @@ async function routeLikeWelcome(
  user: User,
  lang: LangCode,
  fallbackRole?: RoleValue,
+ nextFromUrl?: string,
  invite?: { inviteId: string; token: string }
 ) {
  // If this is an invite link, lock role server-side first.
@@ -994,9 +1009,15 @@ async function routeLikeWelcome(
  // and send them to app.greenpassgroup.com/auth-bridge which signs in via custom token.
  const code = await createBridgeCode(user);
 
- const next = !exists || !onboardingCompleted ? "/onboarding" : "/dashboard";
+ // ✅ Preserve a safe `next` from SEO (e.g. /accept-org-invite?invite=...&token=...)
+ const safeNext = safeNextPath(nextFromUrl || "");
+ const next = safeNext || (!exists || !onboardingCompleted ? "/onboarding" : "/dashboard");
+
+ // Pass role to AuthBridge (helps NEW users create the right role doc)
+ const roleParam = fallbackRole ? `&role=${encodeURIComponent(fallbackRole)}` : "";
+
  window.location.href = appLink(
-  `/auth-bridge?code=${encodeURIComponent(code)}&next=${encodeURIComponent(next)}`,
+  `/auth-bridge?code=${encodeURIComponent(code)}&next=${encodeURIComponent(next)}${roleParam}`,
   lang
  );
 }
@@ -1025,6 +1046,10 @@ export default function HomeClient() {
  const urlLangRaw = params.get("lang") || "";
  const inviteId = params.get("invite") || "";
  const inviteToken = params.get("token") || "";
+
+ // ✅ Preserve safe `next` (for org invitations and other deep links)
+ const rawNextFromUrl = params.get("next") || "";
+ const nextFromUrl = safeNextPath(rawNextFromUrl);
  const logout = params.get("logout") === "1";
  const [logoutDone, setLogoutDone] = useState(!logout);
 
@@ -1230,6 +1255,7 @@ const [authView, setAuthView] = useState<"auth" | "forgot">("auth");
      user,
      lang,
      undefined,
+     nextFromUrl,
      hasInvite ? { inviteId, token: inviteToken } : undefined
     ).catch(() => {});
    }
@@ -1278,6 +1304,7 @@ const [authView, setAuthView] = useState<"auth" | "forgot">("auth");
      cred.user,
      lang,
      undefined,
+     nextFromUrl,
      hasInvite ? { inviteId, token: inviteToken } : undefined
     );
     return;
@@ -1314,6 +1341,7 @@ const [authView, setAuthView] = useState<"auth" | "forgot">("auth");
     cred.user,
     lang,
     !hasInvite && role ? (role as RoleValue) : undefined,
+    nextFromUrl,
     hasInvite ? { inviteId, token: inviteToken } : undefined
    );
   } catch (e: any) {
@@ -1358,6 +1386,7 @@ const [authView, setAuthView] = useState<"auth" | "forgot">("auth");
     cred.user,
     lang,
     !hasInvite && role ? (role as RoleValue) : undefined,
+    nextFromUrl,
     hasInvite ? { inviteId, token: inviteToken } : undefined
    );
   } catch (e: any) {
@@ -1377,6 +1406,7 @@ const [authView, setAuthView] = useState<"auth" | "forgot">("auth");
     cred.user,
     lang,
     !hasInvite && role ? (role as RoleValue) : undefined,
+    nextFromUrl,
     hasInvite ? { inviteId, token: inviteToken } : undefined
    );
   } catch (e: any) {
