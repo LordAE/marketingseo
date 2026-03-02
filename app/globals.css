@@ -1,9 +1,14 @@
-/* === SEO Global Font: Times New Roman === */
-html, body {
-  font-family: "Times New Roman", Times, serif;
-}
+/* === SEO Global Font: Inter (Recommended) === */
+
+/* Load Inter (Google Fonts) */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 
 @import "tailwindcss";
+
+html,
+body {
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+}
 
 :root {
   --background: #ffffff;
@@ -13,14 +18,13 @@ html, body {
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+
+  /* Keep your theme tokens, but ensure sans maps to Inter */
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
 }
 
 /* Marketing site is intentionally light-only (white background). */
-
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: "Times New Roman", Times, serif;
 }
