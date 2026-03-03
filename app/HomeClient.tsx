@@ -244,13 +244,18 @@ const TX: Record<string, Record<string, string>> = {
   password_ph: "Password",
   confirm: "Confirm password",
   confirm_ph: "Confirm password",
+  pw_req_title: "Password requirements:",
+  pw_req_len: "Minimum length: 8 characters",
+  pw_req_upper: "At least 1 uppercase letter",
+  pw_req_num: "At least 1 number",
+  pw_req_special: "At least 1 special character",
   cta_login: "Log in",
   cta_signup: "Create account",
   have_account: "Have an account?",
   no_account: "Don’t have an account?",
   role_required: "Please select a role.",
   pw_mismatch: "Passwords do not match.",
-  weak_pw: "Password must be at least 6 characters.",
+  weak_pw: "Password must be at least 8 characters and include 1 uppercase letter, 1 number, and 1 special character.",
   invalid_creds: "Invalid email or password.",
   email_in_use: "Email is already in use.",
   loading: "Please wait…",
@@ -335,6 +340,11 @@ const TX: Record<string, Record<string, string>> = {
   choose_role: "Chọn vai trò",
   confirm: "Xác nhận mật khẩu",
   confirm_ph: "Xác nhận mật khẩu",
+  pw_req_title: "Yêu cầu mật khẩu:",
+  pw_req_len: "Tối thiểu 8 ký tự",
+  pw_req_upper: "Ít nhất 1 chữ cái viết hoa",
+  pw_req_num: "Ít nhất 1 chữ số",
+  pw_req_special: "Ít nhất 1 ký tự đặc biệt",
   cta_login: "Đăng nhập",
   cta_signup: "Tạo tài khoản",
   email: "Email",
@@ -451,7 +461,30 @@ const TX: Record<string, Record<string, string>> = {
   google_fail: "Hindi nagtagumpay ang Google sign-in.",
   apple_fail: "Hindi nagtagumpay ang Apple sign-in.",
   generic_error: "May nangyaring error.",
- },
+ 
+
+  pw_req_title: "Mga kailangan sa password:",
+  pw_req_len: "Minimum na haba: 8 karakter",
+  pw_req_upper: "May hindi bababa sa 1 malaking titik",
+  pw_req_num: "May hindi bababa sa 1 numero",
+  pw_req_special: "May hindi bababa sa 1 espesyal na karakter",
+
+  school_b1: "Abutin ang mga verified na ahente sa buong mundo",
+  school_b2: "Pamahalaan ang recruitment nang transparent",
+  school_b3: "Bawasan ang marketing at admission costs",
+
+  agent_b1: "Mag-access sa verified na schools at programs",
+  agent_b2: "I-track nang malinaw ang student leads at cases",
+  agent_b3: "Bumuo ng pangmatagalang, trusted partnerships",
+
+  student_b1: "Tuklasin ang verified na schools at programs",
+  student_b2: "Kumonekta sa reliable na agents at tutors",
+  student_b3: "Makakuha ng gabay step-by-step transparently",
+
+  tutor_b1: "Humanap ng students internationally",
+  tutor_b2: "Mag-alok ng academic at pathway support",
+  tutor_b3: "Bumuo ng professional profile mo",
+},
 
  ceb: {
   hero_h1_1: "Ang Global Marketplace nga Nagkonektar",
@@ -504,7 +537,34 @@ const TX: Record<string, Record<string, string>> = {
   google_fail: "Napakyas ang Google sign-in.",
   apple_fail: "Napakyas ang Apple sign-in.",
   generic_error: "Naay sayop nga nahitabo.",
- },
+ 
+
+  pw_req_title: "Mga kinahanglanon sa password:",
+  pw_req_len: "Minimum nga gitas-on: 8 ka karakter",
+  pw_req_upper: "Labing menos 1 ka dakong letra",
+  pw_req_num: "Labing menos 1 ka numero",
+  pw_req_special: "Labing menos 1 ka espesyal nga karakter",
+
+  school_desc: "Konektahi ang kasaligan nga mga ahente ug estudyante sa tibuok kalibutan",
+  school_b1: "Maabot ang verified nga mga ahente sa tibuok kalibutan",
+  school_b2: "Dumala sa recruitment nga klaro ug transparent",
+  school_b3: "Paminusa ang marketing ug admission costs",
+
+  agent_desc: "Direktang makipagtrabaho sa tinuod nga schools—walay middle layers",
+  agent_b1: "Access verified nga mga eskwelahan ug programs",
+  agent_b2: "Subayi ang student leads ug cases nga klaro",
+  agent_b3: "Tukora ang dugayng-panahon, kasaligan nga partnerships",
+
+  student_desc: "Pangitaa ang schools, agents ug tutors nga kasaligan",
+  student_b1: "Ila ang verified nga schools ug programs",
+  student_b2: "Konektahi ang kasaligan nga agents ug tutors",
+  student_b3: "Makakuha ug giya step-by-step nga transparent",
+
+  tutor_desc: "Suportahi ang mga estudyante sa tibuok kalibutan ug patuboa ang imong practice",
+  tutor_b1: "Pangitaa ang students internationally",
+  tutor_b2: "Ihatag ang academic ug pathway support",
+  tutor_b3: "Tukora ang imong professional profile",
+},
 
  es: {
   hero_h1_1: "El Mercado Global que Conecta",
@@ -531,7 +591,13 @@ const TX: Record<string, Record<string, string>> = {
   password_ph: "Contraseña",
   confirm: "Confirmar contraseña",
   confirm_ph: "Confirmar contraseña",
-  cta_login: "Entrar",
+  
+  pw_req_title: "Requisitos de contraseña:",
+  pw_req_len: "Longitud mínima: 8 caracteres",
+  pw_req_upper: "Al menos 1 letra mayúscula",
+  pw_req_num: "Al menos 1 número",
+  pw_req_special: "Al menos 1 carácter especial",
+cta_login: "Entrar",
   cta_signup: "Crear cuenta",
   have_account: "¿Ya tienes cuenta?",
   no_account: "¿No tienes cuenta?",
@@ -557,6 +623,22 @@ const TX: Record<string, Record<string, string>> = {
   google_fail: "Error al iniciar sesión con Google.",
   apple_fail: "Error al iniciar sesión con Apple.",
   generic_error: "Algo salió mal.",
+  school_desc: "Conéctate con agentes y estudiantes de confianza en todo el mundo",
+  school_b1: "Llega a agentes verificados en todo el mundo",
+  school_b2: "Gestiona la captación de forma transparente",
+  school_b3: "Reduce los costos de marketing y admisión",
+  agent_desc: "Trabaja directamente con escuelas reales. Sin intermediarios",
+  agent_b1: "Accede a escuelas y programas verificados",
+  agent_b2: "Rastrea claramente leads y casos de estudiantes",
+  agent_b3: "Construye alianzas duraderas y de confianza",
+  student_desc: "Encuentra escuelas, agentes y tutores en los que puedas confiar",
+  student_b1: "Descubre escuelas y programas verificados",
+  student_b2: "Conéctate con agentes y tutores confiables",
+  student_b3: "Recibe guía paso a paso con transparencia",
+  tutor_desc: "Apoya a estudiantes globalmente y haz crecer tu práctica",
+  tutor_b1: "Encuentra estudiantes internacionales",
+  tutor_b2: "Ofrece apoyo académico y de pathway",
+  tutor_b3: "Construye tu perfil profesional",
  },
 
  ja: {
@@ -584,7 +666,13 @@ const TX: Record<string, Record<string, string>> = {
   password_ph: "パスワード",
   confirm: "パスワード確認",
   confirm_ph: "パスワード確認",
-  cta_login: "ログイン",
+  
+  pw_req_title: "パスワード要件：",
+  pw_req_len: "最小長：8文字",
+  pw_req_upper: "大文字を1文字以上",
+  pw_req_num: "数字を1つ以上",
+  pw_req_special: "特殊文字を1つ以上",
+cta_login: "ログイン",
   cta_signup: "作成する",
   have_account: "アカウントをお持ちですか？",
   no_account: "アカウントをお持ちでないですか？",
@@ -610,6 +698,22 @@ const TX: Record<string, Record<string, string>> = {
   google_fail: "Googleでのログインに失敗しました。",
   apple_fail: "Appleでのログインに失敗しました。",
   generic_error: "問題が発生しました。",
+  school_desc: "信頼できる世界中のエージェントと学生とつながる",
+  school_b1: "認証済みエージェントに世界中でアクセス",
+  school_b2: "募集活動を透明に管理",
+  school_b3: "マーケティング・入学コストを削減",
+  agent_desc: "実在する学校と直接連携。仲介なし",
+  agent_b1: "認証済みの学校・プログラムにアクセス",
+  agent_b2: "学生リードとケースを明確に追跡",
+  agent_b3: "長期的で信頼できるパートナーシップを構築",
+  student_desc: "信頼できる学校・エージェント・チューターを見つける",
+  student_b1: "認証済みの学校・プログラムを発見",
+  student_b2: "信頼できるエージェントやチューターとつながる",
+  student_b3: "透明性のあるステップ別ガイドを受ける",
+  tutor_desc: "世界中の学生を支援し、活動を拡大",
+  tutor_b1: "海外の学生を見つける",
+  tutor_b2: "学習と進路のサポートを提供",
+  tutor_b3: "プロフェッショナルプロフィールを構築",
  },
 
  ko: {
@@ -637,7 +741,13 @@ const TX: Record<string, Record<string, string>> = {
   password_ph: "비밀번호",
   confirm: "비밀번호 확인",
   confirm_ph: "비밀번호 확인",
-  cta_login: "로그인",
+  
+  pw_req_title: "비밀번호 요구 사항:",
+  pw_req_len: "최소 길이: 8자",
+  pw_req_upper: "대문자 1개 이상",
+  pw_req_num: "숫자 1개 이상",
+  pw_req_special: "특수문자 1개 이상",
+cta_login: "로그인",
   cta_signup: "계정 만들기",
   have_account: "계정이 있나요?",
   no_account: "계정이 없나요?",
@@ -663,6 +773,22 @@ const TX: Record<string, Record<string, string>> = {
   google_fail: "Google 로그인에 실패했습니다.",
   apple_fail: "Apple 로그인에 실패했습니다.",
   generic_error: "문제가 발생했습니다.",
+  school_desc: "신뢰할 수 있는 전 세계 에이전트와 학생과 연결",
+  school_b1: "전 세계 인증된 에이전트에 도달",
+  school_b2: "리크루팅을 투명하게 관리",
+  school_b3: "마케팅 및 입학 비용 절감",
+  agent_desc: "실제 학교와 직접 협업. 중간 단계 없음",
+  agent_b1: "인증된 학교와 프로그램에 접근",
+  agent_b2: "학생 리드와 케이스를 명확히 추적",
+  agent_b3: "장기적이고 신뢰할 수 있는 파트너십 구축",
+  student_desc: "신뢰할 수 있는 학교, 에이전트, 튜터 찾기",
+  student_b1: "인증된 학교와 프로그램 발견",
+  student_b2: "신뢰할 수 있는 에이전트와 튜터와 연결",
+  student_b3: "투명한 단계별 안내 받기",
+  tutor_desc: "전 세계 학생을 지원하고 활동을 성장",
+  tutor_b1: "국제 학생 찾기",
+  tutor_b2: "학업 및 경로(pathway) 지원 제공",
+  tutor_b3: "전문 프로필 구축",
  },
 
  zh: {
@@ -690,7 +816,13 @@ const TX: Record<string, Record<string, string>> = {
   password_ph: "密码",
   confirm: "确认密码",
   confirm_ph: "确认密码",
-  cta_login: "登录",
+  
+  pw_req_title: "密码要求：",
+  pw_req_len: "最少长度：8 个字符",
+  pw_req_upper: "至少 1 个大写字母",
+  pw_req_num: "至少 1 个数字",
+  pw_req_special: "至少 1 个特殊字符",
+cta_login: "登录",
   cta_signup: "创建账号",
   have_account: "已有账号？",
   no_account: "还没有账号？",
@@ -716,6 +848,22 @@ const TX: Record<string, Record<string, string>> = {
   google_fail: "Google 登录失败。",
   apple_fail: "Apple 登录失败。",
   generic_error: "出现错误。",
+  school_desc: "与值得信赖的全球中介和学生建立联系",
+  school_b1: "触达全球已验证的中介",
+  school_b2: "透明管理招生与合作",
+  school_b3: "降低营销与招生成本",
+  agent_desc: "直接对接真实院校，无中间环节",
+  agent_b1: "访问已验证的院校与项目",
+  agent_b2: "清晰跟踪学生线索与案例",
+  agent_b3: "建立长期、可信的合作关系",
+  student_desc: "找到你可信赖的院校、中介与导师",
+  student_b1: "发现已验证的院校与项目",
+  student_b2: "连接可靠的中介与导师",
+  student_b3: "获得透明的逐步指导",
+  tutor_desc: "支持全球学生，发展你的辅导业务",
+  tutor_b1: "寻找国际学生",
+  tutor_b2: "提供学术与升学路径支持",
+  tutor_b3: "打造你的专业档案",
  },
 
  ar: {
@@ -743,7 +891,13 @@ const TX: Record<string, Record<string, string>> = {
   password_ph: "كلمة المرور",
   confirm: "تأكيد كلمة المرور",
   confirm_ph: "تأكيد كلمة المرور",
-  cta_login: "تسجيل الدخول",
+  
+  pw_req_title: "متطلبات كلمة المرور:",
+  pw_req_len: "الحد الأدنى للطول: 8 أحرف",
+  pw_req_upper: "حرف كبير واحد على الأقل",
+  pw_req_num: "رقم واحد على الأقل",
+  pw_req_special: "رمز خاص واحد على الأقل",
+cta_login: "تسجيل الدخول",
   cta_signup: "إنشاء حساب",
   have_account: "لديك حساب؟",
   no_account: "ليس لديك حساب؟",
@@ -769,7 +923,28 @@ const TX: Record<string, Record<string, string>> = {
   google_fail: "فشل تسجيل الدخول عبر Google.",
   apple_fail: "فشل تسجيل الدخول عبر Apple.",
   generic_error: "حدث خطأ ما.",
- },
+ 
+
+  school_desc: "تواصل مع وكلاء وطلاب موثوقين حول العالم",
+  school_b1: "الوصول إلى وكلاء موثّقين عالميًا",
+  school_b2: "إدارة الاستقطاب بشفافية",
+  school_b3: "تقليل تكاليف التسويق والقبول",
+
+  agent_desc: "اعمل مباشرة مع مدارس حقيقية دون وسطاء",
+  agent_b1: "الوصول إلى مدارس وبرامج موثّقة",
+  agent_b2: "تتبّع العملاء المحتملين وحالات الطلاب بوضوح",
+  agent_b3: "بناء شراكات طويلة الأمد وموثوقة",
+
+  student_desc: "اعثر على مدارس ووكلاء ومدرّسين يمكنك الوثوق بهم",
+  student_b1: "اكتشف مدارس وبرامج موثّقة",
+  student_b2: "تواصل مع وكلاء ومدرّسين موثوقين",
+  student_b3: "احصل على إرشاد خطوة بخطوة بشفافية",
+
+  tutor_desc: "ادعم الطلاب عالميًا ووسّع عملك",
+  tutor_b1: "اعثر على طلاب دوليين",
+  tutor_b2: "قدّم دعمًا أكاديميًا ودعمًا لمسارات الدراسة",
+  tutor_b3: "ابنِ ملفك المهني",
+},
 
  "pt-BR": {
   hero_h1_1: "O Marketplace Global que Conecta",
@@ -822,7 +997,30 @@ const TX: Record<string, Record<string, string>> = {
   google_fail: "Falha ao entrar com Google.",
   apple_fail: "Falha ao entrar com Apple.",
   generic_error: "Algo deu errado.",
- },
+  school_desc: "Conecte-se com agentes e estudantes confiáveis no mundo todo",
+  school_b1: "Alcance agentes verificados globalmente",
+  school_b2: "Gerencie recrutamento com transparência",
+  school_b3: "Reduza custos de marketing e admissões",
+  agent_desc: "Trabalhe diretamente com escolas reais — sem intermediários",
+  agent_b1: "Acesse escolas e programas verificados",
+  agent_b2: "Acompanhe leads e casos de estudantes com clareza",
+  agent_b3: "Construa parcerias duradouras e confiáveis",
+  student_desc: "Encontre escolas, agentes e tutores em que você pode confiar",
+  student_b1: "Descubra escolas e programas verificados",
+  student_b2: "Conecte-se com agentes e tutores confiáveis",
+  student_b3: "Receba orientação passo a passo com transparência",
+  tutor_desc: "Apoie estudantes globalmente e faça sua prática crescer",
+  tutor_b1: "Encontre estudantes internacionais",
+  tutor_b2: "Ofereça suporte acadêmico e de pathways",
+  tutor_b3: "Construa seu perfil profissional",
+ 
+
+  pw_req_title: "Requisitos da senha:",
+  pw_req_len: "Comprimento mínimo: 8 caracteres",
+  pw_req_upper: "Pelo menos 1 letra maiúscula",
+  pw_req_num: "Pelo menos 1 número",
+  pw_req_special: "Pelo menos 1 caractere especial",
+},
 
  fr: {
   hero_h1_1: "La place de marché mondiale qui connecte",
@@ -849,7 +1047,13 @@ const TX: Record<string, Record<string, string>> = {
   password_ph: "Mot de passe",
   confirm: "Confirmer le mot de passe",
   confirm_ph: "Confirmer le mot de passe",
-  cta_login: "Se connecter",
+  
+  pw_req_title: "Exigences du mot de passe :",
+  pw_req_len: "Longueur minimale : 8 caractères",
+  pw_req_upper: "Au moins 1 lettre majuscule",
+  pw_req_num: "Au moins 1 chiffre",
+  pw_req_special: "Au moins 1 caractère spécial",
+cta_login: "Se connecter",
   cta_signup: "Créer un compte",
   have_account: "Vous avez déjà un compte ?",
   no_account: "Vous n’avez pas de compte ?",
@@ -875,6 +1079,22 @@ const TX: Record<string, Record<string, string>> = {
   google_fail: "Échec de la connexion Google.",
   apple_fail: "Échec de la connexion Apple.",
   generic_error: "Une erreur est survenue.",
+  school_desc: "Connectez-vous à des agents et des étudiants de confiance dans le monde entier",
+  school_b1: "Touchez des agents vérifiés partout dans le monde",
+  school_b2: "Gérez le recrutement en toute transparence",
+  school_b3: "Réduisez les coûts de marketing et d'admission",
+  agent_desc: "Travaillez directement avec de vraies écoles. Aucun intermédiaire",
+  agent_b1: "Accédez à des écoles et des programmes vérifiés",
+  agent_b2: "Suivez clairement les prospects et les dossiers des étudiants",
+  agent_b3: "Bâtissez des partenariats durables et de confiance",
+  student_desc: "Trouvez des écoles, des agents et des tuteurs dignes de confiance",
+  student_b1: "Découvrez des écoles et des programmes vérifiés",
+  student_b2: "Connectez-vous à des agents et des tuteurs fiables",
+  student_b3: "Soyez guidé étape par étape en toute transparence",
+  tutor_desc: "Soutenez des étudiants partout dans le monde et développez votre activité",
+  tutor_b1: "Trouvez des étudiants à l’international",
+  tutor_b2: "Offrez un soutien académique et pour les parcours",
+  tutor_b3: "Construisez votre profil professionnel",
  },
 
  de: {
@@ -928,6 +1148,27 @@ const TX: Record<string, Record<string, string>> = {
   google_fail: "Google-Anmeldung fehlgeschlagen.",
   apple_fail: "Apple-Anmeldung fehlgeschlagen.",
   generic_error: "Etwas ist schiefgelaufen.",
+  school_desc: "Verbinde dich mit vertrauenswürdigen Agenten und Studierenden weltweit",
+  school_b1: "Erreiche verifizierte Agenten weltweit",
+  school_b2: "Recruiting transparent verwalten",
+  school_b3: "Marketing- und Zulassungskosten senken",
+  agent_desc: "Direkt mit echten Schulen arbeiten. Keine Zwischenebenen",
+  agent_b1: "Zugriff auf verifizierte Schulen und Programme",
+  agent_b2: "Studenten-Leads und Fälle klar nachverfolgen",
+  agent_b3: "Langfristige, vertrauensvolle Partnerschaften aufbauen",
+  student_desc: "Finde Schulen, Agenten und Tutoren, denen du vertrauen kannst",
+  student_b1: "Verifizierte Schulen und Programme entdecken",
+  student_b2: "Mit zuverlässigen Agenten und Tutoren verbinden",
+  student_b3: "Schritt-für-Schritt transparent begleitet werden",
+  tutor_desc: "Studierende weltweit unterstützen und deine Praxis ausbauen",
+  tutor_b1: "International Studierende finden",
+  tutor_b2: "Akademische und Pathway-Unterstützung anbieten",
+  tutor_b3: "Dein professionelles Profil aufbauen",
+  pw_req_title: "Passwortanforderungen:",
+  pw_req_len: "Mindestlänge: 8 Zeichen",
+  pw_req_upper: "Mindestens 1 Großbuchstabe",
+  pw_req_num: "Mindestens 1 Zahl",
+  pw_req_special: "Mindestens 1 Sonderzeichen",
  },
 } as any;
 
@@ -1177,6 +1418,11 @@ useEffect(() => {
    password_ph: tr(lang, "password_ph"),
    confirm: tr(lang, "confirm"),
    confirm_ph: tr(lang, "confirm_ph"),
+   pw_req_title: tr(lang, "pw_req_title"),
+   pw_req_len: tr(lang, "pw_req_len"),
+   pw_req_upper: tr(lang, "pw_req_upper"),
+   pw_req_num: tr(lang, "pw_req_num"),
+   pw_req_special: tr(lang, "pw_req_special"),
    cta_login: tr(lang, "cta_login"),
    cta_signup: tr(lang, "cta_signup"),
    have_account: tr(lang, "have_account"),
@@ -1263,6 +1509,26 @@ const [authView, setAuthView] = useState<"auth" | "forgot">("auth");
   return () => unsub();
  }, [lang, logout, logoutDone, hasInvite, inviteId, inviteToken]);
 
+
+ const pwChecks = useMemo(() => {
+  const pw = password || "";
+  return {
+   length: pw.length >= 8,
+   uppercase: /[A-Z]/.test(pw),
+   number: /[0-9]/.test(pw),
+   special: /[!@#$%^&*(),.?":{}|<>\[\]\\\/;'`~_+=\-]/.test(pw),
+  };
+ }, [password]);
+
+ const pwValid = useMemo(() => {
+  return (
+   pwChecks.length &&
+   pwChecks.uppercase &&
+   pwChecks.number &&
+   pwChecks.special
+  );
+ }, [pwChecks]);
+
  const canSubmit = useMemo(() => {
   if (!email || !password) return false;
   if (mode === "signup") {
@@ -1275,7 +1541,7 @@ const [authView, setAuthView] = useState<"auth" | "forgot">("auth");
    if (password !== confirm) return false;
   }
   return true;
- }, [email, password, confirm, role, mode, hasInvite]);
+ }, [email, password, confirm, role, mode, hasInvite, inviteRoleLoading, pwValid]);
 
  function scrollToAuth() {
   if (typeof document === "undefined") return;
@@ -2059,6 +2325,28 @@ const [authView, setAuthView] = useState<"auth" | "forgot">("auth");
              )}
             </button>
            </div>
+
+
+           {mode === "signup" && (
+            <div className="mt-3 rounded-2xl border border-gray-200 bg-gray-50 px-3 py-3 text-xs">
+             <div className="mb-2 font-semibold text-gray-700">{t.pw_req_title}</div>
+
+             <div className="space-y-1">
+              <div className={pwChecks.length ? "text-emerald-700" : "text-gray-600"}>
+               {pwChecks.length ? "✓" : "✕"} {t.pw_req_len}
+              </div>
+              <div className={pwChecks.uppercase ? "text-emerald-700" : "text-gray-600"}>
+               {pwChecks.uppercase ? "✓" : "✕"} {t.pw_req_upper}
+              </div>
+              <div className={pwChecks.number ? "text-emerald-700" : "text-gray-600"}>
+               {pwChecks.number ? "✓" : "✕"} {t.pw_req_num}
+              </div>
+              <div className={pwChecks.special ? "text-emerald-700" : "text-gray-600"}>
+               {pwChecks.special ? "✓" : "✕"} {t.pw_req_special}
+              </div>
+             </div>
+            </div>
+           )}
 
            {mode === "signin" && (
             <div className="mt-2 text-right">
