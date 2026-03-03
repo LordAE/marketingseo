@@ -2,7 +2,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import LangInit from "@/app/LangInit"; // ✅ add this
+import LangInit from "@/app/LangInit";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,8 +15,32 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://greenpassgroup.com"),
   title: "GreenPass",
-  description: "GreenPass",
+  description: "GreenPass — a professional network for international education.",
+
+  openGraph: {
+    title: "GreenPass",
+    description: "GreenPass — a professional network for international education.",
+    url: "https://greenpassgroup.com",
+    siteName: "GreenPass",
+    type: "website",
+    images: [
+      {
+        url: "/greenpass-og.png",
+        width: 1200,
+        height: 630,
+        alt: "GreenPass",
+      },
+    ],
+  },
+
+  twitter: {
+    card: "summary_large_image",
+    title: "GreenPass",
+    description: "GreenPass — a professional network for international education.",
+    images: ["/greenpass-og.png"],
+  },
 };
 
 export default function RootLayout({
@@ -28,9 +52,7 @@ export default function RootLayout({
         suppressHydrationWarning
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {/* ✅ Step 1 runs globally for ALL routes */}
         <LangInit />
-
         {children}
       </body>
     </html>
