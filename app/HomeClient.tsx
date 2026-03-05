@@ -255,11 +255,18 @@ const TX: Record<string, Record<string, string>> = {
   no_account: "Don’t have an account?",
   role_required: "Please select a role.",
   pw_mismatch: "Passwords do not match.",
-  weak_pw: "Password must be at least 8 characters and include 1 uppercase letter, 1 number, and 1 special character.",
+  weak_pw:
+   "Password must be at least 8 characters and include 1 uppercase letter, 1 number, and 1 special character.",
   invalid_creds: "Invalid email or password.",
   email_in_use: "Email is already in use.",
   loading: "Please wait…",
 
+  invalid_email: "Incorrect email.",
+  incorrect_password: "The password you entered is incorrect.",
+  user_not_found: "No account found for that email.",
+  too_many_requests: "Too many attempts. Please try again later.",
+  network_error: "Network error. Check your connection and try again.",
+  popup_closed: "Sign-in was cancelled.",
   // Forgot password
   forgot_pw: "Forgot password?",
   reset_title: "Reset password",
@@ -317,7 +324,8 @@ const TX: Record<string, Record<string, string>> = {
   hero_h1_2: "Trường học, Tư vấn viên, Gia sư & Học sinh",
   hero_tagline:
    "Du học, việc làm và lộ trình di trú kết nối minh bạch trên một nền tảng đáng tin cậy.",
-  promo_title: "Xây dựng mạng lưới giáo dục & sự nghiệp toàn cầu cùng GreenPass",
+  promo_title:
+   "Xây dựng mạng lưới giáo dục & sự nghiệp toàn cầu cùng GreenPass",
   promo_body:
    "GreenPass là nền tảng đáng tin cậy nơi trường học kết nối với tư vấn viên đã xác minh, tư vấn viên hỗ trợ học sinh, gia sư hướng dẫn học tập, và mọi người cùng phát triển minh bạch và hiệu quả.",
   trust_verified: "✔ Hồ sơ đã xác minh",
@@ -372,7 +380,8 @@ const TX: Record<string, Record<string, string>> = {
   school_b1: "Tiếp cận tư vấn viên đã xác minh trên toàn thế giới",
   school_b2: "Quản lý tuyển sinh minh bạch",
   school_b3: "Giảm chi phí tiếp thị và tuyển sinh",
-  school_desc: "Kết nối với tư vấn viên và học viên đáng tin cậy trên toàn cầu",
+  school_desc:
+   "Kết nối với tư vấn viên và học viên đáng tin cậy trên toàn cầu",
   select_role: "Chọn vai trò…",
   signin: "Đăng nhập",
   signup: "Đăng ký",
@@ -389,8 +398,10 @@ const TX: Record<string, Record<string, string>> = {
   reset_sent:
    "Nếu tài khoản tồn tại, liên kết đặt lại sẽ được gửi đến email đó.",
 
-  one_platform: "Một nền tảng. Một hành trình. Kết nối thật sự có ý nghĩa.",
-  after_login: "Sau khi đăng nhập, bạn sẽ tiếp tục trong ứng dụng GreenPass.",
+  one_platform:
+   "Một nền tảng. Một hành trình. Kết nối thật sự có ý nghĩa.",
+  after_login:
+   "Sau khi đăng nhập, bạn sẽ tiếp tục trong ứng dụng GreenPass.",
 
   google_fail: "Đăng nhập Google thất bại.",
   apple_fail: "Đăng nhập Apple thất bại.",
@@ -452,8 +463,10 @@ const TX: Record<string, Record<string, string>> = {
   role_agent: "Ahente",
   role_student: "Estudyante",
   role_tutor: "Tutor",
-  school_desc: "Kumonekta sa mapagkakatiwalaang ahente at estudyante sa buong mundo",
-  agent_desc: "Direktang makipagtrabaho sa totoong schools—walang middle layers",
+  school_desc:
+   "Kumonekta sa mapagkakatiwalaang ahente at estudyante sa buong mundo",
+  agent_desc:
+   "Direktang makipagtrabaho sa totoong schools—walang middle layers",
   student_desc: "Maghanap ng schools, agents, at tutors na mapagkakatiwalaan",
   tutor_desc: "Suportahan ang mga estudyante sa buong mundo at palaguin ang iyong practice",
   one_platform: "Isang platform. Isang journey. Tunay na koneksyong mahalaga.",
@@ -461,7 +474,6 @@ const TX: Record<string, Record<string, string>> = {
   google_fail: "Hindi nagtagumpay ang Google sign-in.",
   apple_fail: "Hindi nagtagumpay ang Apple sign-in.",
   generic_error: "May nangyaring error.",
- 
 
   pw_req_title: "Mga kailangan sa password:",
   pw_req_len: "Minimum na haba: 8 karakter",
@@ -484,7 +496,7 @@ const TX: Record<string, Record<string, string>> = {
   tutor_b1: "Humanap ng students internationally",
   tutor_b2: "Mag-alok ng academic at pathway support",
   tutor_b3: "Bumuo ng professional profile mo",
-},
+ },
 
  ceb: {
   hero_h1_1: "Ang Global Marketplace nga Nagkonektar",
@@ -532,12 +544,12 @@ const TX: Record<string, Record<string, string>> = {
   role_agent: "Ahente",
   role_student: "Estudyante",
   role_tutor: "Tutor",
-  one_platform: "Usa ka platform. Usa ka journey. Tinuod nga koneksyon nga naay pulos.",
+  one_platform:
+   "Usa ka platform. Usa ka journey. Tinuod nga koneksyon nga naay pulos.",
   after_login: "Human sa login, mupadayon ka sulod sa GreenPass app.",
   google_fail: "Napakyas ang Google sign-in.",
   apple_fail: "Napakyas ang Apple sign-in.",
   generic_error: "Naay sayop nga nahitabo.",
- 
 
   pw_req_title: "Mga kinahanglanon sa password:",
   pw_req_len: "Minimum nga gitas-on: 8 ka karakter",
@@ -564,7 +576,7 @@ const TX: Record<string, Record<string, string>> = {
   tutor_b1: "Pangitaa ang students internationally",
   tutor_b2: "Ihatag ang academic ug pathway support",
   tutor_b3: "Tukora ang imong professional profile",
-},
+ },
 
  es: {
   hero_h1_1: "El Mercado Global que Conecta",
@@ -591,13 +603,13 @@ const TX: Record<string, Record<string, string>> = {
   password_ph: "Contraseña",
   confirm: "Confirmar contraseña",
   confirm_ph: "Confirmar contraseña",
-  
+
   pw_req_title: "Requisitos de contraseña:",
   pw_req_len: "Longitud mínima: 8 caracteres",
   pw_req_upper: "Al menos 1 letra mayúscula",
   pw_req_num: "Al menos 1 número",
   pw_req_special: "Al menos 1 carácter especial",
-cta_login: "Entrar",
+  cta_login: "Entrar",
   cta_signup: "Crear cuenta",
   have_account: "¿Ya tienes cuenta?",
   no_account: "¿No tienes cuenta?",
@@ -609,7 +621,8 @@ cta_login: "Entrar",
   loading: "Espera…",
   forgot_pw: "¿Olvidaste la contraseña?",
   reset_title: "Restablecer contraseña",
-  reset_sub: "Ingresa tu correo y te enviaremos un enlace de restablecimiento.",
+  reset_sub:
+   "Ingresa tu correo y te enviaremos un enlace de restablecimiento.",
   send_reset: "Enviar enlace",
   back_to_login: "Volver al inicio",
   reset_sent:
@@ -619,11 +632,13 @@ cta_login: "Entrar",
   role_student: "Estudiante",
   role_tutor: "Tutor",
   one_platform: "Una plataforma. Un camino. Conexiones reales que importan.",
-  after_login: "Después de iniciar sesión, continuarás dentro de la app GreenPass.",
+  after_login:
+   "Después de iniciar sesión, continuarás dentro de la app GreenPass.",
   google_fail: "Error al iniciar sesión con Google.",
   apple_fail: "Error al iniciar sesión con Apple.",
   generic_error: "Algo salió mal.",
-  school_desc: "Conéctate con agentes y estudiantes de confianza en todo el mundo",
+  school_desc:
+   "Conéctate con agentes y estudiantes de confianza en todo el mundo",
   school_b1: "Llega a agentes verificados en todo el mundo",
   school_b2: "Gestiona la captación de forma transparente",
   school_b3: "Reduce los costos de marketing y admisión",
@@ -666,13 +681,13 @@ cta_login: "Entrar",
   password_ph: "パスワード",
   confirm: "パスワード確認",
   confirm_ph: "パスワード確認",
-  
+
   pw_req_title: "パスワード要件：",
   pw_req_len: "最小長：8文字",
   pw_req_upper: "大文字を1文字以上",
   pw_req_num: "数字を1つ以上",
   pw_req_special: "特殊文字を1つ以上",
-cta_login: "ログイン",
+  cta_login: "ログイン",
   cta_signup: "作成する",
   have_account: "アカウントをお持ちですか？",
   no_account: "アカウントをお持ちでないですか？",
@@ -693,7 +708,8 @@ cta_login: "ログイン",
   role_agent: "エージェント",
   role_student: "学生",
   role_tutor: "チューター",
-  one_platform: "ひとつのプラットフォーム。ひとつの旅。本当に大切なつながりを。",
+  one_platform:
+   "ひとつのプラットフォーム。ひとつの旅。本当に大切なつながりを。",
   after_login: "ログイン後はGreenPassアプリ内へ移動します。",
   google_fail: "Googleでのログインに失敗しました。",
   apple_fail: "Appleでのログインに失敗しました。",
@@ -741,13 +757,13 @@ cta_login: "ログイン",
   password_ph: "비밀번호",
   confirm: "비밀번호 확인",
   confirm_ph: "비밀번호 확인",
-  
+
   pw_req_title: "비밀번호 요구 사항:",
   pw_req_len: "최소 길이: 8자",
   pw_req_upper: "대문자 1개 이상",
   pw_req_num: "숫자 1개 이상",
   pw_req_special: "특수문자 1개 이상",
-cta_login: "로그인",
+  cta_login: "로그인",
   cta_signup: "계정 만들기",
   have_account: "계정이 있나요?",
   no_account: "계정이 없나요?",
@@ -794,8 +810,7 @@ cta_login: "로그인",
  zh: {
   hero_h1_1: "连接全球的国际化平台",
   hero_h1_2: "学校、代理、导师与学生",
-  hero_tagline:
-   "留学、工作与移民路径，在一个可信平台上透明连接。",
+  hero_tagline: "留学、工作与移民路径，在一个可信平台上透明连接。",
   trust_verified: "✔ 已验证资料",
   trust_transparent: "✔ 透明合作",
   trust_no_hidden: "✔ 无隐藏条件",
@@ -816,13 +831,13 @@ cta_login: "로그인",
   password_ph: "密码",
   confirm: "确认密码",
   confirm_ph: "确认密码",
-  
+
   pw_req_title: "密码要求：",
   pw_req_len: "最少长度：8 个字符",
   pw_req_upper: "至少 1 个大写字母",
   pw_req_num: "至少 1 个数字",
   pw_req_special: "至少 1 个特殊字符",
-cta_login: "登录",
+  cta_login: "登录",
   cta_signup: "创建账号",
   have_account: "已有账号？",
   no_account: "还没有账号？",
@@ -837,8 +852,7 @@ cta_login: "登录",
   reset_sub: "输入邮箱，我们将发送重置链接。",
   send_reset: "发送重置链接",
   back_to_login: "返回登录",
-  reset_sent:
-   "如果该邮箱对应的账号存在，重置链接已发送。",
+  reset_sent: "如果该邮箱对应的账号存在，重置链接已发送。",
   role_school: "学校",
   role_agent: "代理",
   role_student: "学生",
@@ -891,13 +905,13 @@ cta_login: "登录",
   password_ph: "كلمة المرور",
   confirm: "تأكيد كلمة المرور",
   confirm_ph: "تأكيد كلمة المرور",
-  
+
   pw_req_title: "متطلبات كلمة المرور:",
   pw_req_len: "الحد الأدنى للطول: 8 أحرف",
   pw_req_upper: "حرف كبير واحد على الأقل",
   pw_req_num: "رقم واحد على الأقل",
   pw_req_special: "رمز خاص واحد على الأقل",
-cta_login: "تسجيل الدخول",
+  cta_login: "تسجيل الدخول",
   cta_signup: "إنشاء حساب",
   have_account: "لديك حساب؟",
   no_account: "ليس لديك حساب؟",
@@ -923,7 +937,6 @@ cta_login: "تسجيل الدخول",
   google_fail: "فشل تسجيل الدخول عبر Google.",
   apple_fail: "فشل تسجيل الدخول عبر Apple.",
   generic_error: "حدث خطأ ما.",
- 
 
   school_desc: "تواصل مع وكلاء وطلاب موثوقين حول العالم",
   school_b1: "الوصول إلى وكلاء موثّقين عالميًا",
@@ -944,7 +957,7 @@ cta_login: "تسجيل الدخول",
   tutor_b1: "اعثر على طلاب دوليين",
   tutor_b2: "قدّم دعمًا أكاديميًا ودعمًا لمسارات الدراسة",
   tutor_b3: "ابنِ ملفك المهني",
-},
+ },
 
  "pt-BR": {
   hero_h1_1: "O Marketplace Global que Conecta",
@@ -1013,14 +1026,13 @@ cta_login: "تسجيل الدخول",
   tutor_b1: "Encontre estudantes internacionais",
   tutor_b2: "Ofereça suporte acadêmico e de pathways",
   tutor_b3: "Construa seu perfil profissional",
- 
 
   pw_req_title: "Requisitos da senha:",
   pw_req_len: "Comprimento mínimo: 8 caracteres",
   pw_req_upper: "Pelo menos 1 letra maiúscula",
   pw_req_num: "Pelo menos 1 número",
   pw_req_special: "Pelo menos 1 caractere especial",
-},
+ },
 
  fr: {
   hero_h1_1: "La place de marché mondiale qui connecte",
@@ -1047,13 +1059,13 @@ cta_login: "تسجيل الدخول",
   password_ph: "Mot de passe",
   confirm: "Confirmer le mot de passe",
   confirm_ph: "Confirmer le mot de passe",
-  
+
   pw_req_title: "Exigences du mot de passe :",
   pw_req_len: "Longueur minimale : 8 caractères",
   pw_req_upper: "Au moins 1 lettre majuscule",
   pw_req_num: "Au moins 1 chiffre",
   pw_req_special: "Au moins 1 caractère spécial",
-cta_login: "Se connecter",
+  cta_login: "Se connecter",
   cta_signup: "Créer un compte",
   have_account: "Vous avez déjà un compte ?",
   no_account: "Vous n’avez pas de compte ?",
@@ -1065,16 +1077,17 @@ cta_login: "Se connecter",
   loading: "Veuillez patienter…",
   forgot_pw: "Mot de passe oublié ?",
   reset_title: "Réinitialiser le mot de passe",
-  reset_sub: "Entrez votre e-mail et nous enverrons un lien de réinitialisation.",
+  reset_sub:
+   "Entrez votre e-mail et nous enverrons un lien de réinitialisation.",
   send_reset: "Envoyer le lien",
   back_to_login: "Retour à la connexion",
-  reset_sent:
-   "Si un compte existe pour cet e-mail, un lien a été envoyé.",
+  reset_sent: "Si un compte existe pour cet e-mail, un lien a été envoyé.",
   role_school: "École",
   role_agent: "Agent",
   role_student: "Étudiant",
   role_tutor: "Tuteur",
-  one_platform: "Une plateforme. Un parcours. Des connexions réelles qui comptent.",
+  one_platform:
+   "Une plateforme. Un parcours. Des connexions réelles qui comptent.",
   after_login: "Après connexion, vous continuerez dans l’application GreenPass.",
   google_fail: "Échec de la connexion Google.",
   apple_fail: "Échec de la connexion Apple.",
@@ -1148,7 +1161,8 @@ cta_login: "Se connecter",
   google_fail: "Google-Anmeldung fehlgeschlagen.",
   apple_fail: "Apple-Anmeldung fehlgeschlagen.",
   generic_error: "Etwas ist schiefgelaufen.",
-  school_desc: "Verbinde dich mit vertrauenswürdigen Agenten und Studierenden weltweit",
+  school_desc:
+   "Verbinde dich mit vertrauenswürdigen Agenten und Studierenden weltweit",
   school_b1: "Erreiche verifizierte Agenten weltweit",
   school_b2: "Recruiting transparent verwalten",
   school_b3: "Marketing- und Zulassungskosten senken",
@@ -1252,34 +1266,37 @@ async function routeLikeWelcome(
 
  // ✅ Preserve a safe `next` from SEO (e.g. /accept-org-invite?invite=...&token=...)
  const safeNext = safeNextPath(nextFromUrl || "");
- const next = safeNext || (!exists || !onboardingCompleted ? "/onboarding" : "/dashboard");
+ const next =
+  safeNext || (!exists || !onboardingCompleted ? "/onboarding" : "/dashboard");
 
  // Pass role to AuthBridge (helps NEW users create the right role doc)
  const roleParam = fallbackRole ? `&role=${encodeURIComponent(fallbackRole)}` : "";
 
  window.location.href = appLink(
-  `/auth-bridge?code=${encodeURIComponent(code)}&next=${encodeURIComponent(next)}${roleParam}`,
+  `/auth-bridge?code=${encodeURIComponent(code)}&next=${encodeURIComponent(
+   next
+  )}${roleParam}`,
   lang
  );
 }
 
 /** Normalize lang codes from URL/browser/UI into the exact keys used in TX */
 function normalizeLang(input: string): LangCode {
-  const raw = (input || "").trim();
-  if (!raw) return DEFAULT_LANG;
+ const raw = (input || "").trim();
+ if (!raw) return DEFAULT_LANG;
 
-  // Common variants
-  const lower = raw.toLowerCase();
-  if (lower === "jp" || lower.startsWith("ja")) return "ja" as LangCode;
-  if (lower === "cn" || lower.startsWith("zh")) return "zh" as LangCode;
-  if (lower === "pt" || lower.startsWith("pt-")) return "pt-BR" as LangCode;
-  if (lower === "tl" || lower.startsWith("fil")) return "fil" as LangCode;
+ // Common variants
+ const lower = raw.toLowerCase();
+ if (lower === "jp" || lower.startsWith("ja")) return "ja" as LangCode;
+ if (lower === "cn" || lower.startsWith("zh")) return "zh" as LangCode;
+ if (lower === "pt" || lower.startsWith("pt-")) return "pt-BR" as LangCode;
+ if (lower === "tl" || lower.startsWith("fil")) return "fil" as LangCode;
 
-  // Exact match in TX keys (case-sensitive for pt-BR)
-  if ((TX as any)[raw]) return raw as LangCode;
-  if ((TX as any)[lower]) return lower as LangCode;
+ // Exact match in TX keys (case-sensitive for pt-BR)
+ if ((TX as any)[raw]) return raw as LangCode;
+ if ((TX as any)[lower]) return lower as LangCode;
 
-  return DEFAULT_LANG;
+ return DEFAULT_LANG;
 }
 
 export default function HomeClient() {
@@ -1296,47 +1313,153 @@ export default function HomeClient() {
 
  const hasInvite = Boolean(inviteId && inviteToken);
 
+ // auth UI state
+ const [mode, setMode] = useState<"signin" | "signup">("signin");
 
-// ✅ LOAD INVITE ROLE (preselect + lock) when opening an invite link
-useEffect(() => {
- let cancelled = false;
-
- const run = async () => {
-  if (!hasInvite) return;
-
-  setInviteRoleLoading(true);
+ // ✅ FORCE SIGNUP MODE WHEN INVITE PARAMS EXIST (runs on first client render)
+ useEffect(() => {
   try {
-   const base = FUNCTIONS_BASE.replace(/\/+$/, "");
-   const url = `${base}/getInviteRolePublic?inviteId=${encodeURIComponent(inviteId)}&token=${encodeURIComponent(inviteToken)}`;
-   const r = await fetch(url, { method: "GET" });
-   const data = await r.json();
+   const p = new URLSearchParams(window.location.search);
+   const invite = p.get("invite");
+   const token = p.get("token");
+   if (invite && token) setMode("signup");
+  } catch {}
+ }, []);
 
-   if (cancelled) return;
+ const [authView, setAuthView] = useState<"auth" | "forgot">("auth");
+ const [busy, setBusy] = useState(false);
+ const [msg, setMsg] = useState<string | null>(null);
 
-   if (!data?.ok || !data?.role) {
-    setMsg("Invalid or expired invite link.");
-    return;
+ const [fieldErr, setFieldErr] = useState<{
+  email?: string;
+  password?: string;
+  confirm?: string;
+  role?: string;
+ }>({});
+
+ useEffect(() => {
+  setAuthView("auth");
+ }, [mode]);
+
+ const [email, setEmail] = useState("");
+ const [password, setPassword] = useState("");
+ const [confirm, setConfirm] = useState("");
+
+ // Show/Hide password toggles
+ const [showPassword, setShowPassword] = useState(false);
+ const [showConfirm, setShowConfirm] = useState(false);
+
+ const [role, setRole] = useState<RoleValue | "">("");
+
+ const [inviteRoleLoading, setInviteRoleLoading] = useState(false);
+
+ // ✅ LOAD INVITE ROLE (preselect + lock) when opening an invite link
+ useEffect(() => {
+  let cancelled = false;
+
+  const run = async () => {
+   if (!hasInvite) return;
+
+   setInviteRoleLoading(true);
+   try {
+    const base = FUNCTIONS_BASE.replace(/\/+$/, "");
+    const url = `${base}/getInviteRolePublic?inviteId=${encodeURIComponent(
+     inviteId
+    )}&token=${encodeURIComponent(inviteToken)}`;
+    const r = await fetch(url, { method: "GET" });
+    const data = await r.json();
+
+    if (cancelled) return;
+
+    if (!data?.ok || !data?.role) {
+     setMsg("Invalid or expired invite link.");
+     return;
+    }
+
+    setRole(data.role as RoleValue);
+
+    // Optional: Prefill invited email if returned
+    if (data.invitedEmail && typeof data.invitedEmail === "string") {
+     setEmail(data.invitedEmail);
+    }
+   } catch (e) {
+    if (!cancelled) setMsg("Could not verify invite link.");
+   } finally {
+    if (!cancelled) setInviteRoleLoading(false);
    }
+  };
 
-   setRole(data.role as RoleValue);
+  run();
+  return () => {
+   cancelled = true;
+  };
+ }, [hasInvite, inviteId, inviteToken]);
 
-   // Optional: Prefill invited email if returned
-   if (data.invitedEmail && typeof data.invitedEmail === "string") {
-    setEmail(data.invitedEmail);
-   }
-  } catch (e) {
-   if (!cancelled) setMsg("Could not verify invite link.");
-  } finally {
-   if (!cancelled) setInviteRoleLoading(false);
-  }
- };
+ // ✅ Initialize language from URL/storage/browser
+ const [lang, setLang] = useState<LangCode>(DEFAULT_LANG);
 
- run();
- return () => {
-  cancelled = true;
- };
-}, [hasInvite, inviteId, inviteToken]);
+ // ✅ Keep state in sync if the URL ?lang= changes (e.g. user pasted a link)
+ useEffect(() => {
+  // Prefer explicit URL lang when present; normalize to match TX keys
+  const initial = normalizeLang(urlLangRaw || resolveInitialLang());
+  setLang(initial);
+  setLangEverywhere(initial);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+ }, []);
 
+ useEffect(() => {
+  if (!urlLangRaw) return;
+  const normalized = normalizeLang(urlLangRaw);
+  if (normalized !== lang) setLang(normalized);
+ }, [urlLangRaw, lang]);
+
+ const t = useMemo(() => {
+  return {
+   signin: tr(lang, "signin"),
+   signup: tr(lang, "signup"),
+   login_title: tr(lang, "login_title"),
+   signup_title: tr(lang, "signup_title"),
+   welcome_back: tr(lang, "welcome_back"),
+   signup_journey: tr(lang, "signup_journey"),
+   reset_title: tr(lang, "reset_title"),
+   reset_sub: tr(lang, "reset_sub"),
+   forgot_pw: tr(lang, "forgot_pw"),
+   send_reset: tr(lang, "send_reset"),
+   back_to_login: tr(lang, "back_to_login"),
+   reset_sent: tr(lang, "reset_sent"),
+   google: tr(lang, "google"),
+   apple: tr(lang, "apple"),
+   or: tr(lang, "or"),
+   choose_role: tr(lang, "choose_role"),
+   select_role: tr(lang, "select_role"),
+   email: tr(lang, "email"),
+   email_ph: tr(lang, "email_ph"),
+   password: tr(lang, "password"),
+   password_ph: tr(lang, "password_ph"),
+   confirm: tr(lang, "confirm"),
+   confirm_ph: tr(lang, "confirm_ph"),
+   pw_req_title: tr(lang, "pw_req_title"),
+   pw_req_len: tr(lang, "pw_req_len"),
+   pw_req_upper: tr(lang, "pw_req_upper"),
+   pw_req_num: tr(lang, "pw_req_num"),
+   pw_req_special: tr(lang, "pw_req_special"),
+   cta_login: tr(lang, "cta_login"),
+   cta_signup: tr(lang, "cta_signup"),
+   have_account: tr(lang, "have_account"),
+   no_account: tr(lang, "no_account"),
+   role_required: tr(lang, "role_required"),
+   pw_mismatch: tr(lang, "pw_mismatch"),
+   weak_pw: tr(lang, "weak_pw"),
+   invalid_creds: tr(lang, "invalid_creds"),
+   email_in_use: tr(lang, "email_in_use"),
+   loading: tr(lang, "loading"),
+   one_platform: tr(lang, "one_platform"),
+   after_login: tr(lang, "after_login"),
+   google_fail: tr(lang, "google_fail"),
+   apple_fail: tr(lang, "apple_fail"),
+   generic_error: tr(lang, "generic_error"),
+  };
+ }, [lang]);
 
  useEffect(() => {
   let cancelled = false;
@@ -1392,105 +1515,7 @@ useEffect(() => {
   };
  }, [logout]);
 
- const [lang, setLang] = useState<LangCode>(DEFAULT_LANG);
- const t = useMemo(() => {
-  return {
-   signin: tr(lang, "signin"),
-   signup: tr(lang, "signup"),
-   login_title: tr(lang, "login_title"),
-   signup_title: tr(lang, "signup_title"),
-   welcome_back: tr(lang, "welcome_back"),
-   signup_journey: tr(lang, "signup_journey"),
-   reset_title: tr(lang, "reset_title"),
-   reset_sub: tr(lang, "reset_sub"),
-   forgot_pw: tr(lang, "forgot_pw"),
-   send_reset: tr(lang, "send_reset"),
-   back_to_login: tr(lang, "back_to_login"),
-   reset_sent: tr(lang, "reset_sent"),
-   google: tr(lang, "google"),
-   apple: tr(lang, "apple"),
-   or: tr(lang, "or"),
-   choose_role: tr(lang, "choose_role"),
-   select_role: tr(lang, "select_role"),
-   email: tr(lang, "email"),
-   email_ph: tr(lang, "email_ph"),
-   password: tr(lang, "password"),
-   password_ph: tr(lang, "password_ph"),
-   confirm: tr(lang, "confirm"),
-   confirm_ph: tr(lang, "confirm_ph"),
-   pw_req_title: tr(lang, "pw_req_title"),
-   pw_req_len: tr(lang, "pw_req_len"),
-   pw_req_upper: tr(lang, "pw_req_upper"),
-   pw_req_num: tr(lang, "pw_req_num"),
-   pw_req_special: tr(lang, "pw_req_special"),
-   cta_login: tr(lang, "cta_login"),
-   cta_signup: tr(lang, "cta_signup"),
-   have_account: tr(lang, "have_account"),
-   no_account: tr(lang, "no_account"),
-   role_required: tr(lang, "role_required"),
-   pw_mismatch: tr(lang, "pw_mismatch"),
-   weak_pw: tr(lang, "weak_pw"),
-   invalid_creds: tr(lang, "invalid_creds"),
-   email_in_use: tr(lang, "email_in_use"),
-   loading: tr(lang, "loading"),
-   one_platform: tr(lang, "one_platform"),
-   after_login: tr(lang, "after_login"),
-   google_fail: tr(lang, "google_fail"),
-   apple_fail: tr(lang, "apple_fail"),
-   generic_error: tr(lang, "generic_error"),
-  };
- }, [lang]);
-
- // auth UI state
- const [mode, setMode] = useState<"signin" | "signup">("signin");
- 
-
-  // ✅ FORCE SIGNUP MODE WHEN INVITE PARAMS EXIST (runs on first client render)
-  useEffect(() => {
-    try {
-      const p = new URLSearchParams(window.location.search);
-      const invite = p.get("invite");
-      const token = p.get("token");
-      if (invite && token) setMode("signup");
-    } catch {}
-  }, []);
-const [authView, setAuthView] = useState<"auth" | "forgot">("auth");
- const [busy, setBusy] = useState(false);
- const [msg, setMsg] = useState<string | null>(null);
-
- useEffect(() => {
-  setAuthView("auth");
- }, [mode]);
-
- const [email, setEmail] = useState("");
- const [password, setPassword] = useState("");
- const [confirm, setConfirm] = useState("");
-
- // Show/Hide password toggles
- const [showPassword, setShowPassword] = useState(false);
- const [showConfirm, setShowConfirm] = useState(false);
-
- const [role, setRole] = useState<RoleValue | "">("");
-
- const [inviteRoleLoading, setInviteRoleLoading] = useState(false);
-
- // ✅ Initialize language from URL/storage/browser
- useEffect(() => {
-  // Prefer explicit URL lang when present; normalize to match TX keys
-  const initial = normalizeLang(urlLangRaw || resolveInitialLang());
-  setLang(initial);
-  setLangEverywhere(initial);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
- }, []);
-
- // ✅ Keep state in sync if the URL ?lang= changes (e.g. user pasted a link)
- useEffect(() => {
-  if (!urlLangRaw) return;
-  const normalized = normalizeLang(urlLangRaw);
-  if (normalized !== lang) setLang(normalized);
- }, [urlLangRaw, lang]);
-
-// ✅ If already logged in, route like Welcome (BUT never while logout is running)
+ // ✅ If already logged in, route like Welcome (BUT never while logout is running)
  useEffect(() => {
   if (logout && !logoutDone) return;
 
@@ -1509,7 +1534,6 @@ const [authView, setAuthView] = useState<"auth" | "forgot">("auth");
   return () => unsub();
  }, [lang, logout, logoutDone, hasInvite, inviteId, inviteToken]);
 
-
  const pwChecks = useMemo(() => {
   const pw = password || "";
   return {
@@ -1521,23 +1545,18 @@ const [authView, setAuthView] = useState<"auth" | "forgot">("auth");
  }, [password]);
 
  const pwValid = useMemo(() => {
-  return (
-   pwChecks.length &&
-   pwChecks.uppercase &&
-   pwChecks.number &&
-   pwChecks.special
-  );
+  return pwChecks.length && pwChecks.uppercase && pwChecks.number && pwChecks.special;
  }, [pwChecks]);
 
  const canSubmit = useMemo(() => {
   if (!email || !password) return false;
   if (mode === "signup") {
-  if (hasInvite) {
-   if (inviteRoleLoading || !role) return false;
-  } else {
-   if (!role) return false;
-  }
-   if (password.length < 6) return false;
+   if (hasInvite) {
+    if (inviteRoleLoading || !role) return false;
+   } else {
+    if (!role) return false;
+   }
+   if (!pwValid) return false;
    if (password !== confirm) return false;
   }
   return true;
@@ -1559,13 +1578,68 @@ const [authView, setAuthView] = useState<"auth" | "forgot">("auth");
   setTimeout(scrollToAuth, 50);
  }
 
+ function isEmailLike(v: string) {
+  const s = (v || "").trim();
+  // simple email check (good enough for UI; Firebase still validates server-side)
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s);
+ }
+
+ function applyAuthError(e: any) {
+  const code = String(e?.code || "");
+  // NOTE: never show raw Firebase messages to users
+  let message = t.generic_error;
+
+  const setEmailErr = (m: string) => setFieldErr((p) => ({ ...p, email: m }));
+  const setPwErr = (m: string) => setFieldErr((p) => ({ ...p, password: m }));
+
+  if (code.includes("auth/invalid-email") || code.includes("auth/missing-email")) {
+   message = tr(lang, "invalid_email", "Incorrect email.");
+   setEmailErr(message);
+  } else if (code.includes("auth/user-not-found")) {
+   message = tr(lang, "user_not_found", "No account found for that email.");
+   setEmailErr(message);
+  } else if (
+   code.includes("auth/wrong-password") ||
+   code.includes("auth/invalid-credential") ||
+   code.includes("auth/invalid-login-credentials")
+  ) {
+   message = tr(lang, "incorrect_password", "The password you entered is incorrect.");
+   setPwErr(message);
+  } else if (code.includes("auth/email-already-in-use")) {
+   message = t.email_in_use;
+   setEmailErr(message);
+  } else if (code.includes("auth/weak-password")) {
+   message = t.weak_pw;
+   setPwErr(message);
+  } else if (code.includes("auth/too-many-requests")) {
+   message = tr(lang, "too_many_requests", "Too many attempts. Please try again later.");
+  } else if (code.includes("auth/network-request-failed")) {
+   message = tr(lang, "network_error", "Network error. Check your connection and try again.");
+  } else if (code.includes("auth/popup-closed-by-user")) {
+   message = tr(lang, "popup_closed", "Sign-in was cancelled.");
+  }
+
+  setMsg(message);
+  return message;
+ }
+
  async function handleEmailAuth() {
   setMsg(null);
+  setFieldErr({});
+
+  const cleanEmail = (email || "").trim();
+  if (!isEmailLike(cleanEmail)) {
+   const m = tr(lang, "invalid_email", "Incorrect email.");
+   setFieldErr({ email: m });
+   setMsg(m);
+   return;
+  }
+
   try {
    setBusy(true);
 
    if (mode === "signin") {
-    const cred = await signInWithEmailAndPassword(auth, email.trim(), password);
+    const cred = await signInWithEmailAndPassword(auth, cleanEmail, password);
     await routeLikeWelcome(
      cred.user,
      lang,
@@ -1578,26 +1652,26 @@ const [authView, setAuthView] = useState<"auth" | "forgot">("auth");
 
    if (hasInvite && (inviteRoleLoading || !role)) {
     setMsg("Verifying invite… please wait.");
+    if (!role) setFieldErr((p) => ({ ...p, role: t.role_required }));
     return;
    }
    if (!hasInvite && !role) {
+    setFieldErr((p) => ({ ...p, role: t.role_required }));
     setMsg(t.role_required);
     return;
    }
    if (password !== confirm) {
+    setFieldErr({ confirm: t.pw_mismatch });
     setMsg(t.pw_mismatch);
     return;
    }
-   if (password.length < 6) {
+   if (!pwValid) {
+    setFieldErr({ password: t.weak_pw });
     setMsg(t.weak_pw);
     return;
    }
 
-   const cred = await createUserWithEmailAndPassword(
-    auth,
-    email.trim(),
-    password
-   );
+   const cred = await createUserWithEmailAndPassword(auth, cleanEmail, password);
 
    if (!hasInvite && role) {
     await ensureUserDoc(cred.user, role as RoleValue);
@@ -1611,19 +1685,7 @@ const [authView, setAuthView] = useState<"auth" | "forgot">("auth");
     hasInvite ? { inviteId, token: inviteToken } : undefined
    );
   } catch (e: any) {
-   const code = String(e?.code || "");
-   if (
-    code.includes("auth/invalid-credential") ||
-    code.includes("auth/wrong-password")
-   ) {
-    setMsg(t.invalid_creds);
-   } else if (code.includes("auth/email-already-in-use")) {
-    setMsg(t.email_in_use);
-   } else if (code.includes("auth/weak-password")) {
-    setMsg(t.weak_pw);
-   } else {
-    setMsg(e?.message || t.generic_error);
-   }
+   applyAuthError(e);
   } finally {
    setBusy(false);
   }
@@ -1631,9 +1693,18 @@ const [authView, setAuthView] = useState<"auth" | "forgot">("auth");
 
  async function handleSendReset() {
   setMsg(null);
+  setFieldErr({});
+
+  const cleanEmail = (email || "").trim();
+  if (!isEmailLike(cleanEmail)) {
+   const m = tr(lang, "invalid_email", "Incorrect email.");
+   setFieldErr({ email: m });
+   setMsg(m);
+   return;
+  }
   try {
    setBusy(true);
-   await sendPasswordResetEmail(auth, email.trim());
+   await sendPasswordResetEmail(auth, cleanEmail);
    setMsg(t.reset_sent);
   } catch {
    setMsg(t.reset_sent);
@@ -1656,7 +1727,12 @@ const [authView, setAuthView] = useState<"auth" | "forgot">("auth");
     hasInvite ? { inviteId, token: inviteToken } : undefined
    );
   } catch (e: any) {
-   setMsg(e?.message || t.google_fail);
+   const code = String(e?.code || "");
+   if (code.includes("auth/")) {
+    applyAuthError(e);
+   } else {
+    setMsg(t.google_fail);
+   }
   } finally {
    setBusy(false);
   }
@@ -1676,7 +1752,12 @@ const [authView, setAuthView] = useState<"auth" | "forgot">("auth");
     hasInvite ? { inviteId, token: inviteToken } : undefined
    );
   } catch (e: any) {
-   setMsg(e?.message || t.apple_fail);
+   const code = String(e?.code || "");
+   if (code.includes("auth/")) {
+    applyAuthError(e);
+   } else {
+    setMsg(t.apple_fail);
+   }
   } finally {
    setBusy(false);
   }
@@ -2241,7 +2322,7 @@ const [authView, setAuthView] = useState<"auth" | "forgot">("auth");
             value={role}
             onChange={(e) => setRole(e.target.value as RoleValue)}
             disabled={busy || inviteRoleLoading || hasInvite}
-            className="w-full rounded-2xl border border-gray-300 bg-white px-3 py-3 text-sm text-gray-900 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            className={`w-full rounded-2xl border bg-white px-3 py-3 text-sm text-gray-900 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 ${fieldErr.role ? "border-red-400 focus:ring-red-400" : "border-gray-300 focus:ring-emerald-500"}`}
           >
             <option value="" disabled>
               {t.select_role}
@@ -2253,6 +2334,12 @@ const [authView, setAuthView] = useState<"auth" | "forgot">("auth");
               </option>
             ))}
           </select>
+          {fieldErr.role && (
+           <div className="mt-1 flex items-start gap-2 text-xs text-red-600">
+            <span className="mt-[2px] inline-flex h-4 w-4 items-center justify-center rounded-full bg-red-100 text-red-700">!</span>
+            <span>{fieldErr.role}</span>
+           </div>
+          )}
          </div>
         )}
 
@@ -2292,9 +2379,15 @@ const [authView, setAuthView] = useState<"auth" | "forgot">("auth");
            value={email}
            onChange={(e) => setEmail(e.target.value)}
            placeholder={t.email_ph}
-           className="w-full rounded-2xl border border-gray-300 bg-white px-3 py-3 text-sm text-gray-900 shadow-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+           className={`w-full rounded-2xl border bg-white px-3 py-3 text-sm text-gray-900 shadow-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 ${fieldErr.email ? "border-red-400 focus:ring-red-400" : "border-gray-300"}`}
            autoComplete="email"
           />
+          {fieldErr.email && (
+           <div className="mt-1 flex items-start gap-2 text-xs text-red-600">
+            <span className="mt-[2px] inline-flex h-4 w-4 items-center justify-center rounded-full bg-red-100 text-red-700">!</span>
+            <span>{fieldErr.email}</span>
+           </div>
+          )}
          </div>
 
          {authView === "auth" && (
@@ -2308,7 +2401,7 @@ const [authView, setAuthView] = useState<"auth" | "forgot">("auth");
              onChange={(e) => setPassword(e.target.value)}
              placeholder={t.password_ph}
              type={showPassword ? "text" : "password"}
-             className="w-full rounded-2xl border border-gray-300 bg-white px-3 py-3 pr-12 text-sm text-gray-900 shadow-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+             className={`w-full rounded-2xl border bg-white px-3 py-3 pr-12 text-sm text-gray-900 shadow-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 ${fieldErr.password ? "border-red-400 focus:ring-red-400" : "border-gray-300"}`}
              autoComplete={mode === "signin" ? "current-password" : "new-password"}
             />
 
@@ -2326,6 +2419,12 @@ const [authView, setAuthView] = useState<"auth" | "forgot">("auth");
             </button>
            </div>
 
+           {fieldErr.password && (
+            <div className="mt-2 flex items-start gap-2 text-xs text-red-600">
+             <span className="mt-[2px] inline-flex h-4 w-4 items-center justify-center rounded-full bg-red-100 text-red-700">!</span>
+             <span>{fieldErr.password}</span>
+            </div>
+           )}
 
            {mode === "signup" && (
             <div className="mt-3 rounded-2xl border border-gray-200 bg-gray-50 px-3 py-3 text-xs">
@@ -2376,7 +2475,7 @@ const [authView, setAuthView] = useState<"auth" | "forgot">("auth");
              onChange={(e) => setConfirm(e.target.value)}
              placeholder={t.confirm_ph}
              type={showConfirm ? "text" : "password"}
-             className="w-full rounded-2xl border border-gray-300 bg-white px-3 py-3 pr-12 text-sm text-gray-900 shadow-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+             className={`w-full rounded-2xl border bg-white px-3 py-3 pr-12 text-sm text-gray-900 shadow-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 ${fieldErr.confirm ? "border-red-400 focus:ring-red-400" : "border-gray-300"}`}
              autoComplete="new-password"
             />
 
@@ -2396,6 +2495,13 @@ const [authView, setAuthView] = useState<"auth" | "forgot">("auth");
           </div>
          )}
         </div>
+
+        {fieldErr.confirm && (
+         <div className="mt-2 flex items-start gap-2 text-xs text-red-600">
+          <span className="mt-[2px] inline-flex h-4 w-4 items-center justify-center rounded-full bg-red-100 text-red-700">!</span>
+          <span>{fieldErr.confirm}</span>
+         </div>
+        )}
 
         {msg && (
          <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
