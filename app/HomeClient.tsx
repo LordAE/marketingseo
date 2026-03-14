@@ -364,6 +364,7 @@ export default function HomeClient() {
   const [booting, setBooting] = useState(true);
 
   const hasInvite = Boolean(inviteId && inviteToken);
+  const roleLockedByReferral = Boolean(referralToken) && !hasInvite;
 
   // auth UI state
   const [mode, setMode] = useState<"signin" | "signup">("signin");
@@ -373,7 +374,19 @@ export default function HomeClient() {
       const p = new URLSearchParams(window.location.search);
       const invite = p.get("invite");
       const token = p.get("token");
-      if (invite && token) setMode("signup");
+      const ref = p.get("ref");
+
+      if (invite && token) {
+        setMode("signup");
+        return;
+      }
+
+      if (ref) {
+        setMode("signup");
+        setRole("student");
+        setAuthView("auth");
+        setMsg(null);
+      }
     } catch {}
   }, []);
 
@@ -453,6 +466,13 @@ export default function HomeClient() {
     async function run() {
       if (!referralToken) return;
 
+      if (!hasInvite) {
+        setMode("signup");
+        setRole("student");
+        setAuthView("auth");
+        setMsg(null);
+      }
+
       try {
         setReferralLoading(true);
         const data = await getAgentReferralPublic(referralToken);
@@ -473,7 +493,7 @@ export default function HomeClient() {
     return () => {
       cancelled = true;
     };
-  }, [referralToken]);
+  }, [referralToken, hasInvite]);
 
   const [lang, setLang] = useState<LangCode>(DEFAULT_LANG);
 
@@ -676,6 +696,8 @@ export default function HomeClient() {
     if (mode === "signup") {
       if (hasInvite) {
         if (inviteRoleLoading || !role) return false;
+      } else if (roleLockedByReferral) {
+        if (role !== "student") return false;
       } else {
         if (!role) return false;
       }
@@ -683,7 +705,17 @@ export default function HomeClient() {
       if (password !== confirm) return false;
     }
     return true;
-  }, [email, password, confirm, role, mode, hasInvite, inviteRoleLoading, pwValid]);
+  }, [
+    email,
+    password,
+    confirm,
+    role,
+    mode,
+    hasInvite,
+    inviteRoleLoading,
+    pwValid,
+    roleLockedByReferral,
+  ]);
 
   function scrollToAuth() {
     if (typeof document === "undefined") return;
@@ -815,7 +847,10 @@ export default function HomeClient() {
         if (!role) setFieldErr((p) => ({ ...p, role: t.role_required }));
         return;
       }
-      if (!hasInvite && !role) {
+      if (roleLockedByReferral && role !== "student") {
+        setRole("student");
+      }
+      if (!hasInvite && !roleLockedByReferral && !role) {
         setFieldErr((p) => ({ ...p, role: t.role_required }));
         setMsg(t.role_required);
         return;
@@ -1579,7 +1614,7 @@ export default function HomeClient() {
                       </div>
                     )}
 
-                    {authView === "auth" && mode === "signup" && (
+                    {authView === "auth" && mode === "signup" && !roleLockedByReferral && (
                       <div className="mt-5">
                         <label className="mb-1 block text-xs font-semibold text-gray-600">
                           {t.choose_role}
@@ -1613,6 +1648,12 @@ export default function HomeClient() {
                             <span>{fieldErr.role}</span>
                           </div>
                         )}
+                      </div>
+                    )}
+
+                    {authView === "auth" && mode === "signup" && roleLockedByReferral && (
+                      <div className="mt-5 rounded-2xl border border-blue-200 bg-blue-50 px-3 py-3 text-sm text-blue-700 shadow-sm">
+                        Signing up as: <strong>{tr(lang, "role_student", "Student")}</strong>
                       </div>
                     )}
 
