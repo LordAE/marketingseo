@@ -137,7 +137,6 @@ const FUNCTIONS_BASE =
 
 /** Create a one-time auth bridge code (server validates ID token) */
 async function createBridgeCode(user: User) {
-  // ✅ Do NOT force refresh here; it slows down startup for already-signed-in users.
   const idToken = await user.getIdToken();
 
   const r = await fetch(
@@ -163,7 +162,6 @@ async function createBridgeCode(user: User) {
 
 /** Accept an invite (sets role & onboarding fields server-side). */
 async function acceptInvite(user: User, inviteId: string, token: string) {
-  // ✅ Do NOT force refresh here unless you truly need fresh claims immediately.
   const idToken = await user.getIdToken();
 
   const r = await fetch(
@@ -186,6 +184,45 @@ async function acceptInvite(user: User, inviteId: string, token: string) {
   return r.json().catch(() => ({} as any));
 }
 
+/** Public preview of referral agent from QR token */
+async function getAgentReferralPublic(ref: string) {
+  const r = await fetch(
+    `${FUNCTIONS_BASE.replace(/\/+$/, "")}/getAgentReferralPublic?ref=${encodeURIComponent(ref)}`,
+    { method: "GET" }
+  );
+
+  if (!r.ok) {
+    const msg = await r.text().catch(() => "");
+    throw new Error(msg || "Invalid referral");
+  }
+
+  return r.json().catch(() => ({} as any));
+}
+
+/** Accept agent referral for signed-in student */
+async function acceptAgentReferral(user: User, ref: string) {
+  const idToken = await user.getIdToken();
+
+  const r = await fetch(
+    `${FUNCTIONS_BASE.replace(/\/+$/, "")}/acceptAgentReferral`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${idToken}`,
+      },
+      body: JSON.stringify({ ref }),
+    }
+  );
+
+  if (!r.ok) {
+    const msg = await r.text().catch(() => "");
+    throw new Error(msg || "Failed to accept referral");
+  }
+
+  return r.json().catch(() => ({} as any));
+}
+
 type RoleValue = "student" | "agent" | "tutor" | "school";
 
 const ROLE_ITEMS: { value: RoleValue; key: string; def: string }[] = [
@@ -196,6 +233,18 @@ const ROLE_ITEMS: { value: RoleValue; key: string; def: string }[] = [
 ];
 
 const tr = trHome;
+
+function normalizeUserRole(data: any): string {
+  return String(
+    data?.selected_role ||
+      data?.user_type ||
+      data?.userType ||
+      data?.role ||
+      ""
+  )
+    .toLowerCase()
+    .trim();
+}
 
 async function ensureUserDoc(user: User, role?: RoleValue) {
   const ref = doc(db, "users", user.uid);
@@ -306,6 +355,7 @@ export default function HomeClient() {
   const urlLangRaw = params.get("lang") || "";
   const inviteId = params.get("invite") || "";
   const inviteToken = params.get("token") || "";
+  const referralToken = params.get("ref") || "";
 
   const rawNextFromUrl = params.get("next") || "";
   const nextFromUrl = safeNextPath(rawNextFromUrl);
@@ -353,6 +403,10 @@ export default function HomeClient() {
 
   const [inviteRoleLoading, setInviteRoleLoading] = useState(false);
 
+  const [referralLoading, setReferralLoading] = useState(false);
+  const [referralPreview, setReferralPreview] = useState<any>(null);
+  const [showReferralAccept, setShowReferralAccept] = useState(false);
+
   useEffect(() => {
     let cancelled = false;
 
@@ -392,6 +446,34 @@ export default function HomeClient() {
       cancelled = true;
     };
   }, [hasInvite, inviteId, inviteToken]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function run() {
+      if (!referralToken) return;
+
+      try {
+        setReferralLoading(true);
+        const data = await getAgentReferralPublic(referralToken);
+        if (!cancelled) {
+          setReferralPreview(data);
+        }
+      } catch (e) {
+        console.error("Referral preview failed:", e);
+        if (!cancelled) {
+          setMsg("Invalid or expired referral link.");
+        }
+      } finally {
+        if (!cancelled) setReferralLoading(false);
+      }
+    }
+
+    run();
+    return () => {
+      cancelled = true;
+    };
+  }, [referralToken]);
 
   const [lang, setLang] = useState<LangCode>(DEFAULT_LANG);
 
@@ -505,8 +587,6 @@ export default function HomeClient() {
     };
   }, [logout]);
 
-  // ✅ Faster startup flow for already-signed-in users:
-  // wait for Firebase initial auth state once, then redirect immediately.
   useEffect(() => {
     let cancelled = false;
 
@@ -520,6 +600,21 @@ export default function HomeClient() {
 
         const user = auth.currentUser;
         if (user) {
+          if (referralToken) {
+            const userRef = doc(db, "users", user.uid);
+            const userSnap = await getDoc(userRef);
+            const userData = userSnap.exists() ? userSnap.data() || {} : {};
+            const roleNow = normalizeUserRole(userData);
+
+            if (roleNow === "student" || roleNow === "user") {
+              if (!cancelled) {
+                setShowReferralAccept(true);
+                setBooting(false);
+              }
+              return;
+            }
+          }
+
           await routeLikeWelcome(
             user,
             lang,
@@ -546,7 +641,16 @@ export default function HomeClient() {
     return () => {
       cancelled = true;
     };
-  }, [lang, logout, logoutDone, hasInvite, inviteId, inviteToken, nextFromUrl]);
+  }, [
+    lang,
+    logout,
+    logoutDone,
+    hasInvite,
+    inviteId,
+    inviteToken,
+    nextFromUrl,
+    referralToken,
+  ]);
 
   const pwChecks = useMemo(() => {
     const pw = password || "";
@@ -640,6 +744,31 @@ export default function HomeClient() {
     return message;
   }
 
+  async function handleAcceptReferralNow() {
+    if (!auth.currentUser || !referralToken) return;
+
+    try {
+      setBusy(true);
+      setMsg(null);
+
+      await acceptAgentReferral(auth.currentUser, referralToken);
+
+      await routeLikeWelcome(
+        auth.currentUser,
+        lang,
+        undefined,
+        nextFromUrl,
+        hasInvite ? { inviteId, token: inviteToken } : undefined,
+        { skipDocCheck: !hasInvite }
+      );
+    } catch (e: any) {
+      console.error("Referral accept failed:", e);
+      setMsg(e?.message || "Failed to accept referral.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function handleEmailAuth() {
     setMsg(null);
     setFieldErr({});
@@ -657,6 +786,20 @@ export default function HomeClient() {
 
       if (mode === "signin") {
         const cred = await signInWithEmailAndPassword(auth, cleanEmail, password);
+
+        if (referralToken) {
+          const userRef = doc(db, "users", cred.user.uid);
+          const userSnap = await getDoc(userRef);
+          const userData = userSnap.exists() ? userSnap.data() || {} : {};
+          const roleNow = normalizeUserRole(userData);
+
+          if (roleNow === "student" || roleNow === "user") {
+            setShowReferralAccept(true);
+            setBooting(false);
+            return;
+          }
+        }
+
         await routeLikeWelcome(
           cred.user,
           lang,
@@ -692,6 +835,10 @@ export default function HomeClient() {
 
       if (!hasInvite && role) {
         await ensureUserDoc(cred.user, role as RoleValue);
+      }
+
+      if (referralToken) {
+        await acceptAgentReferral(cred.user, referralToken);
       }
 
       await routeLikeWelcome(
@@ -736,6 +883,18 @@ export default function HomeClient() {
       setBusy(true);
       const provider = new GoogleAuthProvider();
       const cred = await signInWithPopup(auth, provider);
+
+      const userRef = doc(db, "users", cred.user.uid);
+      const userSnap = await getDoc(userRef);
+      const userData = userSnap.exists() ? userSnap.data() || {} : {};
+      const roleNow = normalizeUserRole(userData);
+
+      if (referralToken && (roleNow === "student" || roleNow === "user")) {
+        setShowReferralAccept(true);
+        setBooting(false);
+        return;
+      }
+
       await routeLikeWelcome(
         cred.user,
         lang,
@@ -761,6 +920,18 @@ export default function HomeClient() {
       setBusy(true);
       const provider = new OAuthProvider("apple.com");
       const cred = await signInWithPopup(auth, provider);
+
+      const userRef = doc(db, "users", cred.user.uid);
+      const userSnap = await getDoc(userRef);
+      const userData = userSnap.exists() ? userSnap.data() || {} : {};
+      const roleNow = normalizeUserRole(userData);
+
+      if (referralToken && (roleNow === "student" || roleNow === "user")) {
+        setShowReferralAccept(true);
+        setBooting(false);
+        return;
+      }
+
       await routeLikeWelcome(
         cred.user,
         lang,
@@ -780,7 +951,6 @@ export default function HomeClient() {
     }
   }
 
-  // ✅ While booting, avoid flashing the full landing page for already-signed-in users.
   if (booting && !(logout && !logoutDone)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white text-gray-700">
@@ -806,7 +976,7 @@ export default function HomeClient() {
       <main className="w-full flex-1 min-h-0 overflow-hidden bg-gradient-to-br from-blue-700 via-blue-600 to-indigo-800 px-2 sm:px-4 lg:px-6 pt-4 pb-4 lg:pt-4 lg:pb-4">
         <div className="grid flex-1 min-h-0 grid-cols-1 items-center gap-8 lg:gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(320px,520px)] xl:grid-cols-[minmax(0,1fr)_minmax(360px,560px)]">
           <section className="lg:pr-6 xl:pr-10">
-           <div className="relative mx-auto w-full max-w-[1100px] overflow-hidden rounded-[36px] border border-white/15 bg-white/10 p-3 sm:p-4 lg:p-5 shadow-[0_22px_90px_rgba(0,0,0,0.35)] backdrop-blur">
+            <div className="relative mx-auto w-full max-w-[1100px] overflow-hidden rounded-[36px] border border-white/15 bg-white/10 p-3 sm:p-4 lg:p-5 shadow-[0_22px_90px_rgba(0,0,0,0.35)] backdrop-blur">
               <div className="pointer-events-none absolute inset-0 opacity-70 [background:radial-gradient(900px_circle_at_15%_20%,rgba(255,255,255,0.22),transparent_55%),radial-gradient(900px_circle_at_85%_30%,rgba(16,185,129,0.18),transparent_55%),radial-gradient(900px_circle_at_60%_90%,rgba(255,255,255,0.10),transparent_55%)]" />
               <div className="relative">
                 <h1 className="mt-2 text-center text-2xl font-extrabold leading-tight tracking-tight text-white sm:text-4xl lg:text-5xl">
@@ -826,7 +996,6 @@ export default function HomeClient() {
                   )}
                 </p>
 
-                {/* Infographic layout (desktop) */}
                 <div className="relative mt-2 hidden md:block h-[62vh] min-h-[460px] max-h-[600px] lg:max-h-[640px]">
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="relative h-[640px] w-[1000px] origin-center scale-[0.78] lg:scale-[0.85] xl:scale-[0.9]">
@@ -1152,7 +1321,6 @@ export default function HomeClient() {
                   </div>
                 </div>
 
-                {/* Mobile cards */}
                 <div className="mt-8 grid grid-cols-1 gap-4 md:hidden">
                   {(
                     [
@@ -1194,7 +1362,6 @@ export default function HomeClient() {
                   ))}
                 </div>
 
-                {/* Bottom trust bullets */}
                 <div className="mt-4 w-full text-white/95">
                   <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-center gap-x-3 gap-y-4">
                     <div className="flex items-center gap-2">
@@ -1278,354 +1445,425 @@ export default function HomeClient() {
             </div>
           </section>
 
-          {/* Right auth card */}
           <section className="lg:sticky lg:top-6 justify-self-end w-full text-gray-900">
             <div className="w-full max-w-[560px]">
-              <div
-                id="auth-card"
-                className="rounded-3xl border border-gray-200 bg-white p-5 sm:p-6 lg:p-7 shadow-lg"
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="text-lg font-semibold">
-                      {authView === "forgot"
-                        ? t.reset_title
-                        : mode === "signin"
-                         ? t.login_title
-                         : t.signup_title}
-                    </div>
-                    <div className="text-sm text-gray-500">
-                      {authView === "forgot"
-                        ? t.reset_sub
-                        : mode === "signin"
-                         ? t.welcome_back
-                         : t.signup_journey}
-                    </div>
-                  </div>
-                  <img
-                    src="https://firebasestorage.googleapis.com/v0/b/greenpass-dc92d.firebasestorage.app/o/rawdatas%2FGreenPass%20Official.png?alt=media&token=809da08b-22f6-4049-bbbf-9b82342630e8"
-                    alt="GreenPass"
-                    className="h-14 w-14 rounded-2xl object-cover"
-                    loading="lazy"
-                  />
-                </div>
-
-                {/* Tabs (hidden on Forgot Password view) */}
-                {authView === "auth" && (
-                  <div className="mt-5 grid grid-cols-2 rounded-2xl bg-gray-100 p-1">
-                    <button
-                      onClick={() => {
-                        setMode("signin");
-                        setAuthView("auth");
-                        setMsg(null);
-                      }}
-                      className={`rounded-xl px-3 py-2 text-sm font-semibold ${
-                        mode === "signin" ? "bg-white shadow-sm" : "text-gray-600"
-                      }`}
-                    >
-                      {t.signin}
-                    </button>
-                    <button
-                      onClick={() => {
-                        setMode("signup");
-                        setAuthView("auth");
-                        setMsg(null);
-                      }}
-                      className={`rounded-xl px-3 py-2 text-sm font-semibold ${
-                        mode === "signup" ? "bg-white shadow-sm" : "text-gray-600"
-                      }`}
-                    >
-                      {t.signup}
-                    </button>
-                  </div>
-                )}
-
-                {/* Role dropdown */}
-                {authView === "auth" && mode === "signup" && (
-                  <div className="mt-5">
-                    <label className="mb-1 block text-xs font-semibold text-gray-600">
-                      {t.choose_role}
-                    </label>
-
-                    <select
-                      value={role}
-                      onChange={(e) => setRole(e.target.value as RoleValue)}
-                      disabled={busy || inviteRoleLoading || hasInvite}
-                      className={`w-full rounded-2xl border bg-white px-3 py-3 text-sm text-gray-900 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 ${
-                        fieldErr.role
-                          ? "border-red-400 focus:ring-red-400"
-                          : "border-gray-300 focus:ring-emerald-500"
-                      }`}
-                    >
-                      <option value="" disabled>
-                        {t.select_role}
-                      </option>
-
-                      {ROLE_ITEMS.map((r) => (
-                        <option key={r.value} value={r.value}>
-                          {tr(lang, r.key, r.def)}
-                        </option>
-                      ))}
-                    </select>
-                    {fieldErr.role && (
-                      <div className="mt-1 flex items-start gap-2 text-xs text-red-600">
-                        <span className="mt-[2px] inline-flex h-4 w-4 items-center justify-center rounded-full bg-red-100 text-red-700">
-                          !
-                        </span>
-                        <span>{fieldErr.role}</span>
+              {showReferralAccept && referralPreview ? (
+                <div className="rounded-3xl border border-gray-200 bg-white p-5 sm:p-6 lg:p-7 shadow-lg">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="text-lg font-semibold">Connect with agent</div>
+                      <div className="text-sm text-gray-500">
+                        Accept this referral to be added to the agent’s client list.
                       </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Social */}
-                {authView === "auth" && (
-                  <div className="mt-5 space-y-2">
-                    <button
-                      onClick={handleGoogle}
-                      disabled={busy}
-                      className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-semibold shadow-sm hover:bg-gray-50 disabled:opacity-60"
-                    >
-                      {t.google}
-                    </button>
-                    <button
-                      onClick={handleApple}
-                      disabled={busy}
-                      className="w-full rounded-2xl bg-gray-900 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-black disabled:opacity-60"
-                    >
-                      {t.apple}
-                    </button>
-
-                    <div className="my-5 flex items-center gap-3">
-                      <div className="h-px flex-1 bg-gray-200" />
-                      <div className="text-xs text-gray-500">{t.or}</div>
-                      <div className="h-px flex-1 bg-gray-200" />
                     </div>
-                  </div>
-                )}
-
-                {/* Email */}
-                <div className="space-y-3">
-                  <div>
-                    <label className="mb-1 block text-xs font-semibold text-gray-600">
-                      {t.email}
-                    </label>
-                    <input
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder={t.email_ph}
-                      className={`w-full rounded-2xl border bg-white px-3 py-3 text-sm text-gray-900 shadow-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
-                        fieldErr.email
-                          ? "border-red-400 focus:ring-red-400"
-                          : "border-gray-300"
-                      }`}
-                      autoComplete="email"
+                    <img
+                      src="https://firebasestorage.googleapis.com/v0/b/greenpass-dc92d.firebasestorage.app/o/rawdatas%2FGreenPass%20Official.png?alt=media&token=809da08b-22f6-4049-bbbf-9b82342630e8"
+                      alt="GreenPass"
+                      className="h-14 w-14 rounded-2xl object-cover"
+                      loading="lazy"
                     />
-                    {fieldErr.email && (
-                      <div className="mt-1 flex items-start gap-2 text-xs text-red-600">
+                  </div>
+
+                  <div className="mt-5 rounded-2xl border bg-gray-50 p-4">
+                    <p className="text-xs font-semibold text-gray-500">Agent</p>
+                    <p className="mt-1 text-base font-semibold text-gray-900">
+                      {referralPreview?.agentName || "Agent"}
+                    </p>
+                    {referralPreview?.agentCompany ? (
+                      <p className="mt-1 text-sm text-gray-600">
+                        {referralPreview.agentCompany}
+                      </p>
+                    ) : null}
+                  </div>
+
+                  {referralLoading && (
+                    <div className="mt-4 rounded-2xl border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-blue-700">
+                      Loading referral...
+                    </div>
+                  )}
+
+                  {msg && (
+                    <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+                      {msg}
+                    </div>
+                  )}
+
+                  <div className="mt-5 flex flex-wrap gap-3">
+                    <button
+                      type="button"
+                      onClick={handleAcceptReferralNow}
+                      disabled={busy}
+                      className="rounded-2xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 disabled:opacity-60"
+                    >
+                      {busy ? t.loading : "Accept"}
+                    </button>
+
+                    <button
+                      type="button"
+                      disabled={busy}
+                      onClick={() => {
+                        if (auth.currentUser) {
+                          routeLikeWelcome(
+                            auth.currentUser,
+                            lang,
+                            undefined,
+                            nextFromUrl,
+                            hasInvite ? { inviteId, token: inviteToken } : undefined,
+                            { skipDocCheck: !hasInvite }
+                          );
+                        }
+                      }}
+                      className="rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-semibold text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-60"
+                    >
+                      Skip
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <div
+                    id="auth-card"
+                    className="rounded-3xl border border-gray-200 bg-white p-5 sm:p-6 lg:p-7 shadow-lg"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="text-lg font-semibold">
+                          {authView === "forgot"
+                            ? t.reset_title
+                            : mode === "signin"
+                              ? t.login_title
+                              : t.signup_title}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {authView === "forgot"
+                            ? t.reset_sub
+                            : mode === "signin"
+                              ? t.welcome_back
+                              : t.signup_journey}
+                        </div>
+                      </div>
+                      <img
+                        src="https://firebasestorage.googleapis.com/v0/b/greenpass-dc92d.firebasestorage.app/o/rawdatas%2FGreenPass%20Official.png?alt=media&token=809da08b-22f6-4049-bbbf-9b82342630e8"
+                        alt="GreenPass"
+                        className="h-14 w-14 rounded-2xl object-cover"
+                        loading="lazy"
+                      />
+                    </div>
+
+                    {authView === "auth" && (
+                      <div className="mt-5 grid grid-cols-2 rounded-2xl bg-gray-100 p-1">
+                        <button
+                          onClick={() => {
+                            setMode("signin");
+                            setAuthView("auth");
+                            setMsg(null);
+                          }}
+                          className={`rounded-xl px-3 py-2 text-sm font-semibold ${
+                            mode === "signin" ? "bg-white shadow-sm" : "text-gray-600"
+                          }`}
+                        >
+                          {t.signin}
+                        </button>
+                        <button
+                          onClick={() => {
+                            setMode("signup");
+                            setAuthView("auth");
+                            setMsg(null);
+                          }}
+                          className={`rounded-xl px-3 py-2 text-sm font-semibold ${
+                            mode === "signup" ? "bg-white shadow-sm" : "text-gray-600"
+                          }`}
+                        >
+                          {t.signup}
+                        </button>
+                      </div>
+                    )}
+
+                    {authView === "auth" && mode === "signup" && (
+                      <div className="mt-5">
+                        <label className="mb-1 block text-xs font-semibold text-gray-600">
+                          {t.choose_role}
+                        </label>
+
+                        <select
+                          value={role}
+                          onChange={(e) => setRole(e.target.value as RoleValue)}
+                          disabled={busy || inviteRoleLoading || hasInvite}
+                          className={`w-full rounded-2xl border bg-white px-3 py-3 text-sm text-gray-900 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 ${
+                            fieldErr.role
+                              ? "border-red-400 focus:ring-red-400"
+                              : "border-gray-300 focus:ring-emerald-500"
+                          }`}
+                        >
+                          <option value="" disabled>
+                            {t.select_role}
+                          </option>
+
+                          {ROLE_ITEMS.map((r) => (
+                            <option key={r.value} value={r.value}>
+                              {tr(lang, r.key, r.def)}
+                            </option>
+                          ))}
+                        </select>
+                        {fieldErr.role && (
+                          <div className="mt-1 flex items-start gap-2 text-xs text-red-600">
+                            <span className="mt-[2px] inline-flex h-4 w-4 items-center justify-center rounded-full bg-red-100 text-red-700">
+                              !
+                            </span>
+                            <span>{fieldErr.role}</span>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {authView === "auth" && (
+                      <div className="mt-5 space-y-2">
+                        <button
+                          onClick={handleGoogle}
+                          disabled={busy}
+                          className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-semibold shadow-sm hover:bg-gray-50 disabled:opacity-60"
+                        >
+                          {t.google}
+                        </button>
+                        <button
+                          onClick={handleApple}
+                          disabled={busy}
+                          className="w-full rounded-2xl bg-gray-900 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-black disabled:opacity-60"
+                        >
+                          {t.apple}
+                        </button>
+
+                        <div className="my-5 flex items-center gap-3">
+                          <div className="h-px flex-1 bg-gray-200" />
+                          <div className="text-xs text-gray-500">{t.or}</div>
+                          <div className="h-px flex-1 bg-gray-200" />
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="space-y-3">
+                      <div>
+                        <label className="mb-1 block text-xs font-semibold text-gray-600">
+                          {t.email}
+                        </label>
+                        <input
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          placeholder={t.email_ph}
+                          className={`w-full rounded-2xl border bg-white px-3 py-3 text-sm text-gray-900 shadow-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+                            fieldErr.email
+                              ? "border-red-400 focus:ring-red-400"
+                              : "border-gray-300"
+                          }`}
+                          autoComplete="email"
+                        />
+                        {fieldErr.email && (
+                          <div className="mt-1 flex items-start gap-2 text-xs text-red-600">
+                            <span className="mt-[2px] inline-flex h-4 w-4 items-center justify-center rounded-full bg-red-100 text-red-700">
+                              !
+                            </span>
+                            <span>{fieldErr.email}</span>
+                          </div>
+                        )}
+                      </div>
+
+                      {authView === "auth" && (
+                        <div>
+                          <label className="mb-1 block text-xs font-semibold text-gray-600">
+                            {t.password}
+                          </label>
+                          <div className="relative">
+                            <input
+                              value={password}
+                              onChange={(e) => setPassword(e.target.value)}
+                              placeholder={t.password_ph}
+                              type={showPassword ? "text" : "password"}
+                              className={`w-full rounded-2xl border bg-white px-3 py-3 pr-12 text-sm text-gray-900 shadow-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+                                fieldErr.password
+                                  ? "border-red-400 focus:ring-red-400"
+                                  : "border-gray-300"
+                              }`}
+                              autoComplete={
+                                mode === "signin" ? "current-password" : "new-password"
+                              }
+                            />
+
+                            <button
+                              type="button"
+                              onClick={() => setShowPassword((v) => !v)}
+                              className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-gray-600 hover:text-gray-900"
+                              aria-label={showPassword ? "Hide password" : "Show password"}
+                            >
+                              {showPassword ? (
+                                <EyeOffIcon className="h-4 w-4" />
+                              ) : (
+                                <EyeIcon className="h-4 w-4" />
+                              )}
+                            </button>
+                          </div>
+
+                          {fieldErr.password && (
+                            <div className="mt-2 flex items-start gap-2 text-xs text-red-600">
+                              <span className="mt-[2px] inline-flex h-4 w-4 items-center justify-center rounded-full bg-red-100 text-red-700">
+                                !
+                              </span>
+                              <span>{fieldErr.password}</span>
+                            </div>
+                          )}
+
+                          {mode === "signup" && (
+                            <div className="mt-3 rounded-2xl border border-gray-200 bg-gray-50 px-3 py-3 text-xs">
+                              <div className="mb-2 font-semibold text-gray-700">
+                                {t.pw_req_title}
+                              </div>
+
+                              <div className="space-y-1">
+                                <div className={pwChecks.length ? "text-emerald-700" : "text-gray-600"}>
+                                  {pwChecks.length ? "✓" : "✕"} {t.pw_req_len}
+                                </div>
+                                <div className={pwChecks.uppercase ? "text-emerald-700" : "text-gray-600"}>
+                                  {pwChecks.uppercase ? "✓" : "✕"} {t.pw_req_upper}
+                                </div>
+                                <div className={pwChecks.number ? "text-emerald-700" : "text-gray-600"}>
+                                  {pwChecks.number ? "✓" : "✕"} {t.pw_req_num}
+                                </div>
+                                <div className={pwChecks.special ? "text-emerald-700" : "text-gray-600"}>
+                                  {pwChecks.special ? "✓" : "✕"} {t.pw_req_special}
+                                </div>
+                              </div>
+                            </div>
+                          )}
+
+                          {mode === "signin" && (
+                            <div className="mt-2 text-right">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setAuthView("forgot");
+                                  setMsg(null);
+                                }}
+                                className="text-xs font-semibold text-blue-600 hover:underline"
+                              >
+                                {t.forgot_pw}
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      {authView === "auth" && mode === "signup" && (
+                        <div>
+                          <label className="mb-1 block text-xs font-semibold text-gray-600">
+                            {t.confirm}
+                          </label>
+                          <div className="relative">
+                            <input
+                              value={confirm}
+                              onChange={(e) => setConfirm(e.target.value)}
+                              placeholder={t.confirm_ph}
+                              type={showConfirm ? "text" : "password"}
+                              className={`w-full rounded-2xl border bg-white px-3 py-3 pr-12 text-sm text-gray-900 shadow-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+                                fieldErr.confirm
+                                  ? "border-red-400 focus:ring-red-400"
+                                  : "border-gray-300"
+                              }`}
+                              autoComplete="new-password"
+                            />
+
+                            <button
+                              type="button"
+                              onClick={() => setShowConfirm((v) => !v)}
+                              className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-gray-600 hover:text-gray-900"
+                              aria-label={showConfirm ? "Hide password" : "Show password"}
+                            >
+                              {showConfirm ? (
+                                <EyeOffIcon className="h-4 w-4" />
+                              ) : (
+                                <EyeIcon className="h-4 w-4" />
+                              )}
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {fieldErr.confirm && (
+                      <div className="mt-2 flex items-start gap-2 text-xs text-red-600">
                         <span className="mt-[2px] inline-flex h-4 w-4 items-center justify-center rounded-full bg-red-100 text-red-700">
                           !
                         </span>
-                        <span>{fieldErr.email}</span>
+                        <span>{fieldErr.confirm}</span>
                       </div>
                     )}
+
+                    {msg && (
+                      <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+                        {msg}
+                      </div>
+                    )}
+
+                    {authView === "auth" ? (
+                      <button
+                        onClick={handleEmailAuth}
+                        disabled={!canSubmit || busy}
+                        className="mt-5 w-full rounded-2xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 disabled:opacity-60"
+                      >
+                        {busy ? t.loading : mode === "signin" ? t.cta_login : t.cta_signup}
+                      </button>
+                    ) : (
+                      <div className="mt-5 space-y-2">
+                        <button
+                          onClick={handleSendReset}
+                          disabled={!email || busy}
+                          className="w-full rounded-2xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 disabled:opacity-60"
+                        >
+                          {busy ? t.loading : t.send_reset}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setAuthView("auth");
+                            setMode("signin");
+                            setMsg(null);
+                          }}
+                          className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-semibold text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-60"
+                        >
+                          {t.back_to_login}
+                        </button>
+                      </div>
+                    )}
+
+                    <p className="mt-4 text-center text-xs text-gray-500">
+                      {t.after_login}
+                    </p>
                   </div>
 
                   {authView === "auth" && (
-                    <div>
-                      <label className="mb-1 block text-xs font-semibold text-gray-600">
-                        {t.password}
-                      </label>
-                      <div className="relative">
-                        <input
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                          placeholder={t.password_ph}
-                          type={showPassword ? "text" : "password"}
-                          className={`w-full rounded-2xl border bg-white px-3 py-3 pr-12 text-sm text-gray-900 shadow-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
-                            fieldErr.password
-                              ? "border-red-400 focus:ring-red-400"
-                              : "border-gray-300"
-                          }`}
-                          autoComplete={
-                            mode === "signin" ? "current-password" : "new-password"
-                          }
-                        />
-
-                        <button
-                          type="button"
-                          onClick={() => setShowPassword((v) => !v)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-gray-600 hover:text-gray-900"
-                          aria-label={showPassword ? "Hide password" : "Show password"}
-                        >
-                          {showPassword ? (
-                            <EyeOffIcon className="h-4 w-4" />
-                          ) : (
-                            <EyeIcon className="h-4 w-4" />
-                          )}
-                        </button>
-                      </div>
-
-                      {fieldErr.password && (
-                        <div className="mt-2 flex items-start gap-2 text-xs text-red-600">
-                          <span className="mt-[2px] inline-flex h-4 w-4 items-center justify-center rounded-full bg-red-100 text-red-700">
-                            !
-                          </span>
-                          <span>{fieldErr.password}</span>
-                        </div>
-                      )}
-
-                      {mode === "signup" && (
-                        <div className="mt-3 rounded-2xl border border-gray-200 bg-gray-50 px-3 py-3 text-xs">
-                          <div className="mb-2 font-semibold text-gray-700">
-                            {t.pw_req_title}
-                          </div>
-
-                          <div className="space-y-1">
-                            <div className={pwChecks.length ? "text-emerald-700" : "text-gray-600"}>
-                              {pwChecks.length ? "✓" : "✕"} {t.pw_req_len}
-                            </div>
-                            <div className={pwChecks.uppercase ? "text-emerald-700" : "text-gray-600"}>
-                              {pwChecks.uppercase ? "✓" : "✕"} {t.pw_req_upper}
-                            </div>
-                            <div className={pwChecks.number ? "text-emerald-700" : "text-gray-600"}>
-                              {pwChecks.number ? "✓" : "✕"} {t.pw_req_num}
-                            </div>
-                            <div className={pwChecks.special ? "text-emerald-700" : "text-gray-600"}>
-                              {pwChecks.special ? "✓" : "✕"} {t.pw_req_special}
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                      {mode === "signin" && (
-                        <div className="mt-2 text-right">
+                    <div className="mt-4 rounded-3xl border border-gray-200 bg-white p-4 text-center text-sm text-gray-700 shadow-sm">
+                      {mode === "signin" ? (
+                        <>
+                          {t.no_account}{" "}
                           <button
-                            type="button"
-                            onClick={() => {
-                              setAuthView("forgot");
-                              setMsg(null);
-                            }}
-                            className="text-xs font-semibold text-blue-600 hover:underline"
+                            onClick={() => setMode("signup")}
+                            className="font-semibold text-blue-600 hover:underline"
                           >
-                            {t.forgot_pw}
+                            {t.signup}
                           </button>
-                        </div>
+                        </>
+                      ) : (
+                        <>
+                          {t.have_account}{" "}
+                          <button
+                            onClick={() => setMode("signin")}
+                            className="font-semibold text-blue-600 hover:underline"
+                          >
+                            {t.signin}
+                          </button>
+                        </>
                       )}
                     </div>
                   )}
-
-                  {authView === "auth" && mode === "signup" && (
-                    <div>
-                      <label className="mb-1 block text-xs font-semibold text-gray-600">
-                        {t.confirm}
-                      </label>
-                      <div className="relative">
-                        <input
-                          value={confirm}
-                          onChange={(e) => setConfirm(e.target.value)}
-                          placeholder={t.confirm_ph}
-                          type={showConfirm ? "text" : "password"}
-                          className={`w-full rounded-2xl border bg-white px-3 py-3 pr-12 text-sm text-gray-900 shadow-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
-                            fieldErr.confirm
-                              ? "border-red-400 focus:ring-red-400"
-                              : "border-gray-300"
-                          }`}
-                          autoComplete="new-password"
-                        />
-
-                        <button
-                          type="button"
-                          onClick={() => setShowConfirm((v) => !v)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-gray-600 hover:text-gray-900"
-                          aria-label={showConfirm ? "Hide password" : "Show password"}
-                        >
-                          {showConfirm ? (
-                            <EyeOffIcon className="h-4 w-4" />
-                          ) : (
-                            <EyeIcon className="h-4 w-4" />
-                          )}
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {fieldErr.confirm && (
-                  <div className="mt-2 flex items-start gap-2 text-xs text-red-600">
-                    <span className="mt-[2px] inline-flex h-4 w-4 items-center justify-center rounded-full bg-red-100 text-red-700">
-                      !
-                    </span>
-                    <span>{fieldErr.confirm}</span>
-                  </div>
-                )}
-
-                {msg && (
-                  <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
-                    {msg}
-                  </div>
-                )}
-
-                {authView === "auth" ? (
-                  <button
-                    onClick={handleEmailAuth}
-                    disabled={!canSubmit || busy}
-                    className="mt-5 w-full rounded-2xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 disabled:opacity-60"
-                  >
-                    {busy ? t.loading : mode === "signin" ? t.cta_login : t.cta_signup}
-                  </button>
-                ) : (
-                  <div className="mt-5 space-y-2">
-                    <button
-                      onClick={handleSendReset}
-                      disabled={!email || busy}
-                      className="w-full rounded-2xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 disabled:opacity-60"
-                    >
-                      {busy ? t.loading : t.send_reset}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setAuthView("auth");
-                        setMode("signin");
-                        setMsg(null);
-                      }}
-                      className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-semibold text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-60"
-                    >
-                      {t.back_to_login}
-                    </button>
-                  </div>
-                )}
-
-                <p className="mt-4 text-center text-xs text-gray-500">
-                  {t.after_login}
-                </p>
-              </div>
-
-              {authView === "auth" && (
-                <div className="mt-4 rounded-3xl border border-gray-200 bg-white p-4 text-center text-sm text-gray-700 shadow-sm">
-                  {mode === "signin" ? (
-                    <>
-                      {t.no_account}{" "}
-                      <button
-                        onClick={() => setMode("signup")}
-                        className="font-semibold text-blue-600 hover:underline"
-                      >
-                        {t.signup}
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      {t.have_account}{" "}
-                      <button
-                        onClick={() => setMode("signin")}
-                        className="font-semibold text-blue-600 hover:underline"
-                      >
-                        {t.signin}
-                      </button>
-                    </>
-                  )}
-                </div>
+                </>
               )}
             </div>
           </section>
