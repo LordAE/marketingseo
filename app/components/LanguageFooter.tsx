@@ -20,6 +20,7 @@ const LANGS: Array<{ code: LangCode; label: string }> = [
   { code: "pt-BR", label: "Português (Brasil)" },
   { code: "fr", label: "Français (France)" },
   { code: "de", label: "Deutsch" },
+  { code: "tr", label: "Türkçe" },
 ];
 
 export default function LanguageFooter({ value, onChange }: Props) {

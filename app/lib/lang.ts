@@ -10,7 +10,8 @@ export type LangCode =
   | "ar"
   | "pt-BR"
   | "fr"
-  | "de";
+  | "de"
+  | "tr";
 
 export const DEFAULT_LANG: LangCode = "en";
 
@@ -33,7 +34,7 @@ export function normalizeLang(input: string): LangCode {
   if (v.startsWith("zh")) return "zh";
   if (v.startsWith("ja")) return "ja";
   if (v.startsWith("ko")) return "ko";
-
+  if (v.startsWith("tr")) return "tr";
   return "en";
 }
 

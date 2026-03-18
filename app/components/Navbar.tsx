@@ -21,6 +21,7 @@ const LANGS: Array<{ code: LangCode; label: string }> = [
   { code: "pt-BR" as LangCode, label: "Português (Brasil)" },
   { code: "fr" as LangCode, label: "Français (France)" },
   { code: "de" as LangCode, label: "Deutsch" },
+  { code: "tr" as LangCode, label: "Türkçe" },
 ];
 
 export default function Navbar({ lang, onLangChange }: Props) {
