@@ -1010,11 +1010,13 @@ export default function HomeClient() {
 
       <main className="w-full flex-1 min-h-0 overflow-hidden bg-gradient-to-br from-blue-700 via-blue-600 to-indigo-800 px-2 sm:px-4 lg:px-6 pt-4 pb-4 lg:pt-4 lg:pb-4">
         <div className="grid flex-1 min-h-0 grid-cols-1 items-center gap-8 lg:gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(320px,520px)] xl:grid-cols-[minmax(0,1fr)_minmax(360px,560px)]">
-          <section className="lg:pr-6 xl:pr-10">
+
+          {/* THIS SECTION NEEDS WORKING ON */}
+          <section id='ONBOARD_INTRO' className="lg:pr-6 xl:pr-2">
             <div className="relative mx-auto w-full max-w-[1100px] overflow-hidden rounded-[36px] border border-white/15 bg-white/10 p-3 sm:p-4 lg:p-5 shadow-[0_22px_90px_rgba(0,0,0,0.35)] backdrop-blur">
               <div className="pointer-events-none absolute inset-0 opacity-70 [background:radial-gradient(900px_circle_at_15%_20%,rgba(255,255,255,0.22),transparent_55%),radial-gradient(900px_circle_at_85%_30%,rgba(16,185,129,0.18),transparent_55%),radial-gradient(900px_circle_at_60%_90%,rgba(255,255,255,0.10),transparent_55%)]" />
               <div className="relative">
-                <h1 className="mt-2 text-center text-2xl font-extrabold leading-tight tracking-tight text-white sm:text-4xl lg:text-5xl">
+                <h1 id="1st_TAGLINE" className="mt-2 text-center text-xl font-extrabold leading-[1.08] tracking-tight text-white sm:text-3xl lg:text-4xl xl:text-[2.6rem]">
                   <span className="block">
                     {tr(lang, "hero_h1_1", "The Global Marketplace Connecting")}
                   </span>
@@ -1023,7 +1025,7 @@ export default function HomeClient() {
                   </span>
                 </h1>
 
-                <p className="mx-auto mt-2 max-w-2xl text-center text-sm leading-6 text-white/85 sm:text-base">
+                <p id="2nd_TAGLINE" className="mx-auto mt-2 max-w-2xl text-center text-sm leading-6 text-white/85 sm:text-base">
                   {tr(
                     lang,
                     "hero_tagline",
@@ -1031,9 +1033,9 @@ export default function HomeClient() {
                   )}
                 </p>
 
-                <div className="relative mt-2 hidden md:block h-[62vh] min-h-[460px] max-h-[600px] lg:max-h-[640px]">
+                <div id="4_CONTAINERS_LARGE" className="relative my-12 hidden md:block h-[62vh] min-h-[460px] max-h-[600px] lg:max-h-[640px]">
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="relative h-[640px] w-[1000px] origin-center scale-[0.78] lg:scale-[0.85] xl:scale-[0.9]">
+                    <div  className="relative h-[600px] w-[920px] origin-center scale-[0.72] lg:scale-[0.78] xl:scale-[0.9]">
                       <svg
                         className="absolute inset-0 z-0 h-full w-full opacity-70"
                         viewBox="0 0 1000 640"
@@ -1356,7 +1358,7 @@ export default function HomeClient() {
                   </div>
                 </div>
 
-                <div className="mt-8 grid grid-cols-1 gap-4 md:hidden">
+                <div id="4_CONTAINERS_MEDIUM" className="mt-8 grid grid-cols-1 gap-4 md:hidden">
                   {(
                     [
                       {
@@ -1397,7 +1399,7 @@ export default function HomeClient() {
                   ))}
                 </div>
 
-                <div className="mt-4 w-full text-white/95">
+                <div id="PROLLY CIRCLE" className="mt-4 w-full text-white/95">
                   <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-center gap-x-3 gap-y-4">
                     <div className="flex items-center gap-2">
                       <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/15 ring-1 ring-white/25">
@@ -1473,14 +1475,14 @@ export default function HomeClient() {
                   </div>
                 </div>
 
-                <p className="mt-8 text-center text-sm font-semibold text-white/85">
+                <p id="BOTTOM_TEXT" className="mt-8 text-center text-sm font-semibold text-white/85">
                   {t.one_platform}
                 </p>
               </div>
             </div>
           </section>
 
-          <section className="lg:sticky lg:top-6 justify-self-end w-full text-gray-900">
+          <section id="login_ui" className="lg:sticky lg:top-6 justify-self-end w-full text-gray-900">
             <div className="w-full max-w-[560px]">
               {showReferralAccept && referralPreview ? (
                 <div className="rounded-3xl border border-gray-200 bg-white p-5 sm:p-6 lg:p-7 shadow-lg">
@@ -1908,6 +1910,7 @@ export default function HomeClient() {
               )}
             </div>
           </section>
+          
         </div>
 
         <div className="mt-auto pt-6">
