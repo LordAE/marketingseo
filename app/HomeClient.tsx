@@ -223,9 +223,9 @@ async function acceptAgentReferral(user: User, ref: string) {
   return r.json().catch(() => ({} as any));
 }
 
-type RoleValue = "student" | "agent" | "tutor" | "school";
+type RoleValue = "student" | "agent" | "tutor" | "school" | "collaborator";
 
-const ROLE_ITEMS: { value: RoleValue; key: string; def: string }[] = [
+const ROLE_ITEMS: { value: Exclude<RoleValue, "collaborator">; key: string; def: string }[] = [
   { value: "student", key: "role_student", def: "Student" },
   { value: "agent", key: "role_agent", def: "Agent" },
   { value: "tutor", key: "role_tutor", def: "Tutor" },
@@ -246,11 +246,55 @@ function normalizeUserRole(data: any): string {
     .trim();
 }
 
-async function ensureUserDoc(user: User, role?: RoleValue) {
+function buildCollaboratorReferralFields(refCode = "", referredByUid = "") {
+  const code = String(refCode || "").trim();
+  if (!code) return {};
+
+  return {
+    referred_by_collaborator_code: code,
+    referred_by_collaborator_uid: referredByUid || "",
+    referred_by_collaborator_at: serverTimestamp(),
+  };
+}
+
+async function resolveCollaboratorRef(refCode: string) {
+  const code = String(refCode || "").trim();
+  if (!code) return "";
+
+  try {
+    const { collection, getDocs, limit, query, where } = await import("firebase/firestore");
+
+    const q = query(
+      collection(db, "users"),
+      where("collaborator_referral_code", "==", code),
+      limit(1)
+    );
+
+    const snap = await getDocs(q);
+    if (snap.empty) return "";
+    return snap.docs[0]?.id || "";
+  } catch (error) {
+    console.error("resolveCollaboratorRef error:", error);
+    return "";
+  }
+}
+
+async function ensureUserDoc(
+  user: User,
+  role?: RoleValue,
+  options?: {
+    collaboratorRef?: string;
+    referredByCollaboratorUid?: string;
+    signupEntryRole?: RoleValue;
+  }
+) {
   const ref = doc(db, "users", user.uid);
   const snap = await getDoc(ref);
 
   const chosen = role;
+  const collaboratorRef = options?.collaboratorRef || "";
+  const referredByCollaboratorUid = options?.referredByCollaboratorUid || "";
+  const signupEntryRole = options?.signupEntryRole || chosen;
 
   if (!snap.exists()) {
     const base: any = {
@@ -270,6 +314,15 @@ async function ensureUserDoc(user: User, role?: RoleValue) {
       base.role = chosen;
     }
 
+    if (signupEntryRole) {
+      base.signup_entry_role = signupEntryRole;
+    }
+
+    Object.assign(
+      base,
+      buildCollaboratorReferralFields(collaboratorRef, referredByCollaboratorUid)
+    );
+
     await setDoc(ref, base);
     return { exists: false, data: null as any };
   }
@@ -282,6 +335,20 @@ async function ensureUserDoc(user: User, role?: RoleValue) {
     if (!data.user_type) patch.user_type = chosen;
     if (!data.userType) patch.userType = chosen;
     if (!data.role) patch.role = chosen;
+  }
+
+  if (signupEntryRole && !data.signup_entry_role) {
+    patch.signup_entry_role = signupEntryRole;
+  }
+
+  if (collaboratorRef && !data.referred_by_collaborator_code) {
+    Object.assign(
+      patch,
+      buildCollaboratorReferralFields(
+        collaboratorRef,
+        data?.referred_by_collaborator_uid || referredByCollaboratorUid
+      )
+    );
   }
 
   if (!data.onboarding_step) patch.onboarding_step = "basic_info";
@@ -300,7 +367,12 @@ async function routeLikeWelcome(
   fallbackRole?: RoleValue,
   nextFromUrl?: string,
   invite?: { inviteId: string; token: string },
-  options?: { skipDocCheck?: boolean }
+  options?: {
+    skipDocCheck?: boolean;
+    collaboratorRef?: string;
+    referredByCollaboratorUid?: string;
+    signupEntryRole?: RoleValue;
+  }
 ) {
   if (invite?.inviteId && invite?.token) {
     await acceptInvite(user, invite.inviteId, invite.token);
@@ -311,12 +383,18 @@ async function routeLikeWelcome(
     Boolean(options?.skipDocCheck) &&
     !invite?.inviteId &&
     !invite?.token &&
-    !fallbackRole;
+    !fallbackRole &&
+    !options?.collaboratorRef;
 
   let next = safeNext || "/dashboard";
 
   if (!skipDocCheck) {
-    const { exists, data } = await ensureUserDoc(user, fallbackRole);
+    const { exists, data } = await ensureUserDoc(user, fallbackRole, {
+      collaboratorRef: options?.collaboratorRef,
+      referredByCollaboratorUid: options?.referredByCollaboratorUid,
+      signupEntryRole: options?.signupEntryRole || fallbackRole,
+    });
+
     const onboardingCompleted = Boolean(data?.onboarding_completed);
     next =
       safeNext || (!exists || !onboardingCompleted ? "/onboarding" : "/dashboard");
@@ -356,7 +434,8 @@ export default function HomeClient() {
   const inviteId = params.get("invite") || "";
   const inviteToken = params.get("token") || "";
   const referralToken = params.get("ref") || "";
-
+  const rawRoleParam = (params.get("role") || params.get("userType") || "").trim().toLowerCase();
+  const collaboratorInviteFlow = rawRoleParam === "collaborator" && Boolean(referralToken);
   const rawNextFromUrl = params.get("next") || "";
   const nextFromUrl = safeNextPath(rawNextFromUrl);
   const logout = params.get("logout") === "1";
@@ -364,7 +443,8 @@ export default function HomeClient() {
   const [booting, setBooting] = useState(true);
 
   const hasInvite = Boolean(inviteId && inviteToken);
-  const roleLockedByReferral = Boolean(referralToken) && !hasInvite;
+  const roleLockedByReferral =
+  Boolean(referralToken) && !hasInvite && !collaboratorInviteFlow;
 
   // auth UI state
   const [mode, setMode] = useState<"signin" | "signup">("signin");
@@ -374,10 +454,19 @@ export default function HomeClient() {
       const p = new URLSearchParams(window.location.search);
       const invite = p.get("invite");
       const token = p.get("token");
-      const ref = p.get("ref");
+      const ref = (p.get("ref") || "").trim();
+      const rawRole = (p.get("role") || p.get("userType") || "").trim().toLowerCase();
 
       if (invite && token) {
         setMode("signup");
+        return;
+      }
+
+      if (rawRole === "collaborator" && ref) {
+        setMode("signup");
+        setRole("collaborator");
+        setAuthView("auth");
+        setMsg(null);
         return;
       }
 
@@ -419,6 +508,7 @@ export default function HomeClient() {
   const [referralLoading, setReferralLoading] = useState(false);
   const [referralPreview, setReferralPreview] = useState<any>(null);
   const [showReferralAccept, setShowReferralAccept] = useState(false);
+  const [referredByCollaboratorUid, setReferredByCollaboratorUid] = useState("");
 
   useEffect(() => {
     let cancelled = false;
@@ -494,6 +584,28 @@ export default function HomeClient() {
       cancelled = true;
     };
   }, [referralToken, hasInvite]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function run() {
+      if (!collaboratorInviteFlow || !referralToken) {
+        if (!cancelled) setReferredByCollaboratorUid("");
+        return;
+      }
+
+      const uid = await resolveCollaboratorRef(referralToken);
+      if (!cancelled) {
+        setReferredByCollaboratorUid(uid || "");
+      }
+    }
+
+    run();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [collaboratorInviteFlow, referralToken]);
 
   const [lang, setLang] = useState<LangCode>(DEFAULT_LANG);
 
@@ -620,6 +732,23 @@ export default function HomeClient() {
 
         const user = auth.currentUser;
         if (user) {
+          if (collaboratorInviteFlow) {
+            await routeLikeWelcome(
+              user,
+              lang,
+              "collaborator",
+              nextFromUrl,
+              hasInvite ? { inviteId, token: inviteToken } : undefined,
+              {
+                skipDocCheck: false,
+                collaboratorRef: referralToken,
+                referredByCollaboratorUid,
+                signupEntryRole: "collaborator",
+              }
+            );
+            return;
+          }
+
           if (referralToken) {
             const userRef = doc(db, "users", user.uid);
             const userSnap = await getDoc(userRef);
@@ -696,11 +825,14 @@ export default function HomeClient() {
     if (mode === "signup") {
       if (hasInvite) {
         if (inviteRoleLoading || !role) return false;
+      } else if (collaboratorInviteFlow) {
+        if (role !== "collaborator") return false;
       } else if (roleLockedByReferral) {
         if (role !== "student") return false;
       } else {
         if (!role) return false;
       }
+
       if (!pwValid) return false;
       if (password !== confirm) return false;
     }
@@ -725,7 +857,9 @@ export default function HomeClient() {
     });
   }
 
-  function pickRole(r: RoleValue) {
+  function pickRole(r: Exclude<RoleValue, "collaborator">) {
+    if (collaboratorInviteFlow) return;
+
     setMode("signup");
     setRole(r);
     setAuthView("auth");
@@ -847,10 +981,16 @@ export default function HomeClient() {
         if (!role) setFieldErr((p) => ({ ...p, role: t.role_required }));
         return;
       }
+
+      if (collaboratorInviteFlow && role !== "collaborator") {
+        setRole("collaborator");
+      }
+
       if (roleLockedByReferral && role !== "student") {
         setRole("student");
       }
-      if (!hasInvite && !roleLockedByReferral && !role) {
+
+      if (!hasInvite && !collaboratorInviteFlow && !roleLockedByReferral && !role) {
         setFieldErr((p) => ({ ...p, role: t.role_required }));
         setMsg(t.role_required);
         return;
@@ -867,6 +1007,28 @@ export default function HomeClient() {
       }
 
       const cred = await createUserWithEmailAndPassword(auth, cleanEmail, password);
+
+      if (collaboratorInviteFlow) {
+        await ensureUserDoc(cred.user, "collaborator", {
+          collaboratorRef: referralToken,
+          referredByCollaboratorUid,
+          signupEntryRole: "collaborator",
+        });
+
+        await routeLikeWelcome(
+          cred.user,
+          lang,
+          "collaborator",
+          nextFromUrl,
+          hasInvite ? { inviteId, token: inviteToken } : undefined,
+          {
+            collaboratorRef: referralToken,
+            referredByCollaboratorUid,
+            signupEntryRole: "collaborator",
+          }
+        );
+        return;
+      }
 
       if (!hasInvite && role) {
         await ensureUserDoc(cred.user, role as RoleValue);
@@ -924,6 +1086,23 @@ export default function HomeClient() {
       const userData = userSnap.exists() ? userSnap.data() || {} : {};
       const roleNow = normalizeUserRole(userData);
 
+
+      if (collaboratorInviteFlow) {
+        await routeLikeWelcome(
+          cred.user,
+          lang,
+          "collaborator",
+          nextFromUrl,
+          hasInvite ? { inviteId, token: inviteToken } : undefined,
+          {
+            collaboratorRef: referralToken,
+            referredByCollaboratorUid,
+            signupEntryRole: "collaborator",
+          }
+        );
+        return;
+      }
+
       if (referralToken && (roleNow === "student" || roleNow === "user")) {
         setShowReferralAccept(true);
         setBooting(false);
@@ -960,6 +1139,22 @@ export default function HomeClient() {
       const userSnap = await getDoc(userRef);
       const userData = userSnap.exists() ? userSnap.data() || {} : {};
       const roleNow = normalizeUserRole(userData);
+
+      if (collaboratorInviteFlow) {
+        await routeLikeWelcome(
+          cred.user,
+          lang,
+          "collaborator",
+          nextFromUrl,
+          hasInvite ? { inviteId, token: inviteToken } : undefined,
+          {
+            collaboratorRef: referralToken,
+            referredByCollaboratorUid,
+            signupEntryRole: "collaborator",
+          }
+        );
+        return;
+      }
 
       if (referralToken && (roleNow === "student" || roleNow === "user")) {
         setShowReferralAccept(true);
@@ -1591,13 +1786,14 @@ export default function HomeClient() {
                       <div className="mt-5 grid grid-cols-2 rounded-2xl bg-gray-100 p-1">
                         <button
                           onClick={() => {
+                            if (collaboratorInviteFlow) return;
                             setMode("signin");
                             setAuthView("auth");
                             setMsg(null);
                           }}
                           className={`rounded-xl px-3 py-2 text-sm font-semibold ${
                             mode === "signin" ? "bg-white shadow-sm" : "text-gray-600"
-                          }`}
+                          } ${collaboratorInviteFlow ? "cursor-not-allowed opacity-60" : ""}`}
                         >
                           {t.signin}
                         </button>
@@ -1616,7 +1812,7 @@ export default function HomeClient() {
                       </div>
                     )}
 
-                    {authView === "auth" && mode === "signup" && !roleLockedByReferral && (
+                    {authView === "auth" && mode === "signup" && !roleLockedByReferral && !collaboratorInviteFlow && (
                       <div className="mt-5">
                         <label className="mb-1 block text-xs font-semibold text-gray-600">
                           {t.choose_role}
@@ -1653,6 +1849,21 @@ export default function HomeClient() {
                       </div>
                     )}
 
+                    {authView === "auth" && mode === "signup" && collaboratorInviteFlow && (
+                      <div className="mt-5 flex items-center justify-between rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3">
+                        <div>
+                          <div className="text-sm font-semibold text-emerald-800">
+                            Collaborator
+                          </div>
+                          <div className="text-xs text-emerald-700">
+                            This role was assigned through your invitation link.
+                          </div>
+                        </div>
+                        <div className="rounded-full bg-emerald-600 px-3 py-1 text-xs font-semibold text-white">
+                          Locked
+                        </div>
+                      </div>
+                    )}
                     {authView === "auth" && mode === "signup" && roleLockedByReferral && (
                       <div className="mt-5 rounded-2xl border border-blue-200 bg-blue-50 px-3 py-3 text-sm text-blue-700 shadow-sm">
                         Signing up as: <strong>{tr(lang, "role_student", "Student")}</strong>
@@ -1887,7 +2098,10 @@ export default function HomeClient() {
                         <>
                           {t.no_account}{" "}
                           <button
-                            onClick={() => setMode("signup")}
+                            onClick={() => {
+                              setMode("signup");
+                              if (collaboratorInviteFlow) setRole("collaborator");
+                            }}
                             className="font-semibold text-blue-600 hover:underline"
                           >
                             {t.signup}
@@ -1897,7 +2111,10 @@ export default function HomeClient() {
                         <>
                           {t.have_account}{" "}
                           <button
-                            onClick={() => setMode("signin")}
+                            onClick={() => {
+                              if (collaboratorInviteFlow) return;
+                              setMode("signin");
+                            }}
                             className="font-semibold text-blue-600 hover:underline"
                           >
                             {t.signin}
