@@ -31,8 +31,6 @@ import {
   updateDoc,
 } from "firebase/firestore";
 
-// NOTE: This project doesn't currently have `lucide-react` installed.
-// To avoid adding a new dependency, we use lightweight inline SVG icons.
 function EyeIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
@@ -101,11 +99,8 @@ function EyeOffIcon(props: React.SVGProps<SVGSVGElement>) {
   );
 }
 
-/** ✅ Set your app URL here */
 const APP_BASE = "https://app.greenpassgroup.com";
-// const APP_BASE = "http://localhost:5173";
 
-/** Always returns: APP_BASE + path + ?lang=<lang> */
 function appLink(path: string, lang: string) {
   const cleanPath = (path || "/").startsWith("/") ? path : `/${path}`;
   const code = lang || "en";
@@ -113,10 +108,6 @@ function appLink(path: string, lang: string) {
   return `${APP_BASE}${cleanPath}${sep}lang=${encodeURIComponent(code)}`;
 }
 
-/**
- * ✅ Safe internal `next` param only (prevents open redirects)
- * Allows only paths like "/accept-org-invite?..." and blocks full URLs.
- */
 function safeNextPath(p: string) {
   const raw = (p || "").trim();
   if (!raw) return "";
@@ -127,15 +118,10 @@ function safeNextPath(p: string) {
   return raw;
 }
 
-/** ✅ Firebase Functions base URL (for SEO -> App auth bridge)
- *  Set NEXT_PUBLIC_FUNCTIONS_BASE in your SEO environment (recommended).
- *  Example: https://us-central1-greenpass-dc92d.cloudfunctions.net
- */
 const FUNCTIONS_BASE =
   (process.env.NEXT_PUBLIC_FUNCTIONS_BASE as string | undefined) ||
   "https://us-central1-greenpass-dc92d.cloudfunctions.net";
 
-/** Create a one-time auth bridge code (server validates ID token) */
 async function createBridgeCode(user: User) {
   const idToken = await user.getIdToken();
 
@@ -160,7 +146,6 @@ async function createBridgeCode(user: User) {
   return data.code as string;
 }
 
-/** Accept an invite (sets role & onboarding fields server-side). */
 async function acceptInvite(user: User, inviteId: string, token: string) {
   const idToken = await user.getIdToken();
 
@@ -184,7 +169,6 @@ async function acceptInvite(user: User, inviteId: string, token: string) {
   return r.json().catch(() => ({} as any));
 }
 
-/** Public preview of referral agent from QR token */
 async function getAgentReferralPublic(ref: string) {
   const r = await fetch(
     `${FUNCTIONS_BASE.replace(/\/+$/, "")}/getAgentReferralPublic?ref=${encodeURIComponent(ref)}`,
@@ -199,7 +183,6 @@ async function getAgentReferralPublic(ref: string) {
   return r.json().catch(() => ({} as any));
 }
 
-/** Accept agent referral for signed-in student */
 async function acceptAgentReferral(user: User, ref: string) {
   const idToken = await user.getIdToken();
 
@@ -225,7 +208,11 @@ async function acceptAgentReferral(user: User, ref: string) {
 
 type RoleValue = "student" | "agent" | "tutor" | "school" | "collaborator";
 
-const ROLE_ITEMS: { value: Exclude<RoleValue, "collaborator">; key: string; def: string }[] = [
+const ROLE_ITEMS: {
+  value: Exclude<RoleValue, "collaborator">;
+  key: string;
+  def: string;
+}[] = [
   { value: "student", key: "role_student", def: "Student" },
   { value: "agent", key: "role_agent", def: "Agent" },
   { value: "tutor", key: "role_tutor", def: "Tutor" },
@@ -262,7 +249,9 @@ async function resolveCollaboratorRef(refCode: string) {
   if (!code) return "";
 
   try {
-    const { collection, getDocs, limit, query, where } = await import("firebase/firestore");
+    const { collection, getDocs, limit, query, where } = await import(
+      "firebase/firestore"
+    );
 
     const q = query(
       collection(db, "users"),
@@ -411,7 +400,6 @@ async function routeLikeWelcome(
   );
 }
 
-/** Normalize lang codes from URL/browser/UI into the exact keys used in HOME_TX */
 function normalizeLang(input: string): LangCode {
   const raw = (input || "").trim();
   if (!raw) return DEFAULT_LANG;
@@ -434,8 +422,11 @@ export default function HomeClient() {
   const inviteId = params.get("invite") || "";
   const inviteToken = params.get("token") || "";
   const referralToken = params.get("ref") || "";
-  const rawRoleParam = (params.get("role") || params.get("userType") || "").trim().toLowerCase();
-  const collaboratorInviteFlow = rawRoleParam === "collaborator" && Boolean(referralToken);
+  const rawRoleParam = (params.get("role") || params.get("userType") || "")
+    .trim()
+    .toLowerCase();
+  const collaboratorInviteFlow =
+    rawRoleParam === "collaborator" && Boolean(referralToken);
   const rawNextFromUrl = params.get("next") || "";
   const nextFromUrl = safeNextPath(rawNextFromUrl);
   const logout = params.get("logout") === "1";
@@ -444,9 +435,8 @@ export default function HomeClient() {
 
   const hasInvite = Boolean(inviteId && inviteToken);
   const roleLockedByReferral =
-  Boolean(referralToken) && !hasInvite && !collaboratorInviteFlow;
+    Boolean(referralToken) && !hasInvite && !collaboratorInviteFlow;
 
-  // auth UI state
   const [mode, setMode] = useState<"signin" | "signup">("signin");
 
   useEffect(() => {
@@ -455,7 +445,9 @@ export default function HomeClient() {
       const invite = p.get("invite");
       const token = p.get("token");
       const ref = (p.get("ref") || "").trim();
-      const rawRole = (p.get("role") || p.get("userType") || "").trim().toLowerCase();
+      const rawRole = (p.get("role") || p.get("userType") || "")
+        .trim()
+        .toLowerCase();
 
       if (invite && token) {
         setMode("signup");
@@ -613,7 +605,6 @@ export default function HomeClient() {
     const initial = normalizeLang(urlLangRaw || resolveInitialLang());
     setLang(initial);
     setLangEverywhere(initial);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -719,6 +710,19 @@ export default function HomeClient() {
     };
   }, [logout]);
 
+  const bootEffectKey = [
+    lang,
+    logout ? "1" : "0",
+    logoutDone ? "1" : "0",
+    hasInvite ? "1" : "0",
+    inviteId,
+    inviteToken,
+    nextFromUrl,
+    referralToken,
+    collaboratorInviteFlow ? "1" : "0",
+    referredByCollaboratorUid,
+  ].join("|");
+
   useEffect(() => {
     let cancelled = false;
 
@@ -776,9 +780,7 @@ export default function HomeClient() {
           );
           return;
         }
-      } catch {
-        // ignore and show landing page
-      }
+      } catch {}
 
       if (!cancelled) {
         setBooting(false);
@@ -790,16 +792,19 @@ export default function HomeClient() {
     return () => {
       cancelled = true;
     };
-  }, [
-    lang,
-    logout,
-    logoutDone,
-    hasInvite,
-    inviteId,
-    inviteToken,
-    nextFromUrl,
-    referralToken,
-  ]);
+  }, [bootEffectKey]);
+
+  const HERO_MEDIA = {
+    main:
+      "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=80",
+    secondary:
+      "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=900&q=80",
+    small: "/images/welcome/school-card.jpg",
+    smallFallback:
+      "https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&w=900&q=80",
+    avatar:
+      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=500&q=80",
+  };
 
   const pwChecks = useMemo(() => {
     const pw = password || "";
@@ -807,7 +812,7 @@ export default function HomeClient() {
       length: pw.length >= 8,
       uppercase: /[A-Z]/.test(pw),
       number: /[0-9]/.test(pw),
-      special: /[!@#$%^&*(),.?":{}|<>\[\]\\\/;'`~_+=\-]/.test(pw),
+      special: /[!@#$%^&*(),.?\":{}|<>\[\]\\\\\/;'`~_+=\-]/.test(pw),
     };
   }, [password]);
 
@@ -847,6 +852,7 @@ export default function HomeClient() {
     inviteRoleLoading,
     pwValid,
     roleLockedByReferral,
+    collaboratorInviteFlow,
   ]);
 
   function scrollToAuth() {
@@ -855,16 +861,6 @@ export default function HomeClient() {
       behavior: "smooth",
       block: "start",
     });
-  }
-
-  function pickRole(r: Exclude<RoleValue, "collaborator">) {
-    if (collaboratorInviteFlow) return;
-
-    setMode("signup");
-    setRole(r);
-    setAuthView("auth");
-    setMsg(null);
-    setTimeout(scrollToAuth, 50);
   }
 
   function isEmailLike(v: string) {
@@ -1086,7 +1082,6 @@ export default function HomeClient() {
       const userData = userSnap.exists() ? userSnap.data() || {} : {};
       const roleNow = normalizeUserRole(userData);
 
-
       if (collaboratorInviteFlow) {
         await routeLikeWelcome(
           cred.user,
@@ -1183,964 +1178,545 @@ export default function HomeClient() {
 
   if (booting && !(logout && !logoutDone)) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white text-gray-700">
-        <div className="flex flex-col items-center gap-3">
-          <div className="h-10 w-10 animate-spin rounded-full border-2 border-gray-200 border-t-blue-600" />
-          <div className="text-sm font-medium">Redirecting…</div>
+      <div className="min-h-screen flex items-center justify-center bg-[radial-gradient(circle_at_top,#eff6ff_0%,#f8fafc_45%,#ffffff_100%)] text-gray-700">
+        <div className="flex flex-col items-center gap-4 rounded-3xl border border-white/70 bg-white/80 px-8 py-7 shadow-[0_20px_80px_rgba(15,23,42,0.12)] backdrop-blur">
+          <div className="h-11 w-11 animate-spin rounded-full border-2 border-slate-200 border-t-emerald-600" />
+          <div className="text-sm font-semibold">Redirecting…</div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50 text-gray-900">
-      <Navbar
-        lang={lang}
-        onLangChange={(code) => {
-          const normalized = normalizeLang(String(code));
-          setLang(normalized);
-          setLangEverywhere(normalized);
-        }}
-      />
+    <div className="relative min-h-screen overflow-hidden bg-[linear-gradient(180deg,#eff6ff_0%,#f8fafc_28%,#ffffff_100%)] text-slate-900">
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute -left-24 top-20 h-72 w-72 rounded-full bg-emerald-200/35 blur-3xl" />
+        <div className="absolute right-[-80px] top-[-30px] h-72 w-72 rounded-full bg-blue-200/40 blur-3xl" />
+        <div className="absolute bottom-[-80px] left-1/3 h-72 w-72 rounded-full bg-cyan-100/60 blur-3xl" />
+      </div>
 
-      <main className="w-full flex-1 min-h-0 overflow-hidden bg-gradient-to-br from-blue-700 via-blue-600 to-indigo-800 px-2 sm:px-4 lg:px-6 pt-4 pb-4 lg:pt-4 lg:pb-4">
-        <div className="grid flex-1 min-h-0 grid-cols-1 items-center gap-8 lg:gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(320px,520px)] xl:grid-cols-[minmax(0,1fr)_minmax(360px,560px)]">
+      <div className="relative z-10">
+        <Navbar
+          lang={lang}
+          onLangChange={(code) => {
+            const normalized = normalizeLang(String(code));
+            setLang(normalized);
+            setLangEverywhere(normalized);
+          }}
+        />
 
-          {/* THIS SECTION NEEDS WORKING ON */}
-          <section id='ONBOARD_INTRO' className="lg:pr-6 xl:pr-2">
-            <div className="relative mx-auto w-full max-w-[1100px] overflow-hidden rounded-[36px] border border-white/15 bg-white/10 p-3 sm:p-4 lg:p-5 shadow-[0_22px_90px_rgba(0,0,0,0.35)] backdrop-blur">
-              <div className="pointer-events-none absolute inset-0 opacity-70 [background:radial-gradient(900px_circle_at_15%_20%,rgba(255,255,255,0.22),transparent_55%),radial-gradient(900px_circle_at_85%_30%,rgba(16,185,129,0.18),transparent_55%),radial-gradient(900px_circle_at_60%_90%,rgba(255,255,255,0.10),transparent_55%)]" />
-              <div className="relative">
-                <h1 id="1st_TAGLINE" className="mt-2 text-center text-xl font-extrabold leading-[1.08] tracking-tight text-white sm:text-3xl lg:text-4xl xl:text-[2.6rem]">
-                  <span className="block">
-                    {tr(lang, "hero_h1_1", "The Global Marketplace Connecting")}
-                  </span>
-                  <span className="block">
-                    {tr(lang, "hero_h1_2", "Schools, Agents, Tutors & Students")}
-                  </span>
-                </h1>
-
-                <p id="2nd_TAGLINE" className="mx-auto mt-2 max-w-2xl text-center text-sm leading-6 text-white/85 sm:text-base">
-                  {tr(
-                    lang,
-                    "hero_tagline",
-                    "Study, work, and immigration pathways. Connected transparently in one trusted platform."
-                  )}
-                </p>
-
-                <div id="4_CONTAINERS_LARGE" className="relative my-12 hidden md:block h-[62vh] min-h-[460px] max-h-[600px] lg:max-h-[640px]">
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div  className="relative h-[600px] w-[920px] origin-center scale-[0.72] lg:scale-[0.78] xl:scale-[0.9]">
-                      <svg
-                        className="absolute inset-0 z-0 h-full w-full opacity-70"
-                        viewBox="0 0 1000 640"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <defs>
-                          <linearGradient id="gpGreen" x1="0" y1="0" x2="1" y2="1">
-                            <stop stopColor="rgba(52,211,153,0.95)" />
-                            <stop offset="1" stopColor="rgba(16,185,129,0.25)" />
-                          </linearGradient>
-                          <linearGradient id="gpBlue" x1="0" y1="0" x2="1" y2="1">
-                            <stop stopColor="rgba(96,165,250,0.95)" />
-                            <stop offset="1" stopColor="rgba(59,130,246,0.25)" />
-                          </linearGradient>
-                          <linearGradient id="gpPurple" x1="0" y1="0" x2="1" y2="1">
-                            <stop stopColor="rgba(167,139,250,0.95)" />
-                            <stop offset="1" stopColor="rgba(124,58,237,0.25)" />
-                          </linearGradient>
-                          <linearGradient id="gpAmber" x1="0" y1="0" x2="1" y2="1">
-                            <stop stopColor="rgba(251,191,36,0.95)" />
-                            <stop offset="1" stopColor="rgba(245,158,11,0.25)" />
-                          </linearGradient>
-
-                          <marker
-                            id="arrowGreen"
-                            viewBox="0 0 12 12"
-                            markerWidth="10"
-                            markerHeight="10"
-                            refX="10"
-                            refY="6"
-                            orient="auto"
-                            markerUnits="userSpaceOnUse"
-                          >
-                            <path
-                              d="M0 0 L12 6 L0 12 Z"
-                              fill="rgba(16,185,129,0.95)"
-                            />
-                          </marker>
-
-                          <marker
-                            id="arrowBlue"
-                            viewBox="0 0 12 12"
-                            markerWidth="10"
-                            markerHeight="10"
-                            refX="10"
-                            refY="6"
-                            orient="auto"
-                            markerUnits="userSpaceOnUse"
-                          >
-                            <path
-                              d="M0 0 L12 6 L0 12 Z"
-                              fill="rgba(59,130,246,0.95)"
-                            />
-                          </marker>
-
-                          <marker
-                            id="arrowPurple"
-                            viewBox="0 0 12 12"
-                            markerWidth="10"
-                            markerHeight="10"
-                            refX="10"
-                            refY="6"
-                            orient="auto"
-                            markerUnits="userSpaceOnUse"
-                          >
-                            <path
-                              d="M0 0 L12 6 L0 12 Z"
-                              fill="rgba(124,58,237,0.95)"
-                            />
-                          </marker>
-
-                          <marker
-                            id="arrowAmber"
-                            viewBox="0 0 12 12"
-                            markerWidth="10"
-                            markerHeight="10"
-                            refX="10"
-                            refY="6"
-                            orient="auto"
-                            markerUnits="userSpaceOnUse"
-                          >
-                            <path
-                              d="M0 0 L12 6 L0 12 Z"
-                              fill="rgba(245,158,11,0.95)"
-                            />
-                          </marker>
-                        </defs>
-
-                        <circle
-                          cx="500"
-                          cy="320"
-                          r="120"
-                          stroke="rgba(255,255,255,0.28)"
-                          strokeWidth="3"
-                          strokeDasharray="2 10"
-                        />
-                        <circle
-                          cx="500"
-                          cy="320"
-                          r="170"
-                          stroke="rgba(255,255,255,0.16)"
-                          strokeWidth="2"
-                          strokeDasharray="3 14"
-                        />
-
-                        <path
-                          d="M372.7 192.7 A180 180 0 0 1 627.3 192.7"
-                          stroke="url(#gpAmber)"
-                          strokeWidth="12"
-                          strokeLinecap="round"
-                          opacity="0.9"
-                          markerEnd="url(#arrowAmber)"
-                        />
-                        <path
-                          d="M627.3 192.7 A180 180 0 0 1 627.3 447.3"
-                          stroke="url(#gpBlue)"
-                          strokeWidth="12"
-                          strokeLinecap="round"
-                          opacity="0.9"
-                          markerEnd="url(#arrowBlue)"
-                        />
-                        <path
-                          d="M627.3 447.3 A180 180 0 0 1 372.7 447.3"
-                          stroke="url(#gpPurple)"
-                          strokeWidth="12"
-                          strokeLinecap="round"
-                          opacity="0.9"
-                          markerEnd="url(#arrowPurple)"
-                        />
-                        <path
-                          d="M372.7 447.3 A180 180 0 0 1 372.7 192.7"
-                          stroke="url(#gpGreen)"
-                          strokeWidth="12"
-                          strokeLinecap="round"
-                          opacity="0.9"
-                          markerEnd="url(#arrowGreen)"
-                        />
-                      </svg>
-
-                      <div className="absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2">
-                        <div className="relative flex h-24 w-24 items-center justify-center rounded-full bg-white/95 shadow-[0_14px_50px_rgba(0,0,0,0.25)]">
-                          <div className="absolute inset-[-10px] rounded-full border-2 border-white/30" />
-                          <span className="text-2xl font-extrabold text-emerald-700">GP</span>
-                        </div>
-                      </div>
-
-                      <div className="absolute left-6 top-4 z-10 w-[44%] px-2">
-                        <div className="rounded-3xl bg-white/92 p-4 text-slate-900 text-left shadow-[0_18px_50px_rgba(0,0,0,0.20)]">
-                          <div className="mb-3 flex items-center justify-center">
-                            <img
-                              src="/role-images/role_school.png"
-                              alt=""
-                              className="h-20 w-full max-w-[92%] object-contain"
-                              loading="lazy"
-                            />
-                          </div>
-                          <div className="text-lg font-extrabold">
-                            {tr(lang, "role_school", "School")}
-                          </div>
-                          <div className="mt-1 text-xs text-slate-600">
-                            {tr(
-                              lang,
-                              "school_desc",
-                              "Connect with trusted global agents and students"
-                            )}
-                          </div>
-                          <ul className="mt-2 space-y-1 text-xs text-slate-700">
-                            <li className="flex items-start gap-2">
-                              <span className="mt-1 inline-flex h-4 w-4 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">
-                                ✓
-                              </span>
-                              {tr(lang, "school_b1", "Reach verified agents worldwide")}
-                            </li>
-                            <li className="flex items-start gap-2">
-                              <span className="mt-1 inline-flex h-4 w-4 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">
-                                ✓
-                              </span>
-                              {tr(lang, "school_b2", "Manage recruitment transparently")}
-                            </li>
-                            <li className="flex items-start gap-2">
-                              <span className="mt-1 inline-flex h-4 w-4 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">
-                                ✓
-                              </span>
-                              {tr(lang, "school_b3", "Reduce marketing and admission costs")}
-                            </li>
-                          </ul>
-                        </div>
-                      </div>
-
-                      <div className="absolute right-6 top-4 z-10 w-[44%] px-2">
-                        <div className="rounded-3xl bg-white/92 p-4 text-slate-900 text-left shadow-[0_18px_50px_rgba(0,0,0,0.20)]">
-                          <div className="mb-3 flex items-center justify-center">
-                            <img
-                              src="/role-images/role_agent.png"
-                              alt=""
-                              className="h-20 w-full max-w-[92%] object-contain"
-                              loading="lazy"
-                            />
-                          </div>
-                          <div className="text-lg font-extrabold">
-                            {tr(lang, "role_agent", "Agent")}
-                          </div>
-                          <div className="mt-1 text-xs text-slate-600">
-                            {tr(
-                              lang,
-                              "agent_desc",
-                              "Work directly with real schools — no middle layers"
-                            )}
-                          </div>
-                          <ul className="mt-2 space-y-1 text-xs text-slate-700">
-                            <li className="flex items-start gap-2">
-                              <span className="mt-1 inline-flex h-4 w-4 items-center justify-center rounded-full bg-blue-100 text-blue-700">
-                                ✓
-                              </span>
-                              {tr(lang, "agent_b1", "Access verified schools and programs")}
-                            </li>
-                            <li className="flex items-start gap-2">
-                              <span className="mt-1 inline-flex h-4 w-4 items-center justify-center rounded-full bg-blue-100 text-blue-700">
-                                ✓
-                              </span>
-                              {tr(lang, "agent_b2", "Track applications clearly")}
-                            </li>
-                            <li className="flex items-start gap-2">
-                              <span className="mt-1 inline-flex h-4 w-4 items-center justify-center rounded-full bg-blue-100 text-blue-700">
-                                ✓
-                              </span>
-                              {tr(lang, "agent_b3", "Build long-term, trusted partnerships")}
-                            </li>
-                          </ul>
-                        </div>
-                      </div>
-
-                      <div className="absolute left-6 bottom-4 z-10 w-[44%] px-2">
-                        <div className="rounded-3xl bg-white/92 p-4 text-slate-900 text-left shadow-[0_18px_50px_rgba(0,0,0,0.20)]">
-                          <div className="mb-3 flex items-center justify-center">
-                            <img
-                              src="/role-images/role_student.png"
-                              alt=""
-                              className="h-20 w-full max-w-[92%] object-contain"
-                              loading="lazy"
-                            />
-                          </div>
-                          <div className="text-lg font-extrabold">
-                            {tr(lang, "role_student", "Students")}
-                          </div>
-                          <div className="mt-1 text-xs text-slate-600">
-                            {tr(
-                              lang,
-                              "student_desc",
-                              "Find schools, agents, and tutors you can trust"
-                            )}
-                          </div>
-                          <ul className="mt-2 space-y-1 text-xs text-slate-700">
-                            <li className="flex items-start gap-2">
-                              <span className="mt-1 inline-flex h-4 w-4 items-center justify-center rounded-full bg-violet-100 text-violet-700 ring-1 ring-violet-200">
-                                ✓
-                              </span>
-                              {tr(lang, "student_b1", "Discover verified schools and programs")}
-                            </li>
-                            <li className="flex items-start gap-2">
-                              <span className="mt-1 inline-flex h-4 w-4 items-center justify-center rounded-full bg-violet-100 text-violet-700 ring-1 ring-violet-200">
-                                ✓
-                              </span>
-                              {tr(lang, "student_b2", "Connect with reliable agents and tutors")}
-                            </li>
-                            <li className="flex items-start gap-2">
-                              <span className="mt-1 inline-flex h-4 w-4 items-center justify-center rounded-full bg-violet-100 text-violet-700 ring-1 ring-violet-200">
-                                ✓
-                              </span>
-                              {tr(lang, "student_b3", "Get guided step by step transparently")}
-                            </li>
-                          </ul>
-                        </div>
-                      </div>
-
-                      <div className="absolute right-6 bottom-4 z-10 w-[44%] px-2">
-                        <div className="rounded-3xl bg-white/92 p-4 text-slate-900 text-left shadow-[0_18px_50px_rgba(0,0,0,0.20)]">
-                          <div className="mb-3 flex items-center justify-center">
-                            <img
-                              src="/role-images/role_tutor.jpg"
-                              alt=""
-                              className="h-20 w-full max-w-[92%] object-contain"
-                              loading="lazy"
-                            />
-                          </div>
-                          <div className="text-lg font-extrabold">
-                            {tr(lang, "role_tutor", "Tutors")}
-                          </div>
-                          <div className="mt-1 text-xs text-slate-600">
-                            {tr(
-                              lang,
-                              "tutor_desc",
-                              "Support students globally and grow your practice"
-                            )}
-                          </div>
-                          <ul className="mt-2 space-y-1 text-xs text-slate-700">
-                            <li className="flex items-start gap-2">
-                              <span className="mt-1 inline-flex h-4 w-4 items-center justify-center rounded-full bg-amber-100 text-amber-700">
-                                ✓
-                              </span>
-                              {tr(lang, "tutor_b1", "Find students internationally")}
-                            </li>
-                            <li className="flex items-start gap-2">
-                              <span className="mt-1 inline-flex h-4 w-4 items-center justify-center rounded-full bg-amber-100 text-amber-700">
-                                ✓
-                              </span>
-                              {tr(lang, "tutor_b2", "Offer academic and pathway support")}
-                            </li>
-                            <li className="flex items-start gap-2">
-                              <span className="mt-1 inline-flex h-4 w-4 items-center justify-center rounded-full bg-amber-100 text-amber-700">
-                                ✓
-                              </span>
-                              {tr(lang, "tutor_b3", "Build your professional profile")}
-                            </li>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+        <main className="flex-1 px-4 pb-6 pt-3 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-[1440px]">
+            <div className="grid min-h-[calc(100vh-108px)] items-center gap-6 lg:grid-cols-[minmax(0,1fr)_460px] xl:gap-10">
+              <section className="relative overflow-hidden rounded-[32px] border border-slate-200 bg-[linear-gradient(135deg,#fff7ed_0%,#fdf2f8_24%,#eef2ff_48%,#ecfeff_72%,#f0fdf4_100%)] p-6 shadow-[0_20px_60px_rgba(15,23,42,0.08)] sm:p-8 lg:p-10 xl:p-12">
+                <div className="pointer-events-none absolute inset-0 overflow-hidden">
+                  <div className="absolute -left-14 top-12 h-44 w-44 rounded-full bg-yellow-300/40 blur-3xl" />
+                  <div className="absolute left-1/3 top-0 h-40 w-40 rounded-full bg-pink-300/35 blur-3xl" />
+                  <div className="absolute right-8 top-12 h-44 w-44 rounded-full bg-blue-300/35 blur-3xl" />
+                  <div className="absolute bottom-0 left-1/4 h-44 w-44 rounded-full bg-emerald-300/30 blur-3xl" />
                 </div>
 
-                <div id="4_CONTAINERS_MEDIUM" className="mt-8 grid grid-cols-1 gap-4 md:hidden">
-                  {(
-                    [
-                      {
-                        k: "role_school",
-                        d: "School",
-                        dk: "school_desc",
-                        dd: "Connect with trusted global agents and students",
-                      },
-                      {
-                        k: "role_agent",
-                        d: "Agent",
-                        dk: "agent_desc",
-                        dd: "Work directly with real schools — no middle layers",
-                      },
-                      {
-                        k: "role_student",
-                        d: "Students",
-                        dk: "student_desc",
-                        dd: "Find schools, agents, and tutors you can trust",
-                      },
-                      {
-                        k: "role_tutor",
-                        d: "Tutors",
-                        dk: "tutor_desc",
-                        dd: "Support students globally and grow your practice",
-                      },
-                    ] as const
-                  ).map((x) => (
-                    <div
-                      key={x.k}
-                      className="rounded-3xl bg-white/92 p-4 text-slate-900 text-left shadow-[0_18px_50px_rgba(0,0,0,0.20)]"
-                    >
-                      <div className="text-lg font-extrabold">{tr(lang, x.k, x.d)}</div>
-                      <div className="mt-1 text-xs text-slate-600">
-                        {tr(lang, x.dk, x.dd)}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                <div id="PROLLY CIRCLE" className="mt-4 w-full text-white/95">
-                  <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-center gap-x-3 gap-y-4">
-                    <div className="flex items-center gap-2">
-                      <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/15 ring-1 ring-white/25">
-                        <svg
-                          viewBox="0 0 24 24"
-                          className="h-5 w-5"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          aria-hidden="true"
-                        >
-                          <path d="M12 2l7 4v6c0 5-3 9-7 10-4-1-7-5-7-10V6l7-4z" />
-                          <path d="M9 12l2 2 4-4" />
-                        </svg>
+                <div className="relative z-10 grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(360px,520px)] lg:items-center">
+                  <div className="max-w-xl">
+                    <h1 className="text-4xl font-black leading-[0.94] tracking-[-0.05em] text-slate-950 sm:text-5xl lg:text-6xl xl:text-7xl">
+                      {tr(lang, "hero_short_h1_1", "Study abroad,")}
+                      <span className="mt-2 block text-emerald-500">
+                        {tr(lang, "hero_short_h1_2", "made simpler.")}
                       </span>
-                      <span className="text-lg font-semibold leading-tight">
-                        {tr(lang, "trust_verified", "✔ Verified profiles")
-                          .replace("✔", "")
-                          .trim()}
-                      </span>
-                    </div>
+                    </h1>
 
-                    <div className="flex items-center gap-2">
-                      <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/15 ring-1 ring-white/25">
-                        <svg
-                          viewBox="0 0 24 24"
-                          className="h-5 w-5"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          aria-hidden="true"
-                        >
-                          <path d="M12 6a3 3 0 103 3" />
-                          <path d="M12 21a9 9 0 110-18 9 9 0 010 18z" />
-                          <path d="M7.5 12h9" />
-                          <path d="M12 7.5v9" />
-                        </svg>
-                      </span>
-                      <span className="text-lg font-semibold leading-tight">
-                        {tr(lang, "trust_transparent", "✔ Transparent partnerships")
-                          .replace("✔", "")
-                          .trim()}
-                      </span>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/15 ring-1 ring-white/25">
-                        <svg
-                          viewBox="0 0 24 24"
-                          className="h-5 w-5"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          aria-hidden="true"
-                        >
-                          <path d="M12 3v18" />
-                          <path d="M7 8l5-5 5 5" />
-                          <path d="M7 16l5 5 5-5" />
-                        </svg>
-                      </span>
-                      <span className="text-lg font-semibold leading-tight">
-                        {tr(lang, "trust_no_hidden", "✔ No hidden agendas")
-                          .replace("✔", "")
-                          .trim()}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                <p id="BOTTOM_TEXT" className="mt-8 text-center text-sm font-semibold text-white/85">
-                  {t.one_platform}
-                </p>
-              </div>
-            </div>
-          </section>
-
-          <section id="login_ui" className="lg:sticky lg:top-6 justify-self-end w-full text-gray-900">
-            <div className="w-full max-w-[560px]">
-              {showReferralAccept && referralPreview ? (
-                <div className="rounded-3xl border border-gray-200 bg-white p-5 sm:p-6 lg:p-7 shadow-lg">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="text-lg font-semibold">Connect with agent</div>
-                      <div className="text-sm text-gray-500">
-                        Accept this referral to be added to the agent’s client list.
-                      </div>
-                    </div>
-                    <img
-                      src="https://firebasestorage.googleapis.com/v0/b/greenpass-dc92d.firebasestorage.app/o/rawdatas%2FGreenPass%20Official.png?alt=media&token=809da08b-22f6-4049-bbbf-9b82342630e8"
-                      alt="GreenPass"
-                      className="h-14 w-14 rounded-2xl object-cover"
-                      loading="lazy"
-                    />
-                  </div>
-
-                  <div className="mt-5 rounded-2xl border bg-gray-50 p-4">
-                    <p className="text-xs font-semibold text-gray-500">Agent</p>
-                    <p className="mt-1 text-base font-semibold text-gray-900">
-                      {referralPreview?.agentName || "Agent"}
+                    <p className="mt-5 max-w-md text-base leading-8 text-slate-600 sm:max-w-lg sm:text-lg">
+                      {tr(
+                        lang,
+                        "hero_short_sub",
+                        "Connect with verified students, schools, agents, and tutors."
+                      )}
                     </p>
-                    {referralPreview?.agentCompany ? (
-                      <p className="mt-1 text-sm text-gray-600">
-                        {referralPreview.agentCompany}
-                      </p>
-                    ) : null}
                   </div>
 
-                  {referralLoading && (
-                    <div className="mt-4 rounded-2xl border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-blue-700">
-                      Loading referral...
-                    </div>
-                  )}
-
-                  {msg && (
-                    <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
-                      {msg}
-                    </div>
-                  )}
-
-                  <div className="mt-5 flex flex-wrap gap-3">
-                    <button
-                      type="button"
-                      onClick={handleAcceptReferralNow}
-                      disabled={busy}
-                      className="rounded-2xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 disabled:opacity-60"
-                    >
-                      {busy ? t.loading : "Accept"}
-                    </button>
-
-                    <button
-                      type="button"
-                      disabled={busy}
-                      onClick={() => {
-                        if (auth.currentUser) {
-                          routeLikeWelcome(
-                            auth.currentUser,
-                            lang,
-                            undefined,
-                            nextFromUrl,
-                            hasInvite ? { inviteId, token: inviteToken } : undefined,
-                            { skipDocCheck: !hasInvite }
-                          );
-                        }
-                      }}
-                      className="rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-semibold text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-60"
-                    >
-                      Skip
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <>
-                  <div
-                    id="auth-card"
-                    className="rounded-3xl border border-gray-200 bg-white p-5 sm:p-6 lg:p-7 shadow-lg"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className="text-lg font-semibold">
-                          {authView === "forgot"
-                            ? t.reset_title
-                            : mode === "signin"
-                              ? t.login_title
-                              : t.signup_title}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          {authView === "forgot"
-                            ? t.reset_sub
-                            : mode === "signin"
-                              ? t.welcome_back
-                              : t.signup_journey}
-                        </div>
-                      </div>
+                  <div className="relative mx-auto mt-2 hidden h-[520px] w-full max-w-[500px] md:block">
+                    <div className="absolute left-0 top-32 z-10 w-[42%] overflow-hidden rounded-[28px] bg-white shadow-[0_18px_48px_rgba(15,23,42,0.12)] ring-1 ring-white/70">
                       <img
-                        src="https://firebasestorage.googleapis.com/v0/b/greenpass-dc92d.firebasestorage.app/o/rawdatas%2FGreenPass%20Official.png?alt=media&token=809da08b-22f6-4049-bbbf-9b82342630e8"
-                        alt="GreenPass"
-                        className="h-14 w-14 rounded-2xl object-cover"
+                        src={HERO_MEDIA.small}
+                        alt="Schools"
+                        className="h-[210px] w-full object-cover"
+                        loading="lazy"
+                        onError={(e) => {
+                          e.currentTarget.src = HERO_MEDIA.smallFallback;
+                        }}
+                      />
+                    </div>
+
+                    <div className="absolute left-[14%] top-[14%] z-20 w-[56%] overflow-hidden rounded-[30px] bg-white shadow-[0_28px_70px_rgba(15,23,42,0.16)] ring-1 ring-white/70">
+                      <img
+                        src={HERO_MEDIA.main}
+                        alt="Students"
+                        className="h-[320px] w-full object-cover"
+                        loading="lazy"
+                      />
+                      <div className="absolute right-3 top-3 rounded-2xl bg-[linear-gradient(135deg,#6366f1,#8b5cf6)] px-3 py-2 text-sm font-bold text-white shadow-lg">
+                        Verified
+                      </div>
+                    </div>
+
+                    <div className="absolute left-[10%] top-[56%] z-30 w-[42%] overflow-hidden rounded-[26px] bg-white p-3 shadow-[0_18px_48px_rgba(15,23,42,0.14)] ring-1 ring-white/70">
+                      <img
+                        src={HERO_MEDIA.secondary}
+                        alt="Tutors"
+                        className="h-[150px] w-full rounded-[20px] object-cover"
+                        loading="lazy"
+                      />
+                      <div className="mt-3 h-3 w-24 rounded-full bg-slate-200" />
+                      <div className="mt-2 h-3 w-20 rounded-full bg-slate-200" />
+                    </div>
+
+                    <div className="absolute left-[34%] top-[78%] z-40 flex w-[120px] items-center justify-center rounded-full bg-white p-1 shadow-[0_18px_48px_rgba(15,23,42,0.14)] ring-4 ring-[#f7f8fa]">
+                      <img
+                        src={HERO_MEDIA.avatar}
+                        alt="Community"
+                        className="h-[110px] w-[110px] rounded-full object-cover"
                         loading="lazy"
                       />
                     </div>
 
-                    {authView === "auth" && (
-                      <div className="mt-5 grid grid-cols-2 rounded-2xl bg-gray-100 p-1">
+                    <div className="absolute right-[6%] top-[72%] z-30 rounded-full bg-[linear-gradient(135deg,#fb7185,#f43f5e)] px-5 py-4 text-2xl text-white shadow-[0_18px_48px_rgba(244,63,94,0.35)]">
+                      ❤
+                    </div>
+
+                    <div className="absolute left-[4%] top-[8%] text-5xl drop-shadow-sm">🎓</div>
+                  </div>
+                </div>
+              </section>
+
+              <section id="login_ui" className="flex items-center justify-center lg:justify-end">
+                <div className="w-full max-w-[440px]">
+                  {showReferralAccept && referralPreview ? (
+                    <div className="overflow-hidden rounded-[30px] border border-white/80 bg-white/90 p-5 shadow-[0_24px_80px_rgba(15,23,42,0.12)] backdrop-blur sm:p-6">
+                      <div className="rounded-[24px] bg-[linear-gradient(135deg,#0f172a_0%,#1e293b_55%,#065f46_100%)] p-5 text-white">
+                        <div className="text-xl font-bold">Connect with agent</div>
+                        <div className="mt-1 text-sm text-white/80">
+                          Accept this referral to continue.
+                        </div>
+                      </div>
+
+                      <div className="mt-5 rounded-3xl border border-slate-200 bg-slate-50 p-4">
+                        <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-500">
+                          Agent referral
+                        </p>
+                        <p className="mt-2 text-lg font-bold text-slate-900">
+                          {referralPreview?.agentName || "Agent"}
+                        </p>
+                        {referralPreview?.agentCompany ? (
+                          <p className="mt-1 text-sm text-slate-600">
+                            {referralPreview.agentCompany}
+                          </p>
+                        ) : null}
+                      </div>
+
+                      {referralLoading && (
+                        <div className="mt-4 rounded-2xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-700">
+                          Loading referral...
+                        </div>
+                      )}
+
+                      {msg && (
+                        <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                          {msg}
+                        </div>
+                      )}
+
+                      <div className="mt-5 grid gap-3 sm:grid-cols-2">
                         <button
-                          onClick={() => {
-                            if (collaboratorInviteFlow) return;
-                            setMode("signin");
-                            setAuthView("auth");
-                            setMsg(null);
-                          }}
-                          className={`rounded-xl px-3 py-2 text-sm font-semibold ${
-                            mode === "signin" ? "bg-white shadow-sm" : "text-gray-600"
-                          } ${collaboratorInviteFlow ? "cursor-not-allowed opacity-60" : ""}`}
+                          type="button"
+                          onClick={handleAcceptReferralNow}
+                          disabled={busy}
+                          className="rounded-2xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 disabled:opacity-60"
                         >
-                          {t.signin}
+                          {busy ? t.loading : "Accept"}
                         </button>
+
                         <button
+                          type="button"
+                          disabled={busy}
                           onClick={() => {
-                            setMode("signup");
-                            setAuthView("auth");
-                            setMsg(null);
+                            if (auth.currentUser) {
+                              routeLikeWelcome(
+                                auth.currentUser,
+                                lang,
+                                undefined,
+                                nextFromUrl,
+                                hasInvite ? { inviteId, token: inviteToken } : undefined,
+                                { skipDocCheck: !hasInvite }
+                              );
+                            }
                           }}
-                          className={`rounded-xl px-3 py-2 text-sm font-semibold ${
-                            mode === "signup" ? "bg-white shadow-sm" : "text-gray-600"
-                          }`}
+                          className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-800 transition hover:bg-slate-50 disabled:opacity-60"
                         >
-                          {t.signup}
+                          Skip
                         </button>
                       </div>
-                    )}
+                    </div>
+                  ) : (
+                    <>
+                      <div
+                        id="auth-card"
+                        className="overflow-hidden rounded-[30px] border border-white/80 bg-white/92 p-5 shadow-[0_24px_80px_rgba(15,23,42,0.12)] backdrop-blur sm:p-6"
+                      >
+                        {authView === "auth" &&
+                          mode === "signup" &&
+                          !roleLockedByReferral &&
+                          !collaboratorInviteFlow && (
+                            <div className="mb-5">
+                              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+                                {t.choose_role}
+                              </label>
 
-                    {authView === "auth" && mode === "signup" && !roleLockedByReferral && !collaboratorInviteFlow && (
-                      <div className="mt-5">
-                        <label className="mb-1 block text-xs font-semibold text-gray-600">
-                          {t.choose_role}
-                        </label>
+                              <select
+                                value={role}
+                                onChange={(e) => setRole(e.target.value as RoleValue)}
+                                disabled={busy || inviteRoleLoading || hasInvite}
+                                className={`w-full rounded-2xl border bg-white px-4 py-3 text-sm text-slate-900 shadow-sm focus:outline-none focus:ring-2 ${
+                                  fieldErr.role
+                                    ? "border-red-400 focus:ring-red-400"
+                                    : "border-slate-200 focus:ring-emerald-500"
+                                }`}
+                              >
+                                <option value="" disabled>
+                                  {t.select_role}
+                                </option>
 
-                        <select
-                          value={role}
-                          onChange={(e) => setRole(e.target.value as RoleValue)}
-                          disabled={busy || inviteRoleLoading || hasInvite}
-                          className={`w-full rounded-2xl border bg-white px-3 py-3 text-sm text-gray-900 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 ${
-                            fieldErr.role
-                              ? "border-red-400 focus:ring-red-400"
-                              : "border-gray-300 focus:ring-emerald-500"
-                          }`}
-                        >
-                          <option value="" disabled>
-                            {t.select_role}
-                          </option>
+                                {ROLE_ITEMS.map((r) => (
+                                  <option key={r.value} value={r.value}>
+                                    {tr(lang, r.key, r.def)}
+                                  </option>
+                                ))}
+                              </select>
 
-                          {ROLE_ITEMS.map((r) => (
-                            <option key={r.value} value={r.value}>
-                              {tr(lang, r.key, r.def)}
-                            </option>
-                          ))}
-                        </select>
-                        {fieldErr.role && (
-                          <div className="mt-1 flex items-start gap-2 text-xs text-red-600">
+                              {fieldErr.role && (
+                                <div className="mt-2 flex items-start gap-2 text-xs text-red-600">
+                                  <span className="mt-[2px] inline-flex h-4 w-4 items-center justify-center rounded-full bg-red-100 text-red-700">
+                                    !
+                                  </span>
+                                  <span>{fieldErr.role}</span>
+                                </div>
+                              )}
+                            </div>
+                          )}
+
+                        {authView === "auth" && mode === "signup" && collaboratorInviteFlow && (
+                          <div className="mb-5 flex items-center justify-between rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3">
+                            <div>
+                              <div className="text-sm font-semibold text-emerald-800">
+                                Collaborator
+                              </div>
+                              <div className="text-xs text-emerald-700">
+                                This role was assigned through your invitation link.
+                              </div>
+                            </div>
+                            <div className="rounded-full bg-emerald-600 px-3 py-1 text-xs font-semibold text-white">
+                              Locked
+                            </div>
+                          </div>
+                        )}
+
+                        {authView === "auth" && mode === "signup" && roleLockedByReferral && (
+                          <div className="mb-5 rounded-2xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-700">
+                            Signing up as:{" "}
+                            <strong>{tr(lang, "role_student", "Student")}</strong>
+                          </div>
+                        )}
+
+                        {authView === "auth" && (
+                          <div className="space-y-3">
+                            <button
+                              onClick={handleGoogle}
+                              disabled={busy}
+                              className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-900 shadow-sm transition hover:-translate-y-0.5 hover:bg-slate-50 disabled:opacity-60"
+                            >
+                              {t.google}
+                            </button>
+
+                            <button
+                              onClick={handleApple}
+                              disabled={busy}
+                              className="w-full rounded-2xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800 disabled:opacity-60"
+                            >
+                              {t.apple}
+                            </button>
+
+                            <div className="my-3 flex items-center gap-3">
+                              <div className="h-px flex-1 bg-slate-200" />
+                              <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
+                                {t.or}
+                              </div>
+                              <div className="h-px flex-1 bg-slate-200" />
+                            </div>
+                          </div>
+                        )}
+
+                        <div className="space-y-3">
+                          <div>
+                            <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+                              {t.email}
+                            </label>
+                            <input
+                              value={email}
+                              onChange={(e) => setEmail(e.target.value)}
+                              placeholder={t.email_ph}
+                              className={`w-full rounded-2xl border bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 shadow-sm focus:outline-none focus:ring-2 ${
+                                fieldErr.email
+                                  ? "border-red-400 focus:ring-red-400"
+                                  : "border-slate-200 focus:ring-emerald-500"
+                              }`}
+                              autoComplete="email"
+                            />
+                            {fieldErr.email && (
+                              <div className="mt-2 flex items-start gap-2 text-xs text-red-600">
+                                <span className="mt-[2px] inline-flex h-4 w-4 items-center justify-center rounded-full bg-red-100 text-red-700">
+                                  !
+                                </span>
+                                <span>{fieldErr.email}</span>
+                              </div>
+                            )}
+                          </div>
+
+                          {authView === "auth" && (
+                            <div>
+                              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+                                {t.password}
+                              </label>
+                              <div className="relative">
+                                <input
+                                  value={password}
+                                  onChange={(e) => setPassword(e.target.value)}
+                                  placeholder={t.password_ph}
+                                  type={showPassword ? "text" : "password"}
+                                  className={`w-full rounded-2xl border bg-white px-4 py-3 pr-12 text-sm text-slate-900 placeholder:text-slate-400 shadow-sm focus:outline-none focus:ring-2 ${
+                                    fieldErr.password
+                                      ? "border-red-400 focus:ring-red-400"
+                                      : "border-slate-200 focus:ring-emerald-500"
+                                  }`}
+                                  autoComplete={
+                                    mode === "signin" ? "current-password" : "new-password"
+                                  }
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => setShowPassword((v) => !v)}
+                                  className="absolute right-3 top-1/2 -translate-y-1/2 rounded-xl p-1.5 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900"
+                                  aria-label={showPassword ? "Hide password" : "Show password"}
+                                >
+                                  {showPassword ? (
+                                    <EyeOffIcon className="h-4 w-4" />
+                                  ) : (
+                                    <EyeIcon className="h-4 w-4" />
+                                  )}
+                                </button>
+                              </div>
+
+                              {fieldErr.password && (
+                                <div className="mt-2 flex items-start gap-2 text-xs text-red-600">
+                                  <span className="mt-[2px] inline-flex h-4 w-4 items-center justify-center rounded-full bg-red-100 text-red-700">
+                                    !
+                                  </span>
+                                  <span>{fieldErr.password}</span>
+                                </div>
+                              )}
+
+                              {mode === "signup" && (
+                                <div className="mt-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 text-xs">
+                                  <div className="mb-3 font-semibold text-slate-700">
+                                    {t.pw_req_title}
+                                  </div>
+
+                                  <div className="grid gap-2 sm:grid-cols-2">
+                                    <div
+                                      className={
+                                        pwChecks.length ? "text-emerald-700" : "text-slate-600"
+                                      }
+                                    >
+                                      {pwChecks.length ? "✓" : "✕"} {t.pw_req_len}
+                                    </div>
+                                    <div
+                                      className={
+                                        pwChecks.uppercase
+                                          ? "text-emerald-700"
+                                          : "text-slate-600"
+                                      }
+                                    >
+                                      {pwChecks.uppercase ? "✓" : "✕"} {t.pw_req_upper}
+                                    </div>
+                                    <div
+                                      className={
+                                        pwChecks.number ? "text-emerald-700" : "text-slate-600"
+                                      }
+                                    >
+                                      {pwChecks.number ? "✓" : "✕"} {t.pw_req_num}
+                                    </div>
+                                    <div
+                                      className={
+                                        pwChecks.special ? "text-emerald-700" : "text-slate-600"
+                                      }
+                                    >
+                                      {pwChecks.special ? "✓" : "✕"} {t.pw_req_special}
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+
+                              {mode === "signin" && (
+                                <div className="mt-2 text-right">
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setAuthView("forgot");
+                                      setMsg(null);
+                                    }}
+                                    className="text-xs font-semibold text-slate-700 hover:text-emerald-700 hover:underline"
+                                  >
+                                    {t.forgot_pw}
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          )}
+
+                          {authView === "auth" && mode === "signup" && (
+                            <div>
+                              <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.14em] text-slate-500">
+                                {t.confirm}
+                              </label>
+                              <div className="relative">
+                                <input
+                                  value={confirm}
+                                  onChange={(e) => setConfirm(e.target.value)}
+                                  placeholder={t.confirm_ph}
+                                  type={showConfirm ? "text" : "password"}
+                                  className={`w-full rounded-2xl border bg-white px-4 py-3 pr-12 text-sm text-slate-900 placeholder:text-slate-400 shadow-sm focus:outline-none focus:ring-2 ${
+                                    fieldErr.confirm
+                                      ? "border-red-400 focus:ring-red-400"
+                                      : "border-slate-200 focus:ring-emerald-500"
+                                  }`}
+                                  autoComplete="new-password"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => setShowConfirm((v) => !v)}
+                                  className="absolute right-3 top-1/2 -translate-y-1/2 rounded-xl p-1.5 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900"
+                                  aria-label={showConfirm ? "Hide password" : "Show password"}
+                                >
+                                  {showConfirm ? (
+                                    <EyeOffIcon className="h-4 w-4" />
+                                  ) : (
+                                    <EyeIcon className="h-4 w-4" />
+                                  )}
+                                </button>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        {fieldErr.confirm && (
+                          <div className="mt-2 flex items-start gap-2 text-xs text-red-600">
                             <span className="mt-[2px] inline-flex h-4 w-4 items-center justify-center rounded-full bg-red-100 text-red-700">
                               !
                             </span>
-                            <span>{fieldErr.role}</span>
+                            <span>{fieldErr.confirm}</span>
                           </div>
                         )}
-                      </div>
-                    )}
 
-                    {authView === "auth" && mode === "signup" && collaboratorInviteFlow && (
-                      <div className="mt-5 flex items-center justify-between rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3">
-                        <div>
-                          <div className="text-sm font-semibold text-emerald-800">
-                            Collaborator
-                          </div>
-                          <div className="text-xs text-emerald-700">
-                            This role was assigned through your invitation link.
-                          </div>
-                        </div>
-                        <div className="rounded-full bg-emerald-600 px-3 py-1 text-xs font-semibold text-white">
-                          Locked
-                        </div>
-                      </div>
-                    )}
-                    {authView === "auth" && mode === "signup" && roleLockedByReferral && (
-                      <div className="mt-5 rounded-2xl border border-blue-200 bg-blue-50 px-3 py-3 text-sm text-blue-700 shadow-sm">
-                        Signing up as: <strong>{tr(lang, "role_student", "Student")}</strong>
-                      </div>
-                    )}
-
-                    {authView === "auth" && (
-                      <div className="mt-5 space-y-2">
-                        <button
-                          onClick={handleGoogle}
-                          disabled={busy}
-                          className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-semibold shadow-sm hover:bg-gray-50 disabled:opacity-60"
-                        >
-                          {t.google}
-                        </button>
-                        <button
-                          onClick={handleApple}
-                          disabled={busy}
-                          className="w-full rounded-2xl bg-gray-900 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-black disabled:opacity-60"
-                        >
-                          {t.apple}
-                        </button>
-
-                        <div className="my-5 flex items-center gap-3">
-                          <div className="h-px flex-1 bg-gray-200" />
-                          <div className="text-xs text-gray-500">{t.or}</div>
-                          <div className="h-px flex-1 bg-gray-200" />
-                        </div>
-                      </div>
-                    )}
-
-                    <div className="space-y-3">
-                      <div>
-                        <label className="mb-1 block text-xs font-semibold text-gray-600">
-                          {t.email}
-                        </label>
-                        <input
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                          placeholder={t.email_ph}
-                          className={`w-full rounded-2xl border bg-white px-3 py-3 text-sm text-gray-900 shadow-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
-                            fieldErr.email
-                              ? "border-red-400 focus:ring-red-400"
-                              : "border-gray-300"
-                          }`}
-                          autoComplete="email"
-                        />
-                        {fieldErr.email && (
-                          <div className="mt-1 flex items-start gap-2 text-xs text-red-600">
-                            <span className="mt-[2px] inline-flex h-4 w-4 items-center justify-center rounded-full bg-red-100 text-red-700">
-                              !
-                            </span>
-                            <span>{fieldErr.email}</span>
+                        {msg && (
+                          <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                            {msg}
                           </div>
                         )}
+
+                        {authView === "auth" ? (
+                          <button
+                            onClick={handleEmailAuth}
+                            disabled={!canSubmit || busy}
+                            className="mt-5 w-full rounded-2xl bg-emerald-600 px-4 py-3.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 disabled:opacity-60"
+                          >
+                            {busy ? t.loading : mode === "signin" ? t.cta_login : t.cta_signup}
+                          </button>
+                        ) : (
+                          <div className="mt-5 space-y-3">
+                            <button
+                              onClick={handleSendReset}
+                              disabled={!email || busy}
+                              className="w-full rounded-2xl bg-emerald-600 px-4 py-3.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 disabled:opacity-60"
+                            >
+                              {busy ? t.loading : t.send_reset}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setAuthView("auth");
+                                setMode("signin");
+                                setMsg(null);
+                              }}
+                              className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3.5 text-sm font-semibold text-slate-800 transition hover:bg-slate-50 disabled:opacity-60"
+                            >
+                              {t.back_to_login}
+                            </button>
+                          </div>
+                        )}
+
+                        <p className="mt-4 text-center text-xs leading-5 text-slate-500">
+                          {t.after_login}
+                        </p>
                       </div>
 
                       {authView === "auth" && (
-                        <div>
-                          <label className="mb-1 block text-xs font-semibold text-gray-600">
-                            {t.password}
-                          </label>
-                          <div className="relative">
-                            <input
-                              value={password}
-                              onChange={(e) => setPassword(e.target.value)}
-                              placeholder={t.password_ph}
-                              type={showPassword ? "text" : "password"}
-                              className={`w-full rounded-2xl border bg-white px-3 py-3 pr-12 text-sm text-gray-900 shadow-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
-                                fieldErr.password
-                                  ? "border-red-400 focus:ring-red-400"
-                                  : "border-gray-300"
-                              }`}
-                              autoComplete={
-                                mode === "signin" ? "current-password" : "new-password"
-                              }
-                            />
-
-                            <button
-                              type="button"
-                              onClick={() => setShowPassword((v) => !v)}
-                              className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-gray-600 hover:text-gray-900"
-                              aria-label={showPassword ? "Hide password" : "Show password"}
-                            >
-                              {showPassword ? (
-                                <EyeOffIcon className="h-4 w-4" />
-                              ) : (
-                                <EyeIcon className="h-4 w-4" />
-                              )}
-                            </button>
-                          </div>
-
-                          {fieldErr.password && (
-                            <div className="mt-2 flex items-start gap-2 text-xs text-red-600">
-                              <span className="mt-[2px] inline-flex h-4 w-4 items-center justify-center rounded-full bg-red-100 text-red-700">
-                                !
-                              </span>
-                              <span>{fieldErr.password}</span>
-                            </div>
-                          )}
-
-                          {mode === "signup" && (
-                            <div className="mt-3 rounded-2xl border border-gray-200 bg-gray-50 px-3 py-3 text-xs">
-                              <div className="mb-2 font-semibold text-gray-700">
-                                {t.pw_req_title}
-                              </div>
-
-                              <div className="space-y-1">
-                                <div className={pwChecks.length ? "text-emerald-700" : "text-gray-600"}>
-                                  {pwChecks.length ? "✓" : "✕"} {t.pw_req_len}
-                                </div>
-                                <div className={pwChecks.uppercase ? "text-emerald-700" : "text-gray-600"}>
-                                  {pwChecks.uppercase ? "✓" : "✕"} {t.pw_req_upper}
-                                </div>
-                                <div className={pwChecks.number ? "text-emerald-700" : "text-gray-600"}>
-                                  {pwChecks.number ? "✓" : "✕"} {t.pw_req_num}
-                                </div>
-                                <div className={pwChecks.special ? "text-emerald-700" : "text-gray-600"}>
-                                  {pwChecks.special ? "✓" : "✕"} {t.pw_req_special}
-                                </div>
-                              </div>
-                            </div>
-                          )}
-
-                          {mode === "signin" && (
-                            <div className="mt-2 text-right">
+                        <div className="mt-4 rounded-2xl border border-white/80 bg-white/70 p-4 text-center text-sm text-slate-600 shadow-sm">
+                          {mode === "signin" ? (
+                            <>
+                              {t.no_account}{" "}
                               <button
-                                type="button"
                                 onClick={() => {
-                                  setAuthView("forgot");
-                                  setMsg(null);
+                                  setMode("signup");
+                                  if (collaboratorInviteFlow) setRole("collaborator");
                                 }}
-                                className="text-xs font-semibold text-blue-600 hover:underline"
+                                className="font-semibold text-emerald-700 hover:underline"
                               >
-                                {t.forgot_pw}
+                                {t.signup}
                               </button>
-                            </div>
+                            </>
+                          ) : (
+                            <>
+                              {t.have_account}{" "}
+                              <button
+                                onClick={() => {
+                                  if (collaboratorInviteFlow) return;
+                                  setMode("signin");
+                                }}
+                                className="font-semibold text-emerald-700 hover:underline"
+                              >
+                                {t.signin}
+                              </button>
+                            </>
                           )}
                         </div>
                       )}
-
-                      {authView === "auth" && mode === "signup" && (
-                        <div>
-                          <label className="mb-1 block text-xs font-semibold text-gray-600">
-                            {t.confirm}
-                          </label>
-                          <div className="relative">
-                            <input
-                              value={confirm}
-                              onChange={(e) => setConfirm(e.target.value)}
-                              placeholder={t.confirm_ph}
-                              type={showConfirm ? "text" : "password"}
-                              className={`w-full rounded-2xl border bg-white px-3 py-3 pr-12 text-sm text-gray-900 shadow-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
-                                fieldErr.confirm
-                                  ? "border-red-400 focus:ring-red-400"
-                                  : "border-gray-300"
-                              }`}
-                              autoComplete="new-password"
-                            />
-
-                            <button
-                              type="button"
-                              onClick={() => setShowConfirm((v) => !v)}
-                              className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-gray-600 hover:text-gray-900"
-                              aria-label={showConfirm ? "Hide password" : "Show password"}
-                            >
-                              {showConfirm ? (
-                                <EyeOffIcon className="h-4 w-4" />
-                              ) : (
-                                <EyeIcon className="h-4 w-4" />
-                              )}
-                            </button>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
-                    {fieldErr.confirm && (
-                      <div className="mt-2 flex items-start gap-2 text-xs text-red-600">
-                        <span className="mt-[2px] inline-flex h-4 w-4 items-center justify-center rounded-full bg-red-100 text-red-700">
-                          !
-                        </span>
-                        <span>{fieldErr.confirm}</span>
-                      </div>
-                    )}
-
-                    {msg && (
-                      <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
-                        {msg}
-                      </div>
-                    )}
-
-                    {authView === "auth" ? (
-                      <button
-                        onClick={handleEmailAuth}
-                        disabled={!canSubmit || busy}
-                        className="mt-5 w-full rounded-2xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 disabled:opacity-60"
-                      >
-                        {busy ? t.loading : mode === "signin" ? t.cta_login : t.cta_signup}
-                      </button>
-                    ) : (
-                      <div className="mt-5 space-y-2">
-                        <button
-                          onClick={handleSendReset}
-                          disabled={!email || busy}
-                          className="w-full rounded-2xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 disabled:opacity-60"
-                        >
-                          {busy ? t.loading : t.send_reset}
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setAuthView("auth");
-                            setMode("signin");
-                            setMsg(null);
-                          }}
-                          className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-semibold text-gray-800 shadow-sm hover:bg-gray-50 disabled:opacity-60"
-                        >
-                          {t.back_to_login}
-                        </button>
-                      </div>
-                    )}
-
-                    <p className="mt-4 text-center text-xs text-gray-500">
-                      {t.after_login}
-                    </p>
-                  </div>
-
-                  {authView === "auth" && (
-                    <div className="mt-4 rounded-3xl border border-gray-200 bg-white p-4 text-center text-sm text-gray-700 shadow-sm">
-                      {mode === "signin" ? (
-                        <>
-                          {t.no_account}{" "}
-                          <button
-                            onClick={() => {
-                              setMode("signup");
-                              if (collaboratorInviteFlow) setRole("collaborator");
-                            }}
-                            className="font-semibold text-blue-600 hover:underline"
-                          >
-                            {t.signup}
-                          </button>
-                        </>
-                      ) : (
-                        <>
-                          {t.have_account}{" "}
-                          <button
-                            onClick={() => {
-                              if (collaboratorInviteFlow) return;
-                              setMode("signin");
-                            }}
-                            className="font-semibold text-blue-600 hover:underline"
-                          >
-                            {t.signin}
-                          </button>
-                        </>
-                      )}
-                    </div>
+                    </>
                   )}
-                </>
-              )}
+                </div>
+              </section>
             </div>
-          </section>
-          
-        </div>
+          </div>
 
-        <div className="mt-auto pt-6">
-          <LanguageFooter
-            value={lang}
-            onChange={(code) => {
-              const normalized = normalizeLang(String(code));
-              setLang(normalized);
-              setLangEverywhere(normalized);
-            }}
-          />
-        </div>
-      </main>
+          <div className="mx-auto mt-6 max-w-[1440px] rounded-[24px] border border-white/80 bg-white/70 px-4 py-4 shadow-sm backdrop-blur sm:px-6">
+            <LanguageFooter
+              value={lang}
+              onChange={(code) => {
+                const normalized = normalizeLang(String(code));
+                setLang(normalized);
+                setLangEverywhere(normalized);
+              }}
+            />
+          </div>
+        </main>
+      </div>
     </div>
   );
 }
