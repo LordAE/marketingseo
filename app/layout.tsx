@@ -17,11 +17,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL("https://greenpassgroup.com"),
   title: "GreenPass",
-  description: "GreenPass — a professional network for international education.",
+  description: "GreenPass connects students, schools, agents, and tutors with verified onboarding, invite links, and QR referral flows.",
 
   openGraph: {
     title: "GreenPass",
-    description: "GreenPass — a professional network for international education.",
+    description: "GreenPass connects students, schools, agents, and tutors with verified onboarding, invite links, and QR referral flows.",
     url: "https://greenpassgroup.com",
     siteName: "GreenPass",
     type: "website",
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "GreenPass",
-    description: "GreenPass — a professional network for international education.",
+    description: "GreenPass connects students, schools, agents, and tutors with verified onboarding, invite links, and QR referral flows.",
     images: ["/greenpass-og.png"],
   },
 };

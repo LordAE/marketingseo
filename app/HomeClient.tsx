@@ -183,6 +183,20 @@ async function getAgentReferralPublic(ref: string) {
   return r.json().catch(() => ({} as any));
 }
 
+async function getTutorReferralPublic(ref: string) {
+  const r = await fetch(
+    `${FUNCTIONS_BASE.replace(/\/+$/, "")}/getTutorReferralPublic?tutor_ref=${encodeURIComponent(ref)}`,
+    { method: "GET" }
+  );
+
+  if (!r.ok) {
+    const msg = await r.text().catch(() => "");
+    throw new Error(msg || "Invalid tutor referral");
+  }
+
+  return r.json().catch(() => ({} as any));
+}
+
 async function acceptAgentReferral(user: User, ref: string) {
   const idToken = await user.getIdToken();
 
@@ -201,6 +215,29 @@ async function acceptAgentReferral(user: User, ref: string) {
   if (!r.ok) {
     const msg = await r.text().catch(() => "");
     throw new Error(msg || "Failed to accept referral");
+  }
+
+  return r.json().catch(() => ({} as any));
+}
+
+async function acceptTutorReferral(user: User, tutorRef: string) {
+  const idToken = await user.getIdToken();
+
+  const r = await fetch(
+    `${FUNCTIONS_BASE.replace(/\/+$/, "")}/acceptTutorReferral`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${idToken}`,
+      },
+      body: JSON.stringify({ tutor_ref: tutorRef }),
+    }
+  );
+
+  if (!r.ok) {
+    const msg = await r.text().catch(() => "");
+    throw new Error(msg || "Failed to accept tutor referral");
   }
 
   return r.json().catch(() => ({} as any));
@@ -421,12 +458,14 @@ export default function HomeClient() {
   const urlLangRaw = params.get("lang") || "";
   const inviteId = params.get("invite") || "";
   const inviteToken = params.get("token") || "";
-  const referralToken = params.get("ref") || "";
+  const collaboratorRefToken = params.get("ref") || "";
+  const agentReferralToken = params.get("agent_ref") || "";
+  const tutorReferralToken = params.get("tutor_ref") || "";
   const rawRoleParam = (params.get("role") || params.get("userType") || "")
     .trim()
     .toLowerCase();
   const collaboratorInviteFlow =
-    rawRoleParam === "collaborator" && Boolean(referralToken);
+    rawRoleParam === "collaborator" && Boolean(collaboratorRefToken);
   const rawNextFromUrl = params.get("next") || "";
   const nextFromUrl = safeNextPath(rawNextFromUrl);
   const logout = params.get("logout") === "1";
@@ -434,8 +473,14 @@ export default function HomeClient() {
   const [booting, setBooting] = useState(true);
 
   const hasInvite = Boolean(inviteId && inviteToken);
+  const directReferralType = agentReferralToken
+    ? "agent"
+    : tutorReferralToken
+    ? "tutor"
+    : "";
+  const directReferralToken = agentReferralToken || tutorReferralToken || "";
   const roleLockedByReferral =
-    Boolean(referralToken) && !hasInvite && !collaboratorInviteFlow;
+    Boolean(directReferralToken) && !hasInvite && !collaboratorInviteFlow;
 
   const [mode, setMode] = useState<"signin" | "signup">("signin");
 
@@ -445,6 +490,8 @@ export default function HomeClient() {
       const invite = p.get("invite");
       const token = p.get("token");
       const ref = (p.get("ref") || "").trim();
+      const agentRef = (p.get("agent_ref") || "").trim();
+      const tutorRef = (p.get("tutor_ref") || "").trim();
       const rawRole = (p.get("role") || p.get("userType") || "")
         .trim()
         .toLowerCase();
@@ -462,7 +509,7 @@ export default function HomeClient() {
         return;
       }
 
-      if (ref) {
+      if (agentRef || tutorRef) {
         setMode("signup");
         setRole("student");
         setAuthView("auth");
@@ -546,7 +593,7 @@ export default function HomeClient() {
     let cancelled = false;
 
     async function run() {
-      if (!referralToken) return;
+      if (!directReferralToken) return;
 
       if (!hasInvite) {
         setMode("signup");
@@ -557,9 +604,16 @@ export default function HomeClient() {
 
       try {
         setReferralLoading(true);
-        const data = await getAgentReferralPublic(referralToken);
+        const data =
+          directReferralType === "tutor"
+            ? await getTutorReferralPublic(directReferralToken)
+            : await getAgentReferralPublic(directReferralToken);
+
         if (!cancelled) {
-          setReferralPreview(data);
+          setReferralPreview({
+            ...data,
+            referralType: directReferralType || "agent",
+          });
         }
       } catch (e) {
         console.error("Referral preview failed:", e);
@@ -575,18 +629,18 @@ export default function HomeClient() {
     return () => {
       cancelled = true;
     };
-  }, [referralToken, hasInvite]);
+  }, [directReferralToken, directReferralType, hasInvite]);
 
   useEffect(() => {
     let cancelled = false;
 
     async function run() {
-      if (!collaboratorInviteFlow || !referralToken) {
+      if (!collaboratorInviteFlow || !collaboratorRefToken) {
         if (!cancelled) setReferredByCollaboratorUid("");
         return;
       }
 
-      const uid = await resolveCollaboratorRef(referralToken);
+      const uid = await resolveCollaboratorRef(collaboratorRefToken);
       if (!cancelled) {
         setReferredByCollaboratorUid(uid || "");
       }
@@ -597,7 +651,7 @@ export default function HomeClient() {
     return () => {
       cancelled = true;
     };
-  }, [collaboratorInviteFlow, referralToken]);
+  }, [collaboratorInviteFlow, collaboratorRefToken]);
 
   const [lang, setLang] = useState<LangCode>(DEFAULT_LANG);
 
@@ -718,7 +772,7 @@ export default function HomeClient() {
     inviteId,
     inviteToken,
     nextFromUrl,
-    referralToken,
+    collaboratorRefToken,
     collaboratorInviteFlow ? "1" : "0",
     referredByCollaboratorUid,
   ].join("|");
@@ -745,7 +799,7 @@ export default function HomeClient() {
               hasInvite ? { inviteId, token: inviteToken } : undefined,
               {
                 skipDocCheck: false,
-                collaboratorRef: referralToken,
+                collaboratorRef: collaboratorRefToken,
                 referredByCollaboratorUid,
                 signupEntryRole: "collaborator",
               }
@@ -753,7 +807,7 @@ export default function HomeClient() {
             return;
           }
 
-          if (referralToken) {
+          if (directReferralToken) {
             const userRef = doc(db, "users", user.uid);
             const userSnap = await getDoc(userRef);
             const userData = userSnap.exists() ? userSnap.data() || {} : {};
@@ -907,13 +961,17 @@ export default function HomeClient() {
   }
 
   async function handleAcceptReferralNow() {
-    if (!auth.currentUser || !referralToken) return;
+    if (!auth.currentUser || !directReferralToken) return;
 
     try {
       setBusy(true);
       setMsg(null);
 
-      await acceptAgentReferral(auth.currentUser, referralToken);
+      if (directReferralType === "tutor") {
+        await acceptTutorReferral(auth.currentUser, directReferralToken);
+      } else {
+        await acceptAgentReferral(auth.currentUser, directReferralToken);
+      }
 
       await routeLikeWelcome(
         auth.currentUser,
@@ -949,7 +1007,7 @@ export default function HomeClient() {
       if (mode === "signin") {
         const cred = await signInWithEmailAndPassword(auth, cleanEmail, password);
 
-        if (referralToken) {
+        if (directReferralToken) {
           const userRef = doc(db, "users", cred.user.uid);
           const userSnap = await getDoc(userRef);
           const userData = userSnap.exists() ? userSnap.data() || {} : {};
@@ -1006,7 +1064,7 @@ export default function HomeClient() {
 
       if (collaboratorInviteFlow) {
         await ensureUserDoc(cred.user, "collaborator", {
-          collaboratorRef: referralToken,
+          collaboratorRef: collaboratorRefToken,
           referredByCollaboratorUid,
           signupEntryRole: "collaborator",
         });
@@ -1018,7 +1076,7 @@ export default function HomeClient() {
           nextFromUrl,
           hasInvite ? { inviteId, token: inviteToken } : undefined,
           {
-            collaboratorRef: referralToken,
+            collaboratorRef: collaboratorRefToken,
             referredByCollaboratorUid,
             signupEntryRole: "collaborator",
           }
@@ -1030,8 +1088,12 @@ export default function HomeClient() {
         await ensureUserDoc(cred.user, role as RoleValue);
       }
 
-      if (referralToken) {
-        await acceptAgentReferral(cred.user, referralToken);
+      if (directReferralToken) {
+        if (directReferralType === "tutor") {
+          await acceptTutorReferral(cred.user, directReferralToken);
+        } else {
+          await acceptAgentReferral(cred.user, directReferralToken);
+        }
       }
 
       await routeLikeWelcome(
@@ -1090,7 +1152,7 @@ export default function HomeClient() {
           nextFromUrl,
           hasInvite ? { inviteId, token: inviteToken } : undefined,
           {
-            collaboratorRef: referralToken,
+            collaboratorRef: collaboratorRefToken,
             referredByCollaboratorUid,
             signupEntryRole: "collaborator",
           }
@@ -1098,7 +1160,7 @@ export default function HomeClient() {
         return;
       }
 
-      if (referralToken && (roleNow === "student" || roleNow === "user")) {
+      if (directReferralToken && (roleNow === "student" || roleNow === "user")) {
         setShowReferralAccept(true);
         setBooting(false);
         return;
@@ -1143,7 +1205,7 @@ export default function HomeClient() {
           nextFromUrl,
           hasInvite ? { inviteId, token: inviteToken } : undefined,
           {
-            collaboratorRef: referralToken,
+            collaboratorRef: collaboratorRefToken,
             referredByCollaboratorUid,
             signupEntryRole: "collaborator",
           }
@@ -1151,7 +1213,7 @@ export default function HomeClient() {
         return;
       }
 
-      if (referralToken && (roleNow === "student" || roleNow === "user")) {
+      if (directReferralToken && (roleNow === "student" || roleNow === "user")) {
         setShowReferralAccept(true);
         setBooting(false);
         return;
@@ -1293,7 +1355,9 @@ export default function HomeClient() {
                   {showReferralAccept && referralPreview ? (
                     <div className="overflow-hidden rounded-[30px] border border-white/80 bg-white/90 p-5 shadow-[0_24px_80px_rgba(15,23,42,0.12)] backdrop-blur sm:p-6">
                       <div className="rounded-[24px] bg-[linear-gradient(135deg,#0f172a_0%,#1e293b_55%,#065f46_100%)] p-5 text-white">
-                        <div className="text-xl font-bold">Connect with agent</div>
+                        <div className="text-xl font-bold">
+                          Connect with {referralPreview?.referralType === "tutor" ? "tutor" : "agent"}
+                        </div>
                         <div className="mt-1 text-sm text-white/80">
                           Accept this referral to continue.
                         </div>
@@ -1301,14 +1365,20 @@ export default function HomeClient() {
 
                       <div className="mt-5 rounded-3xl border border-slate-200 bg-slate-50 p-4">
                         <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-slate-500">
-                          Agent referral
+                          {referralPreview?.referralType === "tutor" ? "Tutor referral" : "Agent referral"}
                         </p>
                         <p className="mt-2 text-lg font-bold text-slate-900">
-                          {referralPreview?.agentName || "Agent"}
+                          {referralPreview?.referralType === "tutor"
+                            ? referralPreview?.tutorName || "Tutor"
+                            : referralPreview?.agentName || "Agent"}
                         </p>
-                        {referralPreview?.agentCompany ? (
+                        {(referralPreview?.referralType === "tutor"
+                          ? referralPreview?.tutorCompany
+                          : referralPreview?.agentCompany) ? (
                           <p className="mt-1 text-sm text-slate-600">
-                            {referralPreview.agentCompany}
+                            {referralPreview?.referralType === "tutor"
+                              ? referralPreview?.tutorCompany
+                              : referralPreview?.agentCompany}
                           </p>
                         ) : null}
                       </div>
@@ -1423,6 +1493,9 @@ export default function HomeClient() {
                           <div className="mb-5 rounded-2xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-700">
                             Signing up as:{" "}
                             <strong>{tr(lang, "role_student", "Student")}</strong>
+                            <span className="ml-1">
+                              via {directReferralType === "tutor" ? "tutor" : "agent"} QR referral
+                            </span>
                           </div>
                         )}
 
