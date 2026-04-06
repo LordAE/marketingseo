@@ -10,6 +10,7 @@ export default function JoinPage() {
     const lang = url.searchParams.get("lang");
     const role = url.searchParams.get("role");
     const ref = url.searchParams.get("ref");
+    const studentRef = url.searchParams.get("student_ref");
     const agentRef = url.searchParams.get("agent_ref");
     const tutorRef = url.searchParams.get("tutor_ref");
 
@@ -19,6 +20,7 @@ export default function JoinPage() {
     if (lang) sp.set("lang", lang);
     if (role) sp.set("role", role);
     if (ref) sp.set("ref", ref);
+    if (studentRef) sp.set("student_ref", studentRef);
     if (agentRef) sp.set("agent_ref", agentRef);
     if (tutorRef) sp.set("tutor_ref", tutorRef);
 

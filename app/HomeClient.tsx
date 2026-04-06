@@ -1,6 +1,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
+import type { ReadonlyURLSearchParams } from "next/navigation";
 import React, { useEffect, useMemo, useState } from "react";
 import Navbar from "./components/Navbar";
 import LanguageFooter from "./components/LanguageFooter";
@@ -100,6 +101,124 @@ function EyeOffIcon(props: React.SVGProps<SVGSVGElement>) {
 }
 
 const APP_BASE = "https://app.greenpassgroup.com";
+const PENDING_REFERRAL_STORAGE_KEY = "gp_pending_referral_context";
+
+type PendingReferralContext = {
+  ref?: string;
+  student_ref?: string;
+  agent_ref?: string;
+  tutor_ref?: string;
+  role?: string;
+};
+
+function cleanToken(value: string | null | undefined) {
+  return String(value || "").trim();
+}
+
+function buildReferralContextFromSearch(
+  search: URLSearchParams | ReadonlyURLSearchParams | null | undefined
+): PendingReferralContext {
+  if (!search) return {};
+
+  const role = cleanToken(search.get("role") || search.get("userType"));
+
+  return {
+    ref: cleanToken(search.get("ref")),
+    student_ref: cleanToken(search.get("student_ref")),
+    agent_ref: cleanToken(search.get("agent_ref")),
+    tutor_ref: cleanToken(search.get("tutor_ref")),
+    role,
+  };
+}
+
+function hasReferralContext(ctx?: PendingReferralContext | null) {
+  if (!ctx) return false;
+  return Boolean(
+    cleanToken(ctx.ref) ||
+      cleanToken(ctx.student_ref) ||
+      cleanToken(ctx.agent_ref) ||
+      cleanToken(ctx.tutor_ref)
+  );
+}
+
+function persistReferralContext(ctx?: PendingReferralContext | null) {
+  if (typeof window === "undefined" || !hasReferralContext(ctx)) return;
+
+  const payload: PendingReferralContext = {};
+  if (cleanToken(ctx?.ref)) payload.ref = cleanToken(ctx?.ref);
+  if (cleanToken(ctx?.student_ref)) payload.student_ref = cleanToken(ctx?.student_ref);
+  if (cleanToken(ctx?.agent_ref)) payload.agent_ref = cleanToken(ctx?.agent_ref);
+  if (cleanToken(ctx?.tutor_ref)) payload.tutor_ref = cleanToken(ctx?.tutor_ref);
+  if (cleanToken(ctx?.role)) payload.role = cleanToken(ctx?.role);
+
+  try {
+    window.sessionStorage.setItem(
+      PENDING_REFERRAL_STORAGE_KEY,
+      JSON.stringify(payload)
+    );
+  } catch {}
+
+  try {
+    window.localStorage.setItem(
+      PENDING_REFERRAL_STORAGE_KEY,
+      JSON.stringify(payload)
+    );
+  } catch {}
+}
+
+function readStoredReferralContext(): PendingReferralContext {
+  if (typeof window === "undefined") return {};
+
+  const readRaw = () => {
+    try {
+      const fromSession = window.sessionStorage.getItem(PENDING_REFERRAL_STORAGE_KEY);
+      if (fromSession) return fromSession;
+    } catch {}
+
+    try {
+      const fromLocal = window.localStorage.getItem(PENDING_REFERRAL_STORAGE_KEY);
+      if (fromLocal) return fromLocal;
+    } catch {}
+
+    return "";
+  };
+
+  const raw = readRaw();
+  if (!raw) return {};
+
+  try {
+    const parsed = JSON.parse(raw || "{}");
+    return {
+      ref: cleanToken(parsed?.ref),
+      student_ref: cleanToken(parsed?.student_ref),
+      agent_ref: cleanToken(parsed?.agent_ref),
+      tutor_ref: cleanToken(parsed?.tutor_ref),
+      role: cleanToken(parsed?.role),
+    };
+  } catch {
+    return {};
+  }
+}
+
+function getMergedReferralContext(
+  current?: PendingReferralContext | null
+): PendingReferralContext {
+  const stored = readStoredReferralContext();
+
+  const merged: PendingReferralContext = {
+    ref: cleanToken(current?.ref) || cleanToken(stored?.ref),
+    student_ref: cleanToken(current?.student_ref) || cleanToken(stored?.student_ref),
+    agent_ref: cleanToken(current?.agent_ref) || cleanToken(stored?.agent_ref),
+    tutor_ref: cleanToken(current?.tutor_ref) || cleanToken(stored?.tutor_ref),
+    role: cleanToken(current?.role) || cleanToken(stored?.role),
+  };
+
+  if (hasReferralContext(merged)) {
+    persistReferralContext(merged);
+  }
+
+  return merged;
+}
 
 function appLink(path: string, lang: string) {
   const cleanPath = (path || "/").startsWith("/") ? path : `/${path}`;
@@ -390,6 +509,7 @@ async function ensureUserDoc(
 async function routeLikeWelcome(
   user: User,
   lang: LangCode,
+  params: ReadonlyURLSearchParams,
   fallbackRole?: RoleValue,
   nextFromUrl?: string,
   invite?: { inviteId: string; token: string },
@@ -427,14 +547,35 @@ async function routeLikeWelcome(
   }
 
   const code = await createBridgeCode(user);
-  const roleParam = fallbackRole ? `&role=${encodeURIComponent(fallbackRole)}` : "";
-
-  window.location.href = appLink(
-    `/auth-bridge?code=${encodeURIComponent(code)}&next=${encodeURIComponent(
-      next
-    )}${roleParam}`,
-    lang
+  const mergedReferral = getMergedReferralContext(
+    buildReferralContextFromSearch(params)
   );
+
+  const bridgeParams = new URLSearchParams();
+  bridgeParams.set("code", code);
+  bridgeParams.set("next", next);
+
+  if (fallbackRole) {
+    bridgeParams.set("role", fallbackRole);
+  }
+
+  if (cleanToken(mergedReferral.ref)) {
+    bridgeParams.set("ref", cleanToken(mergedReferral.ref));
+  }
+
+  if (cleanToken(mergedReferral.student_ref)) {
+    bridgeParams.set("student_ref", cleanToken(mergedReferral.student_ref));
+  }
+
+  if (cleanToken(mergedReferral.agent_ref)) {
+    bridgeParams.set("agent_ref", cleanToken(mergedReferral.agent_ref));
+  }
+
+  if (cleanToken(mergedReferral.tutor_ref)) {
+    bridgeParams.set("tutor_ref", cleanToken(mergedReferral.tutor_ref));
+  }
+
+  window.location.href = appLink(`/auth-bridge?${bridgeParams.toString()}`, lang);
 }
 
 function normalizeLang(input: string): LangCode {
@@ -459,6 +600,7 @@ export default function HomeClient() {
   const inviteId = params.get("invite") || "";
   const inviteToken = params.get("token") || "";
   const collaboratorRefToken = params.get("ref") || "";
+  const studentReferralToken = params.get("student_ref") || "";
   const agentReferralToken = params.get("agent_ref") || "";
   const tutorReferralToken = params.get("tutor_ref") || "";
   const rawRoleParam = (params.get("role") || params.get("userType") || "")
@@ -483,6 +625,49 @@ export default function HomeClient() {
     Boolean(directReferralToken) && !hasInvite && !collaboratorInviteFlow;
 
   const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const [authView, setAuthView] = useState<"auth" | "forgot">("auth");
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState<string | null>(null);
+
+  const [fieldErr, setFieldErr] = useState<{
+    email?: string;
+    password?: string;
+    confirm?: string;
+    role?: string;
+  }>({});
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+
+  const [role, setRole] = useState<RoleValue | "">("");
+  const [inviteRoleLoading, setInviteRoleLoading] = useState(false);
+
+  const [referralLoading, setReferralLoading] = useState(false);
+  const [referralPreview, setReferralPreview] = useState<any>(null);
+  const [showReferralAccept, setShowReferralAccept] = useState(false);
+  const [referredByCollaboratorUid, setReferredByCollaboratorUid] = useState("");
+
+  useEffect(() => {
+    try {
+      const current = buildReferralContextFromSearch(params);
+      if (hasReferralContext(current)) {
+        persistReferralContext(current);
+      } else {
+        getMergedReferralContext(current);
+      }
+    } catch {}
+  }, [
+    params,
+    collaboratorRefToken,
+    studentReferralToken,
+    agentReferralToken,
+    tutorReferralToken,
+    rawRoleParam,
+  ]);
 
   useEffect(() => {
     try {
@@ -490,6 +675,7 @@ export default function HomeClient() {
       const invite = p.get("invite");
       const token = p.get("token");
       const ref = (p.get("ref") || "").trim();
+      const studentRef = (p.get("student_ref") || "").trim();
       const agentRef = (p.get("agent_ref") || "").trim();
       const tutorRef = (p.get("tutor_ref") || "").trim();
       const rawRole = (p.get("role") || p.get("userType") || "")
@@ -509,45 +695,23 @@ export default function HomeClient() {
         return;
       }
 
-      if (agentRef || tutorRef) {
+      if (studentRef || agentRef || tutorRef) {
         setMode("signup");
-        setRole("student");
         setAuthView("auth");
         setMsg(null);
+
+        if (agentRef || tutorRef) {
+          setRole("student");
+        }
+
+        return;
       }
     } catch {}
   }, []);
 
-  const [authView, setAuthView] = useState<"auth" | "forgot">("auth");
-  const [busy, setBusy] = useState(false);
-  const [msg, setMsg] = useState<string | null>(null);
-
-  const [fieldErr, setFieldErr] = useState<{
-    email?: string;
-    password?: string;
-    confirm?: string;
-    role?: string;
-  }>({});
-
   useEffect(() => {
     setAuthView("auth");
   }, [mode]);
-
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirm, setConfirm] = useState("");
-
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
-
-  const [role, setRole] = useState<RoleValue | "">("");
-
-  const [inviteRoleLoading, setInviteRoleLoading] = useState(false);
-
-  const [referralLoading, setReferralLoading] = useState(false);
-  const [referralPreview, setReferralPreview] = useState<any>(null);
-  const [showReferralAccept, setShowReferralAccept] = useState(false);
-  const [referredByCollaboratorUid, setReferredByCollaboratorUid] = useState("");
 
   useEffect(() => {
     let cancelled = false;
@@ -773,6 +937,9 @@ export default function HomeClient() {
     inviteToken,
     nextFromUrl,
     collaboratorRefToken,
+    studentReferralToken,
+    agentReferralToken,
+    tutorReferralToken,
     collaboratorInviteFlow ? "1" : "0",
     referredByCollaboratorUid,
   ].join("|");
@@ -794,6 +961,7 @@ export default function HomeClient() {
             await routeLikeWelcome(
               user,
               lang,
+              params,
               "collaborator",
               nextFromUrl,
               hasInvite ? { inviteId, token: inviteToken } : undefined,
@@ -825,6 +993,7 @@ export default function HomeClient() {
           await routeLikeWelcome(
             user,
             lang,
+            params,
             undefined,
             nextFromUrl,
             hasInvite ? { inviteId, token: inviteToken } : undefined,
@@ -846,7 +1015,7 @@ export default function HomeClient() {
     return () => {
       cancelled = true;
     };
-  }, [bootEffectKey]);
+  }, [bootEffectKey, params]);
 
   const HERO_MEDIA = {
     main:
@@ -976,6 +1145,7 @@ export default function HomeClient() {
       await routeLikeWelcome(
         auth.currentUser,
         lang,
+        params,
         undefined,
         nextFromUrl,
         hasInvite ? { inviteId, token: inviteToken } : undefined,
@@ -1023,6 +1193,7 @@ export default function HomeClient() {
         await routeLikeWelcome(
           cred.user,
           lang,
+          params,
           undefined,
           nextFromUrl,
           hasInvite ? { inviteId, token: inviteToken } : undefined
@@ -1072,6 +1243,7 @@ export default function HomeClient() {
         await routeLikeWelcome(
           cred.user,
           lang,
+          params,
           "collaborator",
           nextFromUrl,
           hasInvite ? { inviteId, token: inviteToken } : undefined,
@@ -1099,6 +1271,7 @@ export default function HomeClient() {
       await routeLikeWelcome(
         cred.user,
         lang,
+        params,
         !hasInvite && role ? (role as RoleValue) : undefined,
         nextFromUrl,
         hasInvite ? { inviteId, token: inviteToken } : undefined
@@ -1148,6 +1321,7 @@ export default function HomeClient() {
         await routeLikeWelcome(
           cred.user,
           lang,
+          params,
           "collaborator",
           nextFromUrl,
           hasInvite ? { inviteId, token: inviteToken } : undefined,
@@ -1169,6 +1343,7 @@ export default function HomeClient() {
       await routeLikeWelcome(
         cred.user,
         lang,
+        params,
         !hasInvite && role ? (role as RoleValue) : undefined,
         nextFromUrl,
         hasInvite ? { inviteId, token: inviteToken } : undefined
@@ -1201,6 +1376,7 @@ export default function HomeClient() {
         await routeLikeWelcome(
           cred.user,
           lang,
+          params,
           "collaborator",
           nextFromUrl,
           hasInvite ? { inviteId, token: inviteToken } : undefined,
@@ -1222,6 +1398,7 @@ export default function HomeClient() {
       await routeLikeWelcome(
         cred.user,
         lang,
+        params,
         !hasInvite && role ? (role as RoleValue) : undefined,
         nextFromUrl,
         hasInvite ? { inviteId, token: inviteToken } : undefined
@@ -1413,6 +1590,7 @@ export default function HomeClient() {
                               routeLikeWelcome(
                                 auth.currentUser,
                                 lang,
+                                params,
                                 undefined,
                                 nextFromUrl,
                                 hasInvite ? { inviteId, token: inviteToken } : undefined,
