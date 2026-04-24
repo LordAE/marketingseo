@@ -362,14 +362,14 @@ async function acceptTutorReferral(user: User, tutorRef: string) {
   return r.json().catch(() => ({} as any));
 }
 
-type RoleValue = "student" | "agent" | "tutor" | "school" | "collaborator";
+type RoleValue = "user" | "agent" | "tutor" | "school" | "collaborator";
 
 const ROLE_ITEMS: {
   value: Exclude<RoleValue, "collaborator">;
   key: string;
   def: string;
 }[] = [
-  { value: "student", key: "role_student", def: "Student" },
+  { value: "user", key: "role_student", def: "Student" },
   { value: "agent", key: "role_agent", def: "Agent" },
   { value: "tutor", key: "role_tutor", def: "Tutor" },
   { value: "school", key: "role_school", def: "School" },
@@ -378,15 +378,13 @@ const ROLE_ITEMS: {
 const tr = trHome;
 
 function normalizeUserRole(data: any): string {
-  return String(
-    data?.selected_role ||
-      data?.user_type ||
-      data?.userType ||
-      data?.role ||
-      ""
-  )
-    .toLowerCase()
-    .trim();
+  const raw = String(data?.role || "").toLowerCase().trim();
+
+  if (raw === "student") return "user";
+  if (raw === "institution") return "school";
+  if (raw === "provider") return "vendor";
+
+  return raw || "user";
 }
 
 function buildCollaboratorReferralFields(refCode = "", referredByUid = "") {
@@ -453,9 +451,6 @@ async function ensureUserDoc(
     };
 
     if (chosen) {
-      base.selected_role = chosen;
-      base.user_type = chosen;
-      base.userType = chosen;
       base.role = chosen;
     }
 
@@ -475,11 +470,8 @@ async function ensureUserDoc(
   const data = snap.data() || {};
   const patch: any = { updated_at: serverTimestamp() };
 
-  if (chosen) {
-    if (!data.selected_role) patch.selected_role = chosen;
-    if (!data.user_type) patch.user_type = chosen;
-    if (!data.userType) patch.userType = chosen;
-    if (!data.role) patch.role = chosen;
+  if (chosen && !data.role) {
+    patch.role = chosen;
   }
 
   if (signupEntryRole && !data.signup_entry_role) {
@@ -701,7 +693,7 @@ export default function HomeClient() {
         setMsg(null);
 
         if (agentRef || tutorRef) {
-          setRole("student");
+          setRole("user");
         }
 
         return;
@@ -761,7 +753,7 @@ export default function HomeClient() {
 
       if (!hasInvite) {
         setMode("signup");
-        setRole("student");
+        setRole("user");
         setAuthView("auth");
         setMsg(null);
       }
@@ -981,7 +973,7 @@ export default function HomeClient() {
             const userData = userSnap.exists() ? userSnap.data() || {} : {};
             const roleNow = normalizeUserRole(userData);
 
-            if (roleNow === "student" || roleNow === "user") {
+            if (roleNow === "user") {
               if (!cancelled) {
                 setShowReferralAccept(true);
                 setBooting(false);
@@ -1056,7 +1048,7 @@ export default function HomeClient() {
       } else if (collaboratorInviteFlow) {
         if (role !== "collaborator") return false;
       } else if (roleLockedByReferral) {
-        if (role !== "student") return false;
+        if (role !== "user") return false;
       } else {
         if (!role) return false;
       }
@@ -1183,7 +1175,7 @@ export default function HomeClient() {
           const userData = userSnap.exists() ? userSnap.data() || {} : {};
           const roleNow = normalizeUserRole(userData);
 
-          if (roleNow === "student" || roleNow === "user") {
+          if (roleNow === "user") {
             setShowReferralAccept(true);
             setBooting(false);
             return;
@@ -1211,8 +1203,8 @@ export default function HomeClient() {
         setRole("collaborator");
       }
 
-      if (roleLockedByReferral && role !== "student") {
-        setRole("student");
+      if (roleLockedByReferral && role !== "user") {
+        setRole("user");
       }
 
       if (!hasInvite && !collaboratorInviteFlow && !roleLockedByReferral && !role) {
@@ -1334,7 +1326,7 @@ export default function HomeClient() {
         return;
       }
 
-      if (directReferralToken && (roleNow === "student" || roleNow === "user")) {
+      if (directReferralToken && (roleNow === "user")) {
         setShowReferralAccept(true);
         setBooting(false);
         return;
@@ -1389,7 +1381,7 @@ export default function HomeClient() {
         return;
       }
 
-      if (directReferralToken && (roleNow === "student" || roleNow === "user")) {
+      if (directReferralToken && (roleNow === "user")) {
         setShowReferralAccept(true);
         setBooting(false);
         return;
